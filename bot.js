@@ -1,53 +1,50 @@
-/****************************************************************************************************
-PROG: Discord Bot "Ggis"
-AUTHOR: Michael A. Louro
-VERSION: 1.2.00
-DATE: 9/12/2017
-INFO: /What is Ggis?/
-	Originally designed as a bot for use in the "Christian Mingle" Discord server.
+/*
+	app: Discord Bot 'Ggis'
+	author: Michael A. Louro
+	info: /What is Ggis?/
+	+ Originally designed as a bot for use in the "Christian Mingle" Discord server.
+	+ Features certain chat filter features, automatic emoji reaction to certain messages,
+	  and notifications for connected member's Twitch accounts (for when they go live) & more.
+	+ Commands include: !fortune, !streamlink, !lfg, !aww, etc.
+	+ Ggis is a Discord bot that serves both as a fun and useful tool for our server.
+*/
 
-	Features certain chat filter features, automatic emoji reaction to certain messages,
-	and notifications for connected member's Twitch accounts (for when they go live), and more.
+// Required modules:
+const chalk 	= require('chalk');
+const Discord	= require('discord.js');
+const fs		= require('fs');
+const moment	= require('moment-timezone');
+const schedule 	= require('node-schedule');
+const TwitchPS 	= require('twitchps');
 
-	Commands include: !fortune, !streamlink, !lfg, !aww, etc.
-	Ggis is a Discord bot that serves both as a fun and useful tool for our server.
-****************************************************************************************************/
-
-// Node modules
-const chalk = require('chalk');
-const Discord = require('discord.js');
-const fs = require('fs');
-const moment = require('moment-timezone');
-const schedule = require('node-schedule');
-const TwitchPS = require('twitchps');
-
-const bot = new Discord.Client(); 	// create bot's Discord Client
-bot.commands = new Discord.Collection(); // all commands are stored within the Client here
-bot.aliases = new Discord.Collection(); // all aliases for commands
-bot.streamLink = new Discord.Collection();	// all StreamLink settings are loaded into here
-bot.games = new Discord.Collection(); // collection of LFG games
+const bot 		= new Discord.Client(); 	// create bot's Discord Client
+bot.commands 	= new Discord.Collection(); // all commands are stored within the Client here
+bot.aliases 	= new Discord.Collection(); // all aliases for commands
+bot.streamLink  = new Discord.Collection();	// all StreamLink settings are loaded into here
+bot.games 		= new Discord.Collection(); // collection of LFG games
 bot.gameAliases = new Discord.Collection(); // all aliases for LFG games
-bot.lfgStack = new Discord.Collection(); // ongoing LFG parties are in here
-bot.polls = new Discord.Collection(); // all active polls / petitions
+bot.lfgStack 	= new Discord.Collection(); // ongoing LFG parties are in here
+bot.polls 		= new Discord.Collection(); // all active polls / petitions
 
-var eventHandlers = ['streamlinkHandler', 'lfgHandler', 'pollHandler']; // The event handlers list
-var eventLoader = require('./util/eventLoader')(bot); // Client events
-var streamlink = require('./util/streamlinkHandler'); // StreamLink event handler
-var lfg = require('./util/lfgHandler'); // LFG event handler
-var polls = require('./util/pollHandler'); // Polls event handler
+var eventHandlers  = ['streamlinkHandler', 'lfgHandler', 'pollHandler']; // The event handlers list
+var eventLoader    = require('./util/eventLoader')(bot); // Client events
+var streamlink 	   = require('./util/streamlinkHandler'); // StreamLink event handler
+var lfg 		   = require('./util/lfgHandler'); // LFG event handler
+var polls 		   = require('./util/pollHandler'); // Polls event handler
 
-const slFunc = require('./commands/streamlink');
-const lfgFunc = require('./commands/lfg');
-const pollFunc = require('./commands/poll');
+const slFunc 	   = require('./commands/streamlink');
+const lfgFunc 	   = require('./commands/lfg');
+const pollFunc 	   = require('./commands/poll');
 
-const settings = JSON.parse(fs.readFileSync("./settings.json", "utf8")); // Bot config JSON
-const settingsSL = JSON.parse(fs.readFileSync("./config/streamlink.json", "utf8")); // StreamLink saved info
+const settings 	   = JSON.parse(fs.readFileSync("./settings.json", "utf8")); // Bot config JSON
+const settingsSL   = JSON.parse(fs.readFileSync("./config/streamlink.json", "utf8")); // StreamLink saved info
 const settingsSLMG = JSON.parse(fs.readFileSync("./config/streamlink_multiguild.json", "utf8")); // StreamLink multi-guild, user & server info
 
-const initTopics = [{ topic: "video-playback.channel" }]; // TwitchPS requires a non-empty intial topic list
-const twitch = new TwitchPS({ init_topics: initTopics, reconnect: false, debug: false });
+const initTopics   = [{ topic: "video-playback.channel" }]; // TwitchPS requires a non-empty intial topic list
+const twitch 	   = new TwitchPS({ init_topics: initTopics, reconnect: false, debug: false });
 
 // -------------------------------------------------
+
 // Debug info on startup:
 console.log(chalk.bgBlue.bold(`STARTING 'bot.js' ...`));
 console.log(chalk.bgBlue(`${settings.botnameproper} is connected to ${settings.guilds.length} guilds currently.`));
@@ -57,7 +54,7 @@ console.log(chalk.bgBlue(`Guilds connected to: { ${settings.guilds} }`));
 // 					  Commands
 // -------------------------------------------------
 
-// Load commands from ./commands/ dir, put it in the BOT client!
+// Load commands from ./commands/ dir, add into Client
 fs.readdir('./commands', (err, files) => {
 	if (err) console.error(err);
 	console.log(chalk.bgBlue(`Loading a total of ${files.length} commands.`));
@@ -71,7 +68,7 @@ fs.readdir('./commands', (err, files) => {
 	});
 });
 
-// Reload command(s)
+// Reload command(s) (!reload)
 bot.reload = command => {
 	return new Promise((resolve, reject) => {
 		try {
@@ -122,7 +119,7 @@ bot.reload = command => {
 	});
 };
 
-// Reload event file(s)
+// Reload event file(s) (!reloadevent)
 const reloadEvents = () => {
 	return new Promise((resolve, reject) => {
 		try {
@@ -132,11 +129,13 @@ const reloadEvents = () => {
 			streamlink = require(`./util/streamlinkHandler`);
 			lfg = require(`./util/lfgHandler`);
 			polls = require(`./util/pollHandler`);
-			slFunc.reloadHandler().then(
-				lfgFunc.reloadHandler().then(
-					pollFunc.reloadHandler().then().catch(err => console.log(err))
-				).catch(err => console.log(err))
-			).catch(err => console.log(err));
+			slFunc.reloadHandler()
+			.then(lfgFunc.reloadHandler()
+				.then(pollFunc.reloadHandler()
+					.then()
+					.catch(err => console.log(err)))
+				.catch(err => console.log(err)))
+			.catch(err => console.log(err));
 			resolve();
 		} catch (err) {
 			reject(err);
@@ -144,7 +143,7 @@ const reloadEvents = () => {
 	});
 };
 
-// Permission levels passed thru message for command use
+// Permission levels passed thru message to regulate command use
 bot.elevation = message => {
 	/********************************************* 
 	Assign a permission level based on user role
@@ -159,8 +158,8 @@ bot.elevation = message => {
 	*********************************************/
 	let permlvl = 0; // @everyone
 	if (message.member.hasPermission("ADMINISTRATOR")) permlvl = 2; // Server admin
-	if (message.member === message.guild.owner) permlvl = 3; // Server owner
-	if (message.author.id === settings.masterID) permlvl = 4; // Master user (bot owner), purely for debugging commands
+	if (message.member === message.guild.owner) permlvl = 3; 	   // Server owner
+	if (message.author.id === settings.masterID) permlvl = 4;     // Bot owner ID, purely for debugging commands
 	return permlvl;
 };
 
@@ -314,6 +313,16 @@ twitch.on('viewcount', (data) => {
 	streamlink.viewCount(bot, data);
 });
 
+// Add a topic to watch in TwitchPS
+const addTwitchTopic = (stream) => {
+	twitch.addTopic({ topic: `video-playback.${stream.toLowerCase()}` });
+}
+
+// Remove topic from TwitchPS
+const removeTwitchTopic = (stream) => {
+	twitch.removeTopic({ topic: `video-playback.${stream.toLowerCase()}` });
+}
+
 // -------------------------------------------------
 // Miscellaneous & extra functions
 // -------------------------------------------------
@@ -330,16 +339,6 @@ const weeklyScheduler = schedule.scheduleJob('0 0 5 * * 0', function () {
 	// WORK IN PROGRESS! -- to be used for 'reaction stats' and/or other stats?
 });
 
-// Add a topic to watch in TwitchPS
-const addTwitchTopic = (stream) => {
-	twitch.addTopic({ topic: `video-playback.${stream.toLowerCase()}` });
-}
-
-// Remove topic from TwitchPS
-const removeTwitchTopic = (stream) => {
-	twitch.removeTopic({ topic: `video-playback.${stream.toLowerCase()}` });
-}
-
 // Post LFG stack
 const lfgTest = (message) => {
 	message.reply(`${bot.lfgStack.map(e => JSON.stringify(e, 'utf8'))}`);
@@ -351,12 +350,13 @@ const slTest = (message) => {
 };
 
 // -------------------------------------------------
+
 // Exported functions:
-exports.reloadEvents = reloadEvents;
-exports.lfgTest = lfgTest;
-exports.slTest = slTest;
-exports.addTwitchTopic = addTwitchTopic;
-exports.removeTwitchTopic = removeTwitchTopic;
+exports.reloadEvents 		= reloadEvents;
+exports.addTwitchTopic 		= addTwitchTopic;
+exports.removeTwitchTopic 	= removeTwitchTopic;
+exports.lfgTest 			= lfgTest;
+exports.slTest 				= slTest;
 
 // -------------------------------------------------
 bot.login(settings.token); // Login with auth token

@@ -7,7 +7,7 @@ const fs = require('fs');
 const chalk = require('chalk');
 
 module.exports = member => {
-    var setings = JSON.parse(fs.readFileSync('./settings.json','utf8'));
+    var settings = JSON.parse(fs.readFileSync('./settings.json','utf8'));
     var settingsSL = JSON.parse(fs.readFileSync('./config/streamlink.json','utf8'));
 
     // Firstly, is the member connected with StreamLink?

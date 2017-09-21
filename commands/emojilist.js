@@ -20,7 +20,7 @@ exports.run = (bot, message, args) => {
                 title: "Extended Emoji List",
                 description: 
                 `Here's the list of extra emoji to tag your messages with (ONLY as an emoji reaction).\n`+
-                `Just type the appropriate code in any message you send (ie. :HEYYEA:, :GodNoPleaseNO:, etc.) and the emoji reaction will be added to your message!\n`+
+                `Just type the appropriate code in any message you send (ie. :${emoji_list[0].code}:, :${emoji_list[1].code}:, etc.) and the emoji reaction will be added to your message!\n`+
                 `\`${emoji_list.length} extra emoji\` \`${50-emoji_list.length} slots available\``,
                 fields: fields
             }

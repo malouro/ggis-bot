@@ -10,16 +10,18 @@ var   AutoReactions = new Map();
 
 // ----- Text & Keyword detection -----
 // ExtendedEmojis
-const RegExpExtendedEmojis 	= /:\w+:/g;
+const RegExpExtendedEmojis = /:\w+:(?!\d+>)/g;
+
 // AutoReact Text
-const RegExpAllAboard 		= /\ball+\s+aboard\b|train!*\b/;
-const RegExpBlazer 			= /\bblazer\b/;
-const RegExpDeadGame 		= /d+\s*e+\s*a+\s*d+\s*g+\s*a+\s*m+\s*e|\bdead\s*game\b/;
-const RegExpMurica 			= /murica|\bamerica\b|\busa\b/;
-const RegExpMyB 			= /\bmy\sb\b|\bmy\sbad\b/;
-const RegExpNoice 			= /\bno+ice\b/;
-const RegExpPorkchop 		= /\bsumol\b|\bforca\b]|\bporkchop\b|\bportugal\b/;
-const RegExpSailorMoon 		= /[s$]+\s*a+\s*[i1!]+\s*l+\s*[o0]+\s*r+\s*m+\s*[o0]+\s*[o0]+\s*n/;
+const RegExpAllAboard 	= /\ball+\s+aboard\b|train!*\b/;
+const RegExpBlazer 		= /\bblazer\b/;
+const RegExpDeadGame 	= /d+\s*e+\s*a+\s*d+\s*g+\s*a+\s*m+\s*e|\bdead\s*game\b/;
+const RegExpMurica 		= /murica|\bamerica\b|\busa\b/;
+const RegExpMyB 		= /\bmy\sb\b|\bmy\sbad\b/;
+const RegExpNoice 		= /\bno+ice\b/;
+const RegExpPorkchop 	= /\bsumol\b|\bforca\b]|\bporkchop\b|\bportugal\b/;
+const RegExpSailorMoon 	= /[s$]+\s*a+\s*[i1!]+\s*l+\s*[o0]+\s*r+\s*m+\s*[o0]+\s*[o0]+\s*n/;
+
 // ----- Auto reactions Object -----
 autoreactions.autoreactions.forEach(r => {
 	AutoReactions.set(r.id, r);
@@ -77,7 +79,7 @@ module.exports = message => {
 			}
 			// If MY B
 			if (message.content.toLowerCase().match(RegExpMyB)) {
-				message.reply('*my b*',{file: '../images/memes/myb.png'});
+				message.reply('*my b*', { file: '../images/memes/myb.png' });
 			}
 			// If NOICE
 			if (message.toString().toLowerCase().match(RegExpNoice)) {
@@ -94,22 +96,33 @@ module.exports = message => {
 		// ==================================================================
 
 		// As reactions:
-		if (message.content.toString().match(RegExpExtendedEmojis)) {
+		if (message.content.toString().match(RegExpExtendedEmojis) && settings.rules.extended_emoji.enable && !message.content.startsWith(settings.prefix)) {
 			fs.readFile('./config/emojis.json', 'utf8', (err, data) => {
 				if (err) throw err;
-				else {
-					var emojis = JSON.parse(data);
-					let str = message.content.toString();
-					let emojiCodes = [];
-					while ((emojiCodes = RegExpExtendedEmojis.exec(str)) !== null) {
-						let emoji = emojiCodes[0].toString().slice(1, emojiCodes[0].length - 1);
-						emojis.emojis.forEach(e => {
-							if (emoji === e.code) {
+				let emojis = JSON.parse(data);
+				let str = message.content.toString();
+				let emojiCodes = [];
+				let found = false;
+
+				while ((emojiCodes = RegExpExtendedEmojis.exec(str)) !== null) {
+					console.log('something found?');
+					let emoji = emojiCodes[0].toString().slice(1, emojiCodes[0].length - 1);
+					emojis.emojis.forEach(e => {
+						if (emoji === e.code) {
+							found = true;
+							console.log('found emoji ' + emoji);
+							if (settings.rules.extended_emoji.edit) {
+								message.delete()
+									.then(str = str.replace(`:${e.code}:`,`<${e.id}>`))
+								.catch(err => console.log(err));
+							} else {
 								message.react(e.id).then().catch(err => console.log(err));
+								return;
 							}
-						});
-					}
+						}
+					});
 				}
+				if (found) message.channel.send(`\`${message.author.username}:\` ${str}`);
 			});
 		}
 

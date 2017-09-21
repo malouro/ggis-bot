@@ -1,7 +1,6 @@
 # Node Stuff
 /node_modules
 /logs
-package.json
 package-lock.json
 
 # Privacy
@@ -13,9 +12,13 @@ settings-backup.json
 
 # Commands not to include
 /commands/bananabat.js
+/commands/bitchholdon.js
 /commands/doge.js
 /commands/heavybreathing.js
 /commands/plug.js
 /commands/test.js
 /commands/weeklytest.js
 /commands/wine.js
+
+# Misc
+/vids
