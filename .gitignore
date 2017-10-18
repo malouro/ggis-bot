@@ -1,18 +1,20 @@
 # Node Stuff
-/node_modules
-/logs
+node_modules/
+logs/
 package.json
 package-lock.json
 
 # Privacy
-/config
+config/
 settings.json
 settings-backup.json
-./commands/Useful/nj.js
-./commands/Useful/sayreville.js
+nj.js
+sayreville.js
 
 # Commands not to include
-/commands/Memes/
-./commands/Useful/plug.js
-./commands/Debug & Help/test.js
-./commands/Debug & Help/weeklytest.js
+commands/Memes/
+plug.js
+test.js
+weeklytest.js
+insult.js
+magic8.js
