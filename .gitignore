@@ -1,20 +1,27 @@
-# Node Stuff
-node_modules/
-logs/
+# General & Node & pm2 stuff
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+node_modules
 package.json
 package-lock.json
+.npm
+.DS_Store
+Thumbs.db
 
 # Privacy
 config/
 settings.json
 settings-backup.json
-nj.js
-sayreville.js
+**/nj.js
+**/sayreville.js
 
 # Commands not to include
-commands/Memes/
-plug.js
-test.js
-weeklytest.js
-insult.js
-magic8.js
+**/Memes/*.js
+**/plug.js
+**/test.js
+**/weeklytest.js
+**/insult.js
+**/magic8.js
