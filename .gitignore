@@ -8,14 +8,11 @@ package-lock.json
 /config
 settings.json
 settings-backup.json
-./commands/nj.js
-./commands/sayreville.js
+./commands/Useful/nj.js
+./commands/Useful/sayreville.js
 
 # Commands not to include
-./commands/bananabat.js
-./commands/doge.js
-./commands/heavybreathing.js
-./commands/plug.js
-./commands/test.js
-./commands/weeklytest.js
-./commands/wine.js
+/commands/Memes/
+./commands/Useful/plug.js
+./commands/Debug & Help/test.js
+./commands/Debug & Help/weeklytest.js
