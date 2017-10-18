@@ -1,0 +1,10 @@
+{
+    "code": "kf2",
+    "name": "Killing Floor 2",
+    "aliases": ["killingfloor2"],
+    "thumbnail": "https://wiki.tripwireinteractive.com/images/7/7a/KF2_Icon.png",
+    "default_party_size": [6,6,6,12,12,12,12,6,6,12],
+    "modes": ["any","survival","campaign","versus","vs","versussurvival","vssurvival","custom","custommap","inhouse"],
+    "modes_proper": ["Any","Survival","Survival","VS Survival","VS Survival","VS Survival","VS Survival","Custom Map","Custom Map","In-house Lobby"],
+    "default_game_mode": "survival"
+}

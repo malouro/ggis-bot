@@ -1,5 +1,3 @@
-// This event is for when a message is deleted
-// This is *vital* for making sure !lfg doesn't break when the messages are deleted
 
 var   lfg    = require('../util/lfgHandler');
 const chalk  = require('chalk');

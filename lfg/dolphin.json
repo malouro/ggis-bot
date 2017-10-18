@@ -1,0 +1,10 @@
+{
+    "code": "dolphin",
+    "name": "Dolphin Netplay",
+    "aliases": ["dolphinnetplay"],
+    "thumbnail": "https://i.imgur.com/oQqPdZL.png",
+    "default_party_size": [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],
+    "modes": ["any", "dokapon", "gauntlet", "kar", "airride", "mariokart", "mkdd", "mariokartdd", "marioparty", "mp4", "mp5", "mp6", "smash", "melee", "brawl", "tos", "tales"],
+    "modes_proper": ["Any", "Dokapon Kingdom", "Gauntlet Dark Legacy", "Kirby Air Ride", "Kirby Air Ride", "Mario Kart", "Mario Kart: Double Dash!!", "Mario Kart: Double Dash!!", "Mario Party", "Mario Party 4", "Mario Party 5", "Mario Party 6", "Super Smash Bros.", "Super Smash Bros. Melee", "Super Smash Bros. Brawl", "Tales of Symphonia", "Tales of Symphonia"],
+    "default_game_mode": "any"
+}

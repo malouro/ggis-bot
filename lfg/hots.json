@@ -1,0 +1,10 @@
+{
+    "code": "hots",
+    "name": "Heroes of the Storm",
+    "aliases": ["heroes","heroesofthestorm"],
+    "thumbnail": "https://upload.wikimedia.org/wikipedia/en/4/44/Heroes_of_the_Storm_logo_2016.png",
+    "default_party_size": [5,5,5,5,5,5,5,5,10],
+    "modes": ["any", "qm", "quickmatch", "quick", "unranked", "ranked", "brawl", "custom", "inhouse"],
+    "modes_proper": ["Any", "Quick Match", "Quick Match", "Quick Match", "Unranked", "Ranked", "Brawl", "Custom Lobby", "In-House Lobby"],
+    "default_game_mode": "any"
+}

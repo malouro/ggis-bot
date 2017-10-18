@@ -1,0 +1,10 @@
+{
+    "code": "ow",
+    "name": "Overwatch",
+    "aliases": ["overwatch"],
+    "thumbnail": "http://i.imgur.com/dCU46vf.png",
+    "default_party_size": [6,6,6,6,6,6,6,12],
+    "modes": ["any", "qp", "quickplay", "competitive", "ranked", "arcade", "custom", "inhouse"],
+    "modes_proper": ["Any", "Quick Play", "Quick Play", "Competitive", "Competitive", "Arcade", "Custom Lobby", "In-House Lobby"],
+    "default_game_mode": "any"
+}

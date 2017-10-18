@@ -1,5 +1,3 @@
-// This event is for reactions added to (new) messages
-// This is *vital* for !lfg command and for Reaction Stats
 
 var   lfg     = require('../util/lfgHandler');
 const chalk   = require('chalk');
@@ -9,14 +7,13 @@ const moment  = require('moment-timezone');
 
 module.exports = (messageReaction, user) => {
 
-    if (user.bot) return;
+    if (user.bot) return; // Ignore the bot's reactions
     var settings = JSON.parse(fs.readFileSync('./settings.json', 'utf8'));
-    var memes = JSON.parse(fs.readFileSync('./config/memes.json', 'utf8'));
     var bot = messageReaction.message.client;
 
-    // ---------------------------------------------------------
-    // !LFG reaction inputs
-    // ---------------------------------------------------------
+    /**
+     * LFG stuff
+     */
 
     if (messageReaction.emoji.toString() === '👍') {
         if (bot.lfgStack.has(messageReaction.message.id)) {
@@ -33,12 +30,16 @@ module.exports = (messageReaction, user) => {
         }
     }
 
-    // ---------------------------------------------------------
-    // Random Meme-ing
-    // --------------------------------------------------------- 
+    /**
+     * Random meme stuff
+     */
 
-    // :thinking:
-    if (messageReaction.emoji.toString() === '🤔' && messageReaction.count >= memes.thinking.reaction_threshhold && (messageReaction.message.guild.id === settings.mainguild || messageReaction.message.guild.id === settings.testguild)) {
+    // If meme-ing isn't enabled, or not in a main guild, break out
+    if (!settings.memes && (messageReaction.message.guild.id === settings.mainguild || messageReaction.message.guild.id === settings.testguild)) return; 
+
+    // 🤔 gifs -->
+    if (messageReaction.emoji.toString() === '🤔' && messageReaction.count >= memes.thinking.reaction_threshhold) {
+        let memes = JSON.parse(fs.readFileSync('./config/memes.json', 'utf8'));
         let d = new Date();
         let t = d.getTime();
         if (t > memes.thinking.last_trigger + memes.thinking.reaction_cooldown * 60000) {
@@ -49,26 +50,6 @@ module.exports = (messageReaction, user) => {
             });
         }
     }
-
-    // ---------------------------------------------------------
-    // Reaction Stats stuff:
-    // ---------------------------------------------------------
-    // COMING SOON
-    /* Weekly SQL reaction database
-    sql.open(reactions_db).then().catch(console.error);
-    sql.get(`SELECT * FROM reactions WHERE emojiIdentifier = "${messageReaction.emoji.identifier}"`).then(row => {
-        if (!row) {
-            sql.run("INSERT INTO reactions (emoji, emojiIdentifier, count) VALUES (?, ?, ?)", [messageReaction.emoji.name, messageReaction.emoji.identifier, 1]);
-        }
-        else {
-            sql.run(`UPDATE reactions SET count = ${row.count + 1} WHERE emojiIdentifier = "${messageReaction.emoji.identifier}"`);
-        }
-    }).catch(() => {
-        console.error;
-        sql.run("CREATE TABLE IF NOT EXISTS reactions (emoji TEXT, emojiIdentifier TEXT, count INTEGER)").then(() => {
-            sql.run("INSERT INTO reactions (emoji, emojiIdentifier, count) VALUES (?, ?, ?)", [messageReaction.emoji.name, messageReaction.emoji.identifier, 1]);
-        }).catch(err => console.log(err));
-    });    */
 };
 
 module.exports.reloadHandler = function() {

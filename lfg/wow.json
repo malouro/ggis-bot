@@ -1,0 +1,10 @@
+{
+    "code": "wow",
+    "name": "World of Warcraft",
+    "aliases": ["worldofwarcraft"],
+    "thumbnail": "http://i.imgur.com/nwf5kZa.png",
+    "default_party_size": [16],
+    "modes": ["any"],
+    "modes_proper": ["Any"],
+    "default_game_mode": "any"
+}

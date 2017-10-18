@@ -1,0 +1,10 @@
+{
+    "code": "dontstarve",
+    "name": "Don't Starve Together",
+    "aliases": ["dst","dontstarvetogether","don'tstarve","don'tstarvetogether"],
+    "thumbnail": "http://vignette4.wikia.nocookie.net/dont-starve-game/images/9/90/Don%27t_Starve_Together_Logo.png",
+    "default_party_size": [6],
+    "modes": ["any"],
+    "modes_proper": ["Any"],
+    "default_game_mode": "any"
+}

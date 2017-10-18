@@ -1,0 +1,10 @@
+{
+    "code": "fortnite",
+    "name": "Fortnite",
+    "aliases": [],
+    "thumbnail": "http://imgur.com/9CughEI.png",
+    "default_party_size": [4],
+    "modes": ["any"],
+    "modes_proper": ["Any"],
+    "default_game_mode": "any"
+}

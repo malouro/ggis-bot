@@ -3,7 +3,6 @@
 
 const chalk = require('chalk');
 const fs = require('fs');
-const main = require('../bot.js');
 const moment = require('moment-timezone');
 
 module.exports = channel => {
@@ -11,7 +10,7 @@ module.exports = channel => {
     var bot = channel.client;
     settingsSL.channels.forEach((c, index) => {
         // Remove channel from settings.json!
-        if (c == channel.id) {
+        if (c === channel.id) {
             settingsSL.channels.splice(index, 1);
             settingsSL.guilds.splice(index, 1);
             bot.streamLink("settings").channels.splice(index, 1);

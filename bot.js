@@ -1,171 +1,130 @@
-/*
-	app: Discord Bot 'Ggis'
-	author: Michael A. Louro
-	info: /What is Ggis?/
-	+ Originally designed as a bot for use in the "Christian Mingle" Discord server.
-	+ Features certain chat filter features, automatic emoji reaction to certain messages,
-	  and notifications for connected member's Twitch accounts (for when they go live) & more.
-	+ Commands include: !fortune, !streamlink, !lfg, !aww, etc.
-	+ Ggis is a Discord bot that serves both as a fun and useful tool for our server.
-*/
+/**************************************************************************
+ *  @name	Ggis-bot
+ *	@author	Michael A. Louro
+ *	@version 1.3.02 Last edit: October 15, 2017
+ *
+ *************************************************************************/
 
-// Required modules:
+
+/**************************************************************************
+ * Declare & initialize vars, constants, configs & modules
+ * 
+ **************************************************************************/
+// npm modules
 const chalk 	= require('chalk');
-const Discord	= require('discord.js');
-const fs		= require('fs');
-const moment	= require('moment-timezone');
-const schedule 	= require('node-schedule');
-const TwitchPS 	= require('twitchps');
+const Discord 	= require('discord.js');
+const fs 		= require('fs');
+const moment 	= require('moment-timezone');
+const schedule  = require('node-schedule');
+const TwitchPS  = require('twitchps');
 
-const bot 		= new Discord.Client(); 	// create bot's Discord Client
-bot.commands 	= new Discord.Collection(); // all commands are stored within the Client here
-bot.aliases 	= new Discord.Collection(); // all aliases for commands
-bot.streamLink  = new Discord.Collection();	// all StreamLink settings are loaded into here
-bot.games 		= new Discord.Collection(); // collection of LFG games
-bot.gameAliases = new Discord.Collection(); // all aliases for LFG games
-bot.lfgStack 	= new Discord.Collection(); // ongoing LFG parties are in here
-bot.polls 		= new Discord.Collection(); // all active polls / petitions
+// Discord.js Client & Collections to use later
+const bot 		  = new Discord.Client(); // create bot's Discord Client
+bot.commandGroups = new Discord.Collection(); // all command categories/groups names
+bot.commandGC 	  = new Discord.Collection(); // all command category codes
+bot.commands 	  = new Discord.Collection(); // all commands are stored within here
+bot.aliases 	  = new Discord.Collection(); // all aliases for commands
+bot.streamLink 	  = new Discord.Collection(); // all StreamLink settings are loaded into here
+bot.games 	   	  = new Discord.Collection(); // collection of LFG games
+bot.gameAliases   = new Discord.Collection(); // all aliases for LFG games
+bot.lfgStack 	  = new Discord.Collection(); // ongoing LFG parties are in here
 
-var eventHandlers  = ['streamlinkHandler', 'lfgHandler', 'pollHandler']; // The event handlers list
-var eventLoader    = require('./util/eventLoader')(bot); // Client events
-var streamlink 	   = require('./util/streamlinkHandler'); // StreamLink event handler
-var lfg 		   = require('./util/lfgHandler'); // LFG event handler
-var polls 		   = require('./util/pollHandler'); // Polls event handler
+// JSON configs to read from
+const settings 	   = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
+const settingsSL   = JSON.parse(fs.readFileSync("./config/streamlink.json", "utf8"));
+const settingsSLMG = JSON.parse(fs.readFileSync("./config/streamlink_multiguild.json", "utf8"));
 
-const slFunc 	   = require('./commands/streamlink');
-const lfgFunc 	   = require('./commands/lfg');
-const pollFunc 	   = require('./commands/poll');
+// List of event handlers, reloaders, etc. etc. (needed for event reloading & command reloading later)
+var eventLoader   = require('./util/eventLoader')(bot),
+	eventHandlers = [], functionsToReload = [], lfgUpdateContainer = null;
 
-const settings 	   = JSON.parse(fs.readFileSync("./settings.json", "utf8")); // Bot config JSON
-const settingsSL   = JSON.parse(fs.readFileSync("./config/streamlink.json", "utf8")); // StreamLink saved info
-const settingsSLMG = JSON.parse(fs.readFileSync("./config/streamlink_multiguild.json", "utf8")); // StreamLink multi-guild, user & server info
-
-const initTopics   = [{ topic: "video-playback.channel" }]; // TwitchPS requires a non-empty intial topic list
-const twitch 	   = new TwitchPS({ init_topics: initTopics, reconnect: false, debug: false });
-
-// -------------------------------------------------
-
-// Debug info on startup:
+/**************************************************************************
+ * Start up the bot!!
+ * 
+ **************************************************************************/
 console.log(chalk.bgBlue.bold(`STARTING 'bot.js' ...`));
 console.log(chalk.bgBlue(`${settings.botnameproper} is connected to ${settings.guilds.length} guilds currently.`));
 console.log(chalk.bgBlue(`Guilds connected to: { ${settings.guilds} }`));
 
-// -------------------------------------------------
-// 					  Commands
+// Pre-loading; setting things up
 // -------------------------------------------------
 
-// Load commands from ./commands/ dir, add into Client
-fs.readdir('./commands', (err, files) => {
-	if (err) console.error(err);
-	console.log(chalk.bgBlue(`Loading a total of ${files.length} commands.`));
-	files.forEach(f => {
-		let contents = require(`./commands/${f}`);
-		console.log(chalk.bgCyan.black(`Loading command ... ${contents.help.name} ✓`));
-		bot.commands.set(contents.help.name, contents);
-		contents.conf.aliases.forEach(alias => {
-			bot.aliases.set(alias, contents.help.name);
-		});
-	});
+/**************************************************************************
+ * Things that get pre-loaded:
+ * @var {Collection} bot.commandGroups, (bot.commandGC)
+ * @var {Collection} bot.commands, (bot.aliases)
+ * @var {Array[]} eventHandlers,
+ * @var {Array[]} functionsToReload,
+ * @var {Array[]} reloaders,
+ * @var {Collection} bot.streamLink, //includes all saved StreamLink info
+ * @var {Collection} bot.games, (bot.gameAliases) // for LFG use
+ * 
+ **************************************************************************/
+
+// Get command categories (directories in /commands/)
+settings.commandGroups.forEach(category => {
+	category.code.forEach(code => { bot.commandGC.set(code, category.name);	});
+	bot.commandGroups.set(category.name, category);
 });
 
-// Reload command(s) (!reload)
-bot.reload = command => {
-	return new Promise((resolve, reject) => {
-		try {
-			if (command) {
-				delete require.cache[require.resolve(`./commands/${command}`)];
-				let cmd = require(`./commands/${command}`);
-				bot.commands.delete(command);
-				bot.aliases.forEach((cmd, alias) => {
-					if (cmd === command) bot.aliases.delete(alias);
+// Load commands from each folder in /commands/ dir, add into Client bot
+fs.readdir('./commands/', (err, folders) => {
+	folders.forEach(folder => {
+		fs.readdir(`./commands/${folder}`, (err, files) => {
+			if (err) throw err;
+			console.log(chalk.bgBlue(`Loading a total of ${files.length} commands from /${folder}/`));
+			files.forEach(f => {
+				let contents = require(`./commands/${folder}/${f}`);
+				console.log(chalk.bgCyan.black(`Loading command ${contents.help.name} ... ✓`));
+				bot.commands.set(contents.help.name, contents);
+				bot.commands.get(contents.help.name).conf.category = `${folder}`;
+				contents.conf.aliases.forEach(alias => {
+					bot.aliases.set(alias, contents.help.name);
 				});
-				bot.commands.set(command, cmd);
-				cmd.conf.aliases.forEach(alias => {
-					bot.aliases.set(alias, cmd.help.name);
-				});
-				// Resort command list:
-				var keys = [];
-				var sorted = new Discord.Collection();
-				bot.commands.forEach((value, key, map) => {
-					keys.push(key);
-				});
-				keys.sort().map((key) => {
-					sorted.set(key, bot.commands.get(key));
-				});
-				bot.commands = sorted;
-				resolve();
-			} else {
-				bot.commands.forEach(command => {
-					delete require.cache[require.resolve(`./commands/${command.help.name}`)]
-				});
-				bot.aliases.clear();
-				bot.commands.clear();
-				fs.readdir('./commands', (err, files) => {
-					if (err) console.error(err);
-					files.forEach(f => {
-						let contents = require(`./commands/${f}`);
-						console.log(chalk.bgCyan.black(`Loading command ... ${contents.help.name} ✓`));
-						bot.commands.set(contents.help.name, contents);
-						contents.conf.aliases.forEach(alias => {
-							bot.aliases.set(alias, contents.help.name);
-						});
-					});
-				});
-				resolve();
-			}
-		} catch (err) {
-			reject(err);
-		}
-	});
-};
-
-// Reload event file(s) (!reloadevent)
-const reloadEvents = () => {
-	return new Promise((resolve, reject) => {
-		try {
-			eventHandlers.forEach(file => {
-				delete require.cache[require.resolve(`./util/${file}`)];
 			});
-			streamlink = require(`./util/streamlinkHandler`);
-			lfg = require(`./util/lfgHandler`);
-			polls = require(`./util/pollHandler`);
-			slFunc.reloadHandler()
-			.then(lfgFunc.reloadHandler()
-				.then(pollFunc.reloadHandler()
-					.then()
-					.catch(err => console.log(err)))
-				.catch(err => console.log(err)))
-			.catch(err => console.log(err));
-			resolve();
-		} catch (err) {
-			reject(err);
-		}
-	});
-};
+		});
+	})
+});
+
+// Create list of eventHandler files (from handlerNames list)
+settings.eventHandlers.forEach((event, index) => {
+	eventHandlers.push(null);
+	eventHandlers[index] = require(`./util/${event}`);
+});
+
+// Create list of function files (command files that need to be updated when an eventHandler is altered)
+settings.functionsToReload.forEach((func, index) => { // Link to commands that need to have handlers reloaded
+	functionsToReload.push(null);
+	if (bot.commands.has(func)) {
+		let cat = bot.commands.get(func).conf.category;
+		functionsToReload[index] = require(`./commands/${cat}/${func}`);
+	}
+});
 
 // Permission levels passed thru message to regulate command use
 bot.elevation = message => {
-	/********************************************* 
+	/*********************************************
 	Assign a permission level based on user role
-	Determines the elligble commands for the user
+	Determines the elligble commands for the user,
+	and other permission level access within
+	commands & command options.
 	   ╔permLevel═╦═Role═════════════╗
 	   ║0		  ║	@everyone		║
 	   ║1		  ║	---				║
 	   ║2		  ║	Admins			║
 	   ║3		  ║	Server Owners	║
 	   ║4		  ║	Master			║
-	   ╚═══════════╩══════════════════╝		
+	   ╚═══════════╩══════════════════╝
 	*********************************************/
 	let permlvl = 0; // @everyone
 	if (message.member.hasPermission("ADMINISTRATOR")) permlvl = 2; // Server admin
-	if (message.member === message.guild.owner) permlvl = 3; 	   // Server owner
-	if (message.author.id === settings.masterID) permlvl = 4;     // Bot owner ID, purely for debugging commands
+	if (message.member === message.guild.owner) permlvl = 3; // Server owner
+	if (message.author.id === settings.masterID) permlvl = 4; // Bot owner ID, purely for debugging commands
 	return permlvl;
 };
 
-// -------------------------------------------------
-// 					 StreamLink
-// -------------------------------------------------
+// StreamLink setup ::
+const twitch = new TwitchPS({ init_topics: [{ topic: "video-playback.channel" }], reconnect: false, debug: false });
 
 // Load in StreamLink settings into Client >> "settings" => {...}
 bot.streamLink.set("settings", {
@@ -180,7 +139,7 @@ bot.streamLink.set("settings", {
 // Load in user settings for StreamLink into Client >> "#userid" => {...}
 settingsSL.topics.forEach((topic, index) => {
 	if (index === 0) console.log(chalk.bgMagenta.bold(`StreamLink connections:`));
-	twitch.addTopic([{ topic: `video-playback.${topic}` }]);
+	twitch.addTopic([{ topic: `video-playback.${topic}`	}]);
 	bot.streamLink.set(settingsSL.userIDs[index], {
 		id: settingsSL.userIDs[index],
 		isUser: true,
@@ -206,16 +165,12 @@ settingsSLMG.guilds.forEach((guild, index) => {
 	console.log(chalk.bgMagenta.black(`Guild: ${bot.streamLink.get(settingsSLMG.guilds[index].id).id} => Enabled?: ${bot.streamLink.get(settingsSLMG.guilds[index].id).guildEnable}, Users: ${bot.streamLink.get(settingsSLMG.guilds[index].id).usersEnable}`));
 });
 
-// -------------------------------------------------
-// 						LFG
-// -------------------------------------------------
-
 // Load games for LFG, from ./lfg/ dir, put it in the BOT client!
-fs.readdir('../lfg', (err, files) => {
+fs.readdir('./lfg', (err, files) => {
 	if (err) console.error(err);
 	console.log(chalk.bgYellow.black(`Loading a total of ${files.length} games into Games Collection.`));
 	files.forEach(f => {
-		let contents = require(`../lfg/${f}`);
+		let contents = require(`./lfg/${f}`);
 		console.log(chalk.bgYellow.gray(`Loading game ... ${contents.name}`));
 		bot.games.set(contents.code, contents);
 		contents.aliases.forEach(alias => {
@@ -224,53 +179,43 @@ fs.readdir('../lfg', (err, files) => {
 	});
 });
 
-// Reload LFG games
-bot.reloadLFG = game => {
+// Automatic update for LFG (every 5s by default) (interval is clearable & resettable!)
+bot.lfgUpdate = function (flag, interval) {
+	if (flag) lfgUpdateContainer = setInterval( function() {eventHandlers[1].update(bot)}, interval);
+	else clearInterval(lfgUpdateContainer);
+}
+
+// Re-loading: refreshing to incorporate changes
+// -------------------------------------------------
+
+/**************************************************************************
+ * Things that get re-loaded:
+ * @var {Collection} bot.commands, (via /util/commandsReload)
+ * @var {Collection} bot.games, (via /util/lfgReload)
+ * @var {Array[module]} eventHandlers,
+ * @var {Array[module]} functionsToReload,
+ * @var {Array[]} settings.reloaders,
+ * 
+ **************************************************************************/
+
+bot.commandsReload = require('./util/commandsReload'); // Reload command(s) (!reload)
+bot.lfgReload 	   = require('./util/lfgReload'); // Reload LFG games (!reloadlfg)
+bot.reloadEvents = () => { // Reload event files (!reloadevents)
 	return new Promise((resolve, reject) => {
 		try {
-			if (game === 0) { // If no game specified, reset all LFG games
-				bot.games.forEach(g => {
-					if (typeof require.cache[require.resolve(`../lfg/${g.code}`)] != 'undefined')
-						delete require.cache[require.resolve(`../lfg/${g.code}`)]
-				})
-				bot.games.clear();
-				console.log(chalk.bgYellow.bold.black(`RELOADING LFG GAMES:`));
-				fs.readdir('../lfg', (err, files) => {
-					if (err) console.error(err);
-					console.log(chalk.bgYellow.black(`Loading a total of ${files.length} games into Games Collection.`));
-					files.forEach(f => {
-						let contents = require(`../lfg/${f}`);
-						console.log(chalk.bgYellow.gray(`Loading game ... ${contents.name}`));
-						bot.games.set(contents.code, contents);
-						contents.aliases.forEach(alias => {
-							bot.gameAliases.set(alias, contents.code);
-						});
-					});
-				});
-			} else {
-				delete require.cache[require.resolve(`../lfg/${game}`)];
-				let g = require(`../lfg/${game}`);
-				bot.games.delete(game);
-				bot.aliases.forEach((g, alias) => {
-					if (g === game) bot.gameAliases.delete(alias);
-				});
-				bot.games.set(game, g);
-				g.aliases.forEach(alias => {
-					bot.gameAliases.set(alias, g.code);
-				});
-
-				// Reorder games alphabetically 
-				// (otherwise, the updated game will just get pushed to bottom of list)
-				let keys = [];
-				let sorted = new Discord.Collection();
-				bot.games.forEach((value, key, map) => {
-					keys.push(key);
-				});
-				keys.sort().map((key) => {
-					sorted.set(key, bot.commands.get(key));
-				});
-				bot.games = sorted;
-			}
+			settings.eventHandlers.forEach((file, index) => {
+				delete require.cache[require.resolve(`./util/${file}`)];
+				eventHandlers[index] = require(`./util/${file}`);
+				if (bot.commands.has(settings.functionsToReload[index])) {
+					let cat = bot.commands.get(settings.functionsToReload[index]).conf.category;
+					functionsToReload[index] = require(`./commands/${cat}/${settings.functionsToReload[index]}`);
+					functionsToReload[index].reloadHandler().then().catch(err => console.log(err));
+				}
+			});
+			settings.reloaders.forEach(file => {
+				delete require.cache[require.resolve(`./util/${file}`)];
+				bot[`${file}`] = require(`./util/${file}`);
+			});
 			resolve();
 		} catch (err) {
 			reject(err);
@@ -278,85 +223,45 @@ bot.reloadLFG = game => {
 	});
 };
 
-// Continuous update & check of LFG stack, performed every 5s:
-const lfgUpdateInterval = setInterval(async function () {
-	if (bot.lfgStack.size > 0) {
-		var d = new Date();
-		bot.lfgStack.forEach(l => {
-			if (d.getTime() >= l.time + (l.ttl * 60000)) { // check if LFG's have timed out
-				lfg.timeout(bot, l.id);
-			}
-			else if (l.ttl >= settings.lfg.ttl_threshold && l.time + (l.ttl * 60000) - d.getTime() <= Math.round(l.ttl * 60000 / 4) && !l.warning && settings.lfg.ttl_warning) { // check if LFG's are running out of time
-				let timeleft = Math.round(Math.round(l.ttl * 60000 / 4) / 60000);
-				lfg.warning(bot, l.id, timeleft);
-			}
-		});
-	}
-}, 5000);
-
-// -------------------------------------------------
-// 				  TwitchPS Events:
+// TwitchPS events (for StreamLink)
 // -------------------------------------------------
 
-// Detect when a stream goes live
-twitch.on('stream-up', (data) => {
-	streamlink.streamUp(bot, data);
-});
+/**************************************************************************
+ * These are all the functions that need to be monitored for StreamLink
+ * 
+ * 	(StreamLink handler func) <--> (TwitchPS event)
+ *  @func streamUp <--> 'stream-up'
+ * 		@param {Object} data : Contains {Integer time, String channel_name }
+ *  @func streamDown <--> 'stream-down'
+ * 		@param {Object} data : Contains {Integer time, String channel_name }
+ *  @func viewCount <--> 'viewcount'
+ * 		@param {Object} data : Contains {Integer time, String channel_name, Integer viewers }
+ * 
+ * And here are functions that get exported to StreamLink handler
+ * 
+ *  @func addTwitchTopic @param {String} stream : String (stream) in http://www.twitch.tv/(stream)
+ * 
+ *************************************************************************/
 
-// Detect when a stream goes down
-twitch.on('stream-down', (data) => {
-	streamlink.streamDown(bot, data);
-});
+twitch.on('stream-up', 	 data => {	if (settings.streamlink.enable) eventHandlers[0].streamUp(bot, data);});
+twitch.on('stream-down', data => {	if (settings.streamlink.enable) eventHandlers[0].streamDown(bot, data);});
+twitch.on('viewcount', 	 data => {	if (settings.streamlink.enable) eventHandlers[0].viewCount(bot, data);});
+exports.addTwitchTopic    = stream => {	twitch.addTopic	({topic: `video-playback.${stream.toLowerCase()}`}); }
+exports.removeTwitchTopic = stream => {	twitch.removeTopic({topic: `video-playback.${stream.toLowerCase()}`}); }
 
-// Updates on viewer count
-twitch.on('viewcount', (data) => {
-	streamlink.viewCount(bot, data);
-});
-
-// Add a topic to watch in TwitchPS
-const addTwitchTopic = (stream) => {
-	twitch.addTopic({ topic: `video-playback.${stream.toLowerCase()}` });
-}
-
-// Remove topic from TwitchPS
-const removeTwitchTopic = (stream) => {
-	twitch.removeTopic({ topic: `video-playback.${stream.toLowerCase()}` });
-}
-
-// -------------------------------------------------
-// Miscellaneous & extra functions
+// Miscellaneous / work in progress
 // -------------------------------------------------
 
-// Bot's pulse "Are you still there?"
-// Log the app's average Discord latency every 10 minutes
-const botPulse = setInterval(async function () {
-	console.log(chalk.bgBlue(`[${moment().tz("America/New_York").format('hh:mm:ssA MM/DD/YY')}] ♥ Heartbeat ... ${Math.round(bot.ping)} ms`))
-}, 10 * 60000)
+//#region Coming soon™?
+/* -------------------------------------------------
 
-// Scheduled weekly event -- Every Sunday at 12:00AM EST!
-const weeklyScheduler = schedule.scheduleJob('0 0 5 * * 0', function () {
+var weeklyScheduler = schedule.scheduleJob('0 0 0 * * 0', function () { // Scheduled weekly event -- Every Sunday at 12:00AM EST!
 	console.log(chalk.bgBlue.white(`The week has come to a close... Time to post some weekly stats!`));
 	// WORK IN PROGRESS! -- to be used for 'reaction stats' and/or other stats?
 });
 
-// Post LFG stack
-const lfgTest = (message) => {
-	message.reply(`${bot.lfgStack.map(e => JSON.stringify(e, 'utf8'))}`);
-};
-
-// Post StreamLink objects
-const slTest = (message) => {
-	message.reply(`${bot.streamLink.map(e => JSON.stringify(e, 'utf8'))}`);
-};
-
-// -------------------------------------------------
-
-// Exported functions:
-exports.reloadEvents 		= reloadEvents;
-exports.addTwitchTopic 		= addTwitchTopic;
-exports.removeTwitchTopic 	= removeTwitchTopic;
-exports.lfgTest 			= lfgTest;
-exports.slTest 				= slTest;
+//#endregion
+*/
 
 // -------------------------------------------------
 bot.login(settings.token); // Login with auth token

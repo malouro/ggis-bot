@@ -1,0 +1,10 @@
+{
+    "code": "golf",
+    "name": "Golf With Your Friends",
+    "aliases": ["gfw","golfwithfriends","golfwithyourfriends"],
+    "thumbnail": "http://www.blacklightinteractive.com/wp-content/uploads/2016/06/GWFLOGO.png",
+    "default_party_size": [12,12,12,12,12,12,12,12,12,12],
+    "modes": ["any", "classic", "normal", "dunk", "hoops", "bball", "custom", "randomball", "lowgrav"],
+    "modes_proper": ["Any", "Classic", "Classic", "Dunk", "Dunk", "Dunk", "Custom", "Custom - Random Ball Shape", "Custom - Low Gravity"],
+    "default_game_mode": "classic"
+}

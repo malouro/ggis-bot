@@ -1,0 +1,10 @@
+{
+    "code": "terraria",
+    "name": "Terraria",
+    "aliases": [],
+    "thumbnail": "http://vignette4.wikia.nocookie.net/terraria/images/7/75/Terraria_logo_by_dak47922-d4l8t7v.png",
+    "default_party_size": [8,8,8,8,8,8,8,8,8,8,8,8,8],
+    "modes": ["any","softcore","mediumcore","hardcore","expert","expertmode","new","newgame","newserver","fresh","newmediumcore","newhardcore","newsoftcore"],
+    "modes_proper": ["Any","Softcore","Mediumcore","Hardcore","Expert Mode","Expert Mode","New Server","New Server","New Server","New Server", "New Mediumcore Server", "New Hardcore Server", "New Softcore Server"],
+    "default_game_mode": "any"
+}

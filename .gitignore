@@ -1,24 +1,21 @@
 # Node Stuff
 /node_modules
 /logs
+package.json
 package-lock.json
 
 # Privacy
 /config
 settings.json
 settings-backup.json
-/commands/nj.js
-/commands/sayreville.js
+./commands/nj.js
+./commands/sayreville.js
 
 # Commands not to include
-/commands/bananabat.js
-/commands/bitchholdon.js
-/commands/doge.js
-/commands/heavybreathing.js
-/commands/plug.js
-/commands/test.js
-/commands/weeklytest.js
-/commands/wine.js
-
-# Misc
-/vids
+./commands/bananabat.js
+./commands/doge.js
+./commands/heavybreathing.js
+./commands/plug.js
+./commands/test.js
+./commands/weeklytest.js
+./commands/wine.js

@@ -1,0 +1,10 @@
+{
+    "code": "paragon",
+    "name": "Paragon",
+    "aliases": ["paratroopers","paratrooper","paramedics","paramedic","paranormal","paralegal","paradiddle","paragliders","parabola","parasol","parachute","parakeets","pairofsocks"],
+    "thumbnail": "http://i.imgur.com/PI7qKsV.png",
+    "default_party_size": [5,5,5,5],
+    "modes": ["any", "pvp", "coop", "vsai"],
+    "modes_proper": ["Any", "Player vs. Player", "Co-op vs. AI", "Co-op vs. AI"],
+    "default_game_mode": "any"
+}

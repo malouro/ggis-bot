@@ -1,0 +1,10 @@
+{
+    "code": "vermintide",
+    "name": "Warhammer: End Times - Vermintide",
+    "aliases": ["warhammerendtimesvermintide","l4dbutwithrats"],
+    "thumbnail": "http://www.fatsharkgames.com/wp-content/uploads/2015/02/vermintide_logo_small_no_bg.png",
+    "default_party_size": [4],
+    "modes": ["any"],
+    "modes_proper": ["Any"],
+    "default_game_mode": "any"
+}

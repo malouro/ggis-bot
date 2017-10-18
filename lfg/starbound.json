@@ -1,0 +1,10 @@
+{
+    "code": "starbound",
+    "name": "Starbound",
+    "aliases": [],
+    "thumbnail": "http://i.imgur.com/K6hil8G.png",
+    "default_party_size": [8,8,8,8,8,8,8,8,8,8,8],
+    "modes": ["any","survival","hardcore","casual","new","newgame","newserver","fresh","newsurvival","newhardcore","newcasual"],
+    "modes_proper": ["Any","Survival","Hardcore","Casual","New Server","New Server","New Server","New Server", "New Survival Server", "New Hardcore Server", "New Casual Server"],
+    "default_game_mode": "any"
+}

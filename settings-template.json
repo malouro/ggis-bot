@@ -3,11 +3,17 @@
     "botnameproper": "Ggis",
     "token": "Token goes here!",
     "prefix": "!",
-    "guilds": [],
-    "masterID": "Your User ID",
-    "mainguild": "Main guild ID, for guildOnly commands",
+    "commandGroups": [
+        {"code": ["debug","help"], "name":"Debug & Help", "description": "Help menus & debug"},
+        {"code": ["useful"],"name":"Useful", "description": "Commands that do useful things"},
+        {"code": ["random","rng"],"name":"Random", "description": "Random, fun commands"},
+        {"code": ["memes"], "name":"Memes", "description": "Memes & dreams"}
+    ],
+    "guilds": [], // "<bot will add a list of server ID's as it joins them in here>"
+    "masterID": "Your User ID (bot owner)",
+    "mainguild": "Main server ID, for guildOnly commands",
     "mainchannel": "Main channel in main guild",
-    "testguild": "Test guild ID#, ",
+    "testguild": "Test server ID, where most if not all testing takes place",
     "rules": {
         "enable": true,
         "sailormoon": true,
@@ -18,8 +24,10 @@
         },
         "extended_emoji": {
             "enable": true,
-            "edit": true
-        }
+            "edit": true,
+            "embed": true
+        },
+        "memes": true
     },
     "streamlink": {
         "default_setting": true,

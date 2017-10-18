@@ -1,0 +1,10 @@
+{
+    "code": "dota2",
+    "name": "Dota 2",
+    "aliases": ["dota"],
+    "thumbnail": "http://imgur.com/ZQXkICq",
+    "default_party_size": [5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,10],
+    "modes": ["any", "allpick", "singledraft", "randomdraft", "allrandom", "ar", "captainsmode","captainsdraft", "leastplayed", "limited", "limited heroes", "ability", "abilitydraft", "allrandomdm", "ardm", "private", "privatelobby", "custom", "customlobby", "inhouse"],
+    "modes_proper": ["Any", "All Pick", "Single Draft", "Random Draft", "All Random", "All Random", "Captain's Mode", "Captain's Draft", "Least Played", "Limited Heroes", "Limited Heroes", "Ability Draft", "Ability Draft", "All Random Deathmatch", "All Random Deathmatch", "Private Lobby", "Private Lobby", "Private Lobby", "Private Lobby", "In-house Lobby"],
+    "default_game_mode": "any"
+}

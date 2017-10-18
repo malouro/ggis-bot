@@ -1,0 +1,10 @@
+{
+    "code": "ark",
+    "name": "ARK: Survival Evolved",
+    "aliases": ["dinos"],
+    "thumbnail": "http://imgur.com/bcx5yks.png",
+    "default_party_size": [12,12,12,12],
+    "modes": ["any","pvp","pve","rp"],
+    "modes_proper": ["Any","PvP Server","PvE Server","RP Server"],
+    "default_game_mode": "any"
+}

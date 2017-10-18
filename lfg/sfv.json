@@ -1,0 +1,10 @@
+{
+    "code": "sfv",
+    "name": "Street Fighter 5",
+    "aliases": ["streetfighter5","sf5"],
+    "thumbnail": "http://www.fightersgeneration.com/nz3/game/sf5-sfv-logo-white.jpg",
+    "default_party_size": [2,8,8],
+    "modes": ["any","custom","lobby"],
+    "modes_proper": ["Any","Lobby","Lobby"],
+    "default_game_mode": "any"
+}

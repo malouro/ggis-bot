@@ -1,0 +1,10 @@
+{
+    "code": "t7",
+    "name": "Tekken 7",
+    "aliases": ["tekken","tekken7"],
+    "thumbnail": "https://vignette4.wikia.nocookie.net/logopedia/images/6/67/Tekken-7-logo-wallpaper.jpg",
+    "default_party_size": [2,8,8],
+    "modes": ["any","custom","lobby"],
+    "modes_proper": ["Any","Lobby","Lobby"],
+    "default_game_mode": "any"
+}

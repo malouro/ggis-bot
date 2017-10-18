@@ -1,0 +1,10 @@
+{
+    "code": "sf4",
+    "name": "Ultra Street Fighter 4",
+    "aliases": ["ultra","ultrasf4","usf4","usfiv"],
+    "thumbnail": "https://i.imgur.com/1lkqXeI.png",
+    "default_party_size": [2,8,8],
+    "modes": ["any","custom","lobby"],
+    "modes_proper": ["Any","Lobby","Lobby"],
+    "default_game_mode": "any"
+}

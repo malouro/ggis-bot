@@ -1,0 +1,10 @@
+{
+    "code": "f13",
+    "name": "Friday the 13th",
+    "aliases": ["friday13","fridaythe13th"],
+    "thumbnail": "http://f13game.com/wp-content/uploads/2015/10/f13_large.png",
+    "default_party_size": [8],
+    "modes": ["any"],
+    "modes_proper": ["Any"],
+    "default_game_mode": "any"
+}

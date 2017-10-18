@@ -1,0 +1,10 @@
+{
+    "code": "mc",
+    "name": "Minecraft",
+    "aliases": ["minecraft"],
+    "thumbnail": "https://vignette3.wikia.nocookie.net/ashton-games/images/9/97/Minecraft-logo-transparent-background-ut05tirq.png/revision/latest?cb=20150505163601",
+    "default_party_size": [8],
+    "modes": ["any"],
+    "modes_proper": ["Any"],
+    "default_game_mode": "any"
+}

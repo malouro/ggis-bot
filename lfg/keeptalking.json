@@ -1,0 +1,10 @@
+{
+    "code": "keeptalking",
+    "name": "Keep Talking and Nobody Explodes",
+    "aliases": [],
+    "thumbnail": "http://www.bombmanual.com/manual/1/html/img/ktane-logo.png",
+    "default_party_size": [2],
+    "modes": ["any"],
+    "modes_proper": ["Any"],
+    "default_game_mode": "any"
+}

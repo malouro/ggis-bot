@@ -1,0 +1,10 @@
+{
+    "code": "mysterium",
+    "name": "Mysterium",
+    "aliases": [],
+    "thumbnail": "http://www.tabletopgamingnews.com/wp-content/uploads/2016/02/Mysterium.png",
+    "default_party_size": [7,7,7,7],
+    "modes": ["any", "easy", "medium", "hard"],
+    "modes_proper": ["Any", "Easy", "Medium", "Hard"],
+    "default_game_mode": "any"
+}

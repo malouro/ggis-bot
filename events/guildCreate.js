@@ -43,10 +43,11 @@ module.exports = guild => {
     } catch (err) {
         console.log(chalk.bgRed.bold(`[${moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY')}] ${err}`));
     }
+    
     // Send welcome message to main text channel!
     try {
         var ch = guild.channels.entries().next().value;
-        guild.channels.get(ch[0]).send(`Sup ${guild.name}, I'm ${settings.botnameproper}. The new neighborhood Discord bot. Check out **${settings.prefix}help** or **${settings.prefix}ggis** to see what commands I've got.`);
+        guild.channels.get(ch[0]).send(`Sup ${guild.name}, I'm ${guild.client.user}. The new neighborhood Discord bot. Check out **${settings.prefix}help** or **${settings.prefix}ggis** to see what commands I've got.`);
     } catch (err) {
         console.log(chalk.bgRed.bold(`[${moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY')}] ${err}`));
     }

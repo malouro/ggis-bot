@@ -1,0 +1,10 @@
+{
+    "code": "l4d2",
+    "name": "Left 4 Dead 2",
+    "aliases": ["left4dead2"],
+    "thumbnail": "http://i.imgur.com/Xb7EH42.png",
+    "default_party_size": [4,4,4,4,4,4,8,8,8,8,4,4,8,8,4,4,4,4,4,8],
+    "modes": ["any", "campaign", "story", "customcampaign", "survival", "customsurvival", "vs", "versus", "customvs", "customversus", "realism", "customrealism", "realismvs", "customrealismvs", "scavenge", "customscavenge", "mutations", "custom", "custommap", "inhouse"],
+    "modes_proper": ["Any", "Campaign", "Campaign", "Custom Campaign", "Survival", "Custom Survival", "Versus", "Versus", "Custom Versus", "Custom Versus", "Realism", "Custom Realism", "Realism Versus", "Custom Realism Versus", "Scavenge", "Custom Scavenge", "Mutations", "Custom Map", "Custom Map", "In-house Lobby"],
+    "default_game_mode": "any"
+}

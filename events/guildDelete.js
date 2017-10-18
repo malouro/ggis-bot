@@ -1,4 +1,4 @@
-// This event triggers whenever the Bot leaves guild (aka server) or a guild gets deleted
+// This event triggers whenever the Bot leaves guild (aka: server) or a guild gets deleted
 // Ggis will remove the guild from the list of connected guilds, and edit StreamLink settings
 
 const chalk = require('chalk');
@@ -9,17 +9,16 @@ const streamlink = require('../util/streamlinkHandler');
 
 module.exports = guild => {
     try {
-        // Update settings JSON configs
         var settings     = JSON.parse(fs.readFileSync('./settings.json', 'utf8'));
         var settingsSL   = JSON.parse(fs.readFileSync('./config/streamlink.json', 'utf8'));
         var settingsSLMG = JSON.parse(fs.readFileSync('./config/streamlink_multiguild.json', 'utf8'));
         let index        = settings.guilds.indexOf(guild.id);
         let flag, flagMG = false;
+
         if (index > -1) {
-            // Remove guild from settings.json!
-            settings.guilds.splice(index, 1);
-            // Remove guild from streamlink.json!
-            for (i = 0; i < settingsSL.channels.length; i++) {
+
+            settings.guilds.splice(index, 1); // Remove guild from settings.json!
+            for (i = 0; i < settingsSL.channels.length; i++) { // Remove guild from streamlink.json!
                 if (settingsSL.guilds[i] === guild.id) {
                     flag = true;
                     settingsSL.guilds.splice(i, 1);
@@ -31,7 +30,8 @@ module.exports = guild => {
             settingsSLMG.guilds.forEach((g,index) => {
                 if (g.id === guild.id) {
                     flagMG = true;
-                    settingsSLMG.guilds.splice(index, 1);                    
+                    settingsSLMG.guilds.splice(index, 1);
+                    guild.client.streamLink.delete(guild.id);              
                 }
             });
             
@@ -41,13 +41,13 @@ module.exports = guild => {
                 else console.log(chalk.bgCyan.black('[' + moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY') + `] Wrote to settings.json OK! Left Guild "${guild.name}" (ID ${guild.id})`));
             });
             if (flag) {
-                fs.writeFile("./config/streamlink.json", JSON.stringify(settingsStreamLink), (err) => {
+                fs.writeFile("./config/streamlink.json", JSON.stringify(settingsSL), (err) => {
                     if (err) console.error(`[${moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY')}] ${err}`);
                     else console.log(chalk.bgCyan.black('[' + moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY') + `] Wrote to streamlink.json OK! Left Guild "${guild.name}" (ID ${guild.id})`));
                 });
             }
             if (flagMG) {
-                fs.writeFile("./config/streamlink_multiguild.json", JSON.stringify(settingsStreamLinkMG), (err) => {
+                fs.writeFile("./config/streamlink_multiguild.json", JSON.stringify(settingsSLMG), (err) => {
                     if (err) console.error(`[${moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY')}] ${err}`);
                     else console.log(chalk.bgCyan.black('[' + moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY') + `] Wrote to streamlink_multiguild.json OK! Left Guild "${guild.name}" (ID ${guild.id})`));
                 });
@@ -73,7 +73,6 @@ module.exports = guild => {
                 });
             }
         }); 
-
     } catch (err) {
         console.log(chalk.bgRed.bold('[' + moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY') + '] ' + err));
     }

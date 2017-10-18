@@ -1,0 +1,10 @@
+{
+    "code": "l4d",
+    "name": "Left 4 Dead",
+    "aliases": ["left4dead"],
+    "thumbnail": "http://www.l4d.com/sacrifice/images/l4d_logo.png",
+    "default_party_size": [4,4,4,4,4,4,8,8,8,8,4,4,8],
+    "modes": ["any", "campaign", "story", "customcampaign", "survival", "customsurvival", "vs", "versus", "customvs", "customversus", "custom", "custommap", "inhouse"],
+    "modes_proper": ["Any", "Campaign", "Campaign", "Custom Campaign", "Survival", "Custom Survival", "Versus", "Versus", "Custom Versus", "Custom Versus", "Custom Map", "Custom Map", "In-house Lobby"],
+    "default_game_mode": "any"
+}

@@ -1,0 +1,10 @@
+{
+    "code": "pubg",
+    "name": "PLAYERUNKNOWN'S BATTLEGROUNDS",
+    "aliases": ["pub", "playerunknown", "playerunknowns", "playerunknownbattlegrounds", "playerunknownsbattlegrounds"],
+    "thumbnail": "http://i.imgur.com/TthutjZ.png",
+    "default_party_size": [4,2,2,2,4,4],
+    "modes": ["any", "duo", "duos", "2s", "squad", "squads"],
+    "modes_proper": ["Any", "Duo", "Duo", "Duo", "Squad", "Squad"],
+    "default_game_mode": "any"
+}

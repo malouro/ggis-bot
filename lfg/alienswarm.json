@@ -1,0 +1,10 @@
+{
+    "code": "alienswarm",
+    "name": "Alien Swarm: Reactive Drop",
+    "aliases": ["as","asrd", "as:rd"],
+    "thumbnail": "https://i.imgur.com/HMDpXjL.png",
+    "default_party_size": [8],
+    "modes": ["any"],
+    "modes_proper": ["Any"],
+    "default_game_mode": "any"
+}

@@ -17,4 +17,5 @@ module.exports = bot => {
     bot.on('guildCreate', reqEvent('guildCreate'));
     bot.on('guildDelete', reqEvent('guildDelete'));
     bot.on('guildMemberRemove', reqEvent('guildMemberRemove'));
+    bot.on('channelDelete', reqEvent('channelDelete'));
 };

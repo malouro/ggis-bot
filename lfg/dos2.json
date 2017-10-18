@@ -1,0 +1,10 @@
+{
+    "code": "dos2",
+    "name": "Divinity: Original Sin 2",
+    "aliases": ["divinity2","divinityoriginalsin2"],
+    "thumbnail": "https://vignette3.wikia.nocookie.net/divinity2/images/0/01/Divinity_Original_Sin_2_Logo_Portal_Dark_001.png",
+    "default_party_size": [4,4,4],
+    "modes": ["any","campaign","custom"],
+    "modes_proper": ["Any","Campaign","Custom Campaign"],
+    "default_game_mode": "any"
+}

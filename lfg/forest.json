@@ -1,0 +1,10 @@
+{
+    "code": "forest",
+    "name": "The Forest",
+    "aliases": ["theforest"],
+    "thumbnail": "http://imgur.com/3tCXwNK.png",
+    "default_party_size": [8],
+    "modes": ["any"],
+    "modes_proper": ["Any"],
+    "default_game_mode": "any"
+}

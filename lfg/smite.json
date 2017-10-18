@@ -1,0 +1,10 @@
+{
+    "code": "smite",
+    "name": "Smite",
+    "aliases": [],
+    "thumbnail": "https://upload.wikimedia.org/wikipedia/en/archive/7/79/20170722015355%21Logo_for_the_Video_game_Smite.png",
+    "default_party_size": [5,5,5,5,3,4,5,5,5,5,5,10],
+    "modes": ["any","conquest","arena","assault","joust","siege","clash","motd","adventure","adventures","custom","inhouse"],
+    "modes_proper": ["Any","Conquest","Arena","Assault","Joust","Siege","Clash","Match of the Day","Adventures","Adventures","Custom Lobby","In-house Lobby"],
+    "default_game_mode": "any"
+}
