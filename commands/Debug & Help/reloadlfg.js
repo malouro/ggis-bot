@@ -5,6 +5,7 @@
 
 exports.run = (bot, message, args) => {
     let game;
+
     if (args[1]) {
         if (bot.games.has(args[1])) {
             game = args[1];
@@ -18,21 +19,12 @@ exports.run = (bot, message, args) => {
     if (!game & game !== 0) {
         return message.channel.send(`Cannot find the game: ${args[1]}`);
     } else {
-        if (game !== 0) {
-            message.channel.send(`Reloading: ${game}`)
-                .then(m => {
-                    bot.lfgReload(bot, game)
-                        .then(m.edit(`Successfully reloaded game: ${game}`))
-                        .catch(e => {m.edit(`LFG reload failed: ${game}\n\`\`\`${e.stack}\`\`\``);});
-                });
-        } else {
-            message.channel.send(`Reloading LFG games!`)
-                .then(m => {
-                    bot.lfgReload(bot, game)
-                        .then(m.edit(`Successfully reloaded the LFG games library.`))
-                        .catch(e => {m.edit(`LFG reload failed!\n\`\`\`${e.stack}\`\`\``);});
-                });
-        }
+        message.channel.send((game == 0) ? `Reloading LFG library!` : `Reloading: ${game}`)
+        .then(m => {
+            bot.reloadLFG(bot, game)
+                .then(m.edit((game === 0) ? `Successfully reloaded the LFG games library.` : `Successfully reloaded game: ${game}`))
+                .catch(e => { m.edit(`LFG reload failed: ${game}\n\`\`\`${e.stack}\`\`\``); });
+        }).catch(err => console.log(err));
     }
 };
 
@@ -40,6 +32,7 @@ exports.conf = {
     enabled: true,
     visible: true,
     guildOnly: false,
+    textChannelOnly: true,
     aliases: ['rlfg', 'rllfg', 'reloadgames'],
     permLevel: 4
 };

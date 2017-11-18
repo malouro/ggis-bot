@@ -45,6 +45,7 @@ exports.conf = {
     enabled: true,
     visible: true,
     guildOnly: false,
+    textChannelOnly: false,
     aliases: [],
     permLevel: 0
 };

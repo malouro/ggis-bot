@@ -1,8 +1,4 @@
-
-var   lfg    = require('../util/lfgHandler');
-const chalk  = require('chalk');
-const fs     = require('fs');
-const moment = require('moment-timezone');
+var lfg    = require('../util/lfgHandler');
 
 module.exports = message => {
 

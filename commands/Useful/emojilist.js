@@ -5,7 +5,6 @@
 
 const chalk     = require('chalk');
 const Discord   = require('discord.js');
-const fs        = require('fs');
 const moment    = require('moment');
 const settings  = require('../../settings.json');
 const TestGuild = settings.testguild;
@@ -21,12 +20,13 @@ exports.run = (bot, message, args) => {
                     let str = `Normally, a server can only have 50 custom emojis. Here in ${message.guild.name}, through the power of ${bot.user}, you can access even more emojis!`+
                     ` Just type the appropriate code for the emoji you want and ${bot.user} will replace your message with the emoji editted in.\n\n`+
                     `*Use \`${settings.prefix}emojilist\` or \`${settings.prefix}emojilist (page#)\` to see the list of extra emoji you can use!*`;
+
                     let embed = new Discord.RichEmbed().setTitle('Extended Emoji List').setDescription(str);
                     message.channel.send({embed: embed});
                 break;
                 default:
                     let pageGiven = parseInt(args[1], 10) - 1;
-                    if (typeof pageGiven !== 'NaN') this.buildEmojiList(bot, message, pageGiven); 
+                    if (!isNaN(pageGiven)) this.buildEmojiList(bot, message, pageGiven); 
                     else this.buildEmojiList(bot, message, -1);
                 break;
             }
@@ -72,6 +72,7 @@ exports.conf = {
     enabled: true,
     visible: true,
     guildOnly: true,
+    textChannelOnly: true,
     aliases: ['extraemoji','extraemojis','extendedemoji','extendedemojis','el'],
     permLevel: 0
 };

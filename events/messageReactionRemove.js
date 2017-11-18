@@ -1,9 +1,6 @@
 // Whenever an emoji reaction is removed from a message
 
-var   lfg     = require('../util/lfgHandler');
-const Discord = require('discord.js');
-const fs      = require('fs');
-const moment  = require('moment-timezone');
+var lfg     = require('../util/lfgHandler');
 
 module.exports = (messageReaction, user) => {
 

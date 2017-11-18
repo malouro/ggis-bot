@@ -12,7 +12,8 @@ exports.run = (bot, message, args, perms) => {
     try {
         let opts = { channel: message.channel, del: true, type: true, time: 0};
         let lastArg; let givenArgs = false, twoArgsLast = false, finishedWithArgs = false;
-
+        args.splice(0,1);
+        
         // Read possible arguments
         args.forEach((arg, index) => {
             if (arg.startsWith('--') || arg.startsWith('-') && !finishedWithArgs) {
@@ -67,12 +68,11 @@ exports.run = (bot, message, args, perms) => {
             let str = args.join(' ');
             this.sendMessage(message, str, opts);
         } else {
-            args.splice(0, 1);
             let str = args.join(' ');
             this.sendMessage(message, str, opts);
         }
     } catch (err) {
-        console.log(chalk.bgRed.bold(`[${moment().format('h:mm:ssA MM/DD/YY')}] ${err}`));
+        console.log(chalk.bgRed.bold(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${err}`));
     }
 };
 
@@ -80,14 +80,14 @@ exports.sendMessage = function (message, str, opts) {
     if (opts.type) {
         opts.time = str.length * msPerChar;
         opts.channel.startTyping();
-        if (opts.del) message.delete().then().catch(err => console.log(err));
+        if (opts.del && message.channel.type === 'text') message.delete().then().catch(err => console.log(err));
         var func = setTimeout(function () {
             opts.channel.stopTyping(true);
             opts.channel.send(str);
             console.log(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${message.author.username} echo'd the message "${str}"`);
         }, opts.time);
     } else {
-        if (opts.del) message.delete().then(() => {
+        if (opts.del && message.channel.type === 'text') message.delete().then(() => {
             opts.channel.send(str);
             console.log(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${message.author.username} echo'd the message "${str}"`);            
         }).catch(err => console.log(err));
@@ -99,6 +99,7 @@ exports.conf = {
     enabled: true,
     visible: true,
     guildOnly: false,
+    textChannelOnly: false,
     aliases: [],
     permLevel: 0
 };

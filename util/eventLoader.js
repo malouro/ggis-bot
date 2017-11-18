@@ -1,12 +1,14 @@
-// =====================================================================================
-//                                   Event Loader
-// =====================================================================================
-// All bot Client events are passed through this.
-// this includes 'ready', 'message', 'reconnecting', disconnect', etc...
+/**
+ * Adds functions to the Client's event listeners
+ * 
+ * @param {String} event 
+ *  Does Node require for each events .js file
+ */
 
 var reqEvent = (event) => require(`../events/${event}`)
 
-module.exports = bot => {
+exports.init = bot => {
+    
     bot.on('ready', () => reqEvent('ready')(bot));
     bot.on('reconnecting', () => reqEvent('reconnecting')(bot));
     bot.on('disconnect', () => reqEvent('disconnect')(bot));
@@ -18,4 +20,5 @@ module.exports = bot => {
     bot.on('guildDelete', reqEvent('guildDelete'));
     bot.on('guildMemberRemove', reqEvent('guildMemberRemove'));
     bot.on('channelDelete', reqEvent('channelDelete'));
+    
 };

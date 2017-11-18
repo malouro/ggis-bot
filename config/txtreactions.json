@@ -1,0 +1,53 @@
+{
+    "reactions": [
+        {
+            "description": "All aboard! choochooStallion",
+            "type": "react",
+            "reaction": [":choochooStallion:313085732275355649"],
+            "reply": {"message": "", "file": ""},
+            "regex": "\\ball+\\s+aboard\\b|train!*\\b"
+        },
+        {
+            "description": "Blazer",
+            "type": "react",
+            "reaction": [":Blazergasm:301912648457650194"],
+            "reply": {"message": "", "file": ""},
+            "regex": "\\bblazer\\b"
+        },
+        {
+            "description": "dead game",
+            "type": "react",
+            "reaction": ["☠","🎮"],
+            "reply": {"message": "", "file": ""},
+            "regex": "d+\\s*e+\\s*a+\\s*d+\\s*g+\\s*a+\\s*m+\\s*e|\\bdead\\s*game\\b"
+        },
+        {
+            "description": "'Murica!",
+            "type": "react",
+            "reaction": ["🇺🇸"],
+            "reply": {"message": "", "file": ""},
+            "regex": "murica|\\bamerica[!?]*\\b|\\busa\\b"
+        },
+        {
+            "description": "my b",
+            "type": "reply",
+            "reaction": [],
+            "reply": {"message": "*my b*", "file": "../images/memes/myb.png"},
+            "regex": "\\bmy\\sb\\b|\\bmy\\sbad\\b|\\bmyb\\b"
+        },
+        {
+            "description": "NOICE",
+            "type": "reply",
+            "reaction": [],
+            "reply": {"message": "NOICE! https://www.youtube.com/watch?v=rQnYi3z56RE", "file": ""},
+            "regex": "\\bno+ice\\b"
+        },
+        {
+            "description": "Portugal",
+            "type": "react",
+            "reaction": ["🇵🇹"],
+            "reply": {"message": "", "file": ""},
+            "regex": "\\bsumol\\b|\\bforca\\b]|\\bporkchop\\b|\\bportugal\\b"
+        }
+    ]
+}

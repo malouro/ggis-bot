@@ -1,5 +1,4 @@
 {
-    // You may need to remove comments for the json to parse correctly
     "botname": "ggis",
     "botnameproper": "Ggis",
     "token": "Discord OAuth token for the bot goes here!",
@@ -13,12 +12,11 @@
     "eventHandlers": ["streamlinkHandler", "lfgHandler", "pollHandler", "spoilerHandler"],
     "functionsToReload": ["streamlink", "lfg", "poll", "spoiler"],
     "reloaders": ["commandsReload", "lfgReload"],
-    "guilds": [], // "<bot will add a list of server ID's as it joins them in here>"
+    "guilds": [],
     "masterID": "Your User ID (bot owner)",
     "mainguild": "Main server ID, for guildOnly commands",
     "mainchannel": "Main channel in main guild",
-    "testguild": "Test server ID, where most if not all testing takes place",
-    // Whether certain GuildOnly features are enabled or not
+    "testguild": "Test server ID, where most if not all testing takes place (also where extended emoji come from)",
     "rules": {
         "enable": true,
         "sailormoon": true,
@@ -37,27 +35,26 @@
     "fortune": {
         "token": "IMGUR API Client Token",
         "album": "Album to look thru",
-        "amount": 0 // Stores # of images here
+        "amount": 0
     },
     "streamlink": {
         "default_setting": true,
         "enable": true,
-        "timer": 60, //60 minutes
-        "split_value": 10 //shows 10 user configs per message with StreamLink status cmd
+        "timer": 60,
+        "split_value": 10
     },
     "lfg": {
-        //ttl = time to live in minutes
         "ttl_default": 15,
-        "ttl_warning": true, // warn when longer lfg requests are running out of time?
+        "ttl_warning": true,
         "ttl_max": 180,
         "ttl_threshold": 30,
         "max_party_size": 32,
-        "split_value": 25 // where to split the lfg list
+        "split_value": 25
     },
     "squad": {
         "server_max": 25
     },
     "poll": {
-        "divider": "|" // character which divides poll options
+        "divider": "|"
     }
 }

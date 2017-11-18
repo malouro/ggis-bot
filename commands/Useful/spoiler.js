@@ -81,6 +81,7 @@ exports.conf = {
     enabled: true,
     visible: true,
     guildOnly: false,
+    textChannelOnly: true,
     aliases: ["spoil"],
     permLevel: 0
 };
@@ -88,7 +89,7 @@ exports.conf = {
 exports.help = {
     name: 'spoiler',
     description: `Tag your message with a spoiler`,
-    usage: `spoiler [spoilerTopic ::] (spoiler message goes here, shh)\n\nThe spoiler topic is completely optional, but if included it must be at the beginning of the message and followed up by '${SPOIL_SEPERATOR.source.toString()}' (and don't include the '[ ]'s either!)` +
+    usage: `spoiler [spoilerTopic ${SPOIL_SEPERATOR}] (spoiler message goes here, shh)\n\nThe spoiler topic is completely optional, but if included it must be at the beginning of the message and followed up by '${SPOIL_SEPERATOR.source.toString()}' (and don't include the '[ ]'s either!)` +
     `\n\nWarning ::\nAs of now, the spoiler gifs don't work too great on mobile, due to the sheer nature of how gifs on Discord's mobile app work in general. Unfortuantely, there's not much of a work around for this, so just take caution when using Discord on mobile.`+
     `\n\nCredit ::\n${settings.botnameproper}'s ${settings.prefix}spoiler command uses the GifGenerator method from Tim K's (https://github.com/TimboKZ) discord-spoiler-bot repository. Thanks Tim! :)`
 };
