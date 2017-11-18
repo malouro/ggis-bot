@@ -1,0 +1,10 @@
+{
+    "code": "destiny2",
+    "name": "Destiny 2",
+    "aliases": [],
+    "thumbnail": "https://i.imgur.com/dn81oLb.png",
+    "default_party_size": [4,4],
+    "modes": ["any","custom"],
+    "modes_proper": ["Any","Custom Lobby"],
+    "default_game_mode": "any"
+}

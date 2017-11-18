@@ -1,59 +1,29 @@
 // This event triggers whenever the Bot leaves guild (aka: server) or a guild gets deleted
 // Ggis will remove the guild from the list of connected guilds, and edit StreamLink settings
 
-const chalk = require('chalk');
-const fs = require('fs');
-const moment = require('moment-timezone');
-const rmdir = require('rmdir');
-const streamlink = require('../util/streamlinkHandler');
+const chalk      = require('chalk');
+const fs         = require('fs');
+const moment     = require('moment');
+const rmdir      = require('rmdir');
+var   streamlink = require('../util/streamlinkHandler');
 
 module.exports = guild => {
     try {
         var settings     = JSON.parse(fs.readFileSync('./settings.json', 'utf8'));
-        var settingsSL   = JSON.parse(fs.readFileSync('./config/streamlink.json', 'utf8'));
-        var settingsSLMG = JSON.parse(fs.readFileSync('./config/streamlink_multiguild.json', 'utf8'));
         let index        = settings.guilds.indexOf(guild.id);
         let flag, flagMG = false;
 
+        // Update guilds in settings & StreamLink settings
         if (index > -1) {
-
             settings.guilds.splice(index, 1); // Remove guild from settings.json!
-            for (i = 0; i < settingsSL.channels.length; i++) { // Remove guild from streamlink.json!
-                if (settingsSL.guilds[i] === guild.id) {
-                    flag = true;
-                    settingsSL.guilds.splice(i, 1);
-                    settingsSL.channels.splice(i, 1);
-                    guild.client.streamLink.get("settings").guilds.splice(i, 1);
-                    guild.client.streamLink.get("settings").channels.splice(i, 1);
-                }
-            }
-            settingsSLMG.guilds.forEach((g,index) => {
-                if (g.id === guild.id) {
-                    flagMG = true;
-                    settingsSLMG.guilds.splice(index, 1);
-                    guild.client.streamLink.delete(guild.id);              
-                }
+            fs.writeFile("./settings.json", JSON.stringify(settings), (err) => {
+                if (err) console.error(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${err}`);
+                console.log(chalk.bgCyan.black(`[${moment().format('hh:mm:ssA MM/DD/YY')}] Wrote to settings.json OK! Left Guild "${guild.name}" (ID ${guild.id})`));
+                streamlink.removeGuild(guild);
             });
             
-            // Write & notify
-            fs.writeFile("./settings.json", JSON.stringify(settings), (err) => {
-                if (err) console.error(`[${moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY')}] ${err}`);
-                else console.log(chalk.bgCyan.black('[' + moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY') + `] Wrote to settings.json OK! Left Guild "${guild.name}" (ID ${guild.id})`));
-            });
-            if (flag) {
-                fs.writeFile("./config/streamlink.json", JSON.stringify(settingsSL), (err) => {
-                    if (err) console.error(`[${moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY')}] ${err}`);
-                    else console.log(chalk.bgCyan.black('[' + moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY') + `] Wrote to streamlink.json OK! Left Guild "${guild.name}" (ID ${guild.id})`));
-                });
-            }
-            if (flagMG) {
-                fs.writeFile("./config/streamlink_multiguild.json", JSON.stringify(settingsSLMG), (err) => {
-                    if (err) console.error(`[${moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY')}] ${err}`);
-                    else console.log(chalk.bgCyan.black('[' + moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY') + `] Wrote to streamlink_multiguild.json OK! Left Guild "${guild.name}" (ID ${guild.id})`));
-                });
-            }
         } else {
-            console.log(chalk.bgRed.bold(`[${moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY')}] ERROR LEAVING GUILD: Somehow, guild not found`));
+            console.log(chalk.bgRed.bold(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ERROR LEAVING GUILD: Somehow, guild not found`));
         }
 
         // Update squads folders
@@ -61,19 +31,31 @@ module.exports = guild => {
             if (err) {
                 if (err.code !== 'ENOENT') throw err;
             } else {
-                console.log(chalk.bgBlue.bold(`[${moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY')}] Successfully deleted the ${guild.name} guild's (#${guild.id}) Squad folder.`));
+                console.log(chalk.bgBlue.bold(`[${moment().format('hh:mm:ssA MM/DD/YY')}] Successfully deleted the ${guild.name} guild's (#${guild.id}) Squad folder.`));
                 fs.rmdir(`./config/squads/${guild.id}`, function (err) {
                     if (err) {
                         if (err.code === 'ENOENT') {
-                            console.log(chalk.bgRed.bold('[' + moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY') + `] Squad folder for guild #${guild.id} was not found`));
+                            console.log(chalk.bgRed.bold(`[${moment().format('hh:mm:ssA MM/DD/YY')}] Squad folder for guild #${guild.id} was not found`));
                         } else throw err;
                     } else {
-                        console.log(chalk.bgCyan.black('[' + moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY') + `] Removed squad folder for guild "${guild.name}" (ID ${guild.id}) OK!`));
+                        console.log(chalk.bgCyan.black(`[${moment().format('hh:mm:ssA MM/DD/YY')}] Removed squad folder for guild "${guild.name}" (ID ${guild.id}) OK!`));
                     }
                 });
             }
         }); 
     } catch (err) {
-        console.log(chalk.bgRed.bold('[' + moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY') + '] ' + err));
+        console.log(chalk.bgRed.bold(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${err}`));
     }
+};
+
+module.exports.reloadHandler = function () {
+    return new Promise((resolve, reject) => {
+        try {
+            delete require.cache[require.resolve(`../util/streamlinkHandler`)];
+            streamlink = require(`../util/streamlinkHandler`);
+            resolve();
+        } catch (err) {
+            reject(err);
+        }
+    });
 };

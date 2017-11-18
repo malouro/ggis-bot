@@ -12,15 +12,13 @@ package-lock.json
 Thumbs.db
 
 # Privacy
-config/
+# config/
 settings.json
 settings-backup.json
-**/nj.js
-**/sayreville.js
 
 # Commands not to include
-**/Memes/*.js
-**/plug.js
+# **/Memes/*.js
+# **/plug.js
 **/test.js
 **/weeklytest.js
 **/insult.js

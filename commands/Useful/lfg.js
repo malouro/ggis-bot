@@ -291,13 +291,14 @@ exports.conf = {
     enabled: true,
     visible: true,
     guildOnly: false,
+    textChannelOnly: true,
     aliases: ["lookingforgroup", "lookforgroup"],
     permLevel: 0
 };
 
 exports.help = {
     name: 'lfg',
-    description: `Look for players to join you in a game. Creates a 'party' for the specified game`,
+    description: `Look for players to join you in a game`,
     usage: `lfg <game> [mode] [partySize] [expirationTime(in minutes)]\n\n<game> is *mandatory*, and doesn't include spaces\n[mode], [partSize], [expirationTime] are all optional` +
     `\n\n- These three options, if used, must be given *consecutivtely and in order*.` +
     `\n- That is, in order to give the party size, you must have a mode chosen, and in order to specify the time left to expire, you must have a party size set.` +

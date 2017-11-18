@@ -383,7 +383,8 @@ exports.conf = {
     enabled: true,
     visible: true,
     guildOnly: false,
-    aliases: ["s"],
+    textChannelOnly: true,    
+    aliases: ["sq"],
     permLevel: 0
 };
 

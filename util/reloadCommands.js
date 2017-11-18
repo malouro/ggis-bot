@@ -5,8 +5,11 @@ const fs      = require('fs');
 module.exports = (bot, command) => {
     return new Promise((resolve, reject) => {
         try {
+            /**
+             * Reload a single command
+             */
             if (command) {
-                if (!bot.commands.has(command) && !bot.aliases.has(command)) reject(new Error('COMMAND_NOT_FOUND'));
+                if (!bot.commands.has(command) && !bot.aliases.has(command)) reject(new Error(`Command "${command}" not found`));
                 let cat = bot.commands.get(command).conf.category;                
                 delete require.cache[require.resolve(`../commands/${cat}/${command}`)];
                 let cmd = require(`../commands/${cat}/${command}`);
@@ -19,7 +22,7 @@ module.exports = (bot, command) => {
                 cmd.conf.aliases.forEach(alias => {
                     bot.aliases.set(alias, cmd.help.name);
                 });
-                // Re-sort command list:
+                // Re-sort command list by keys
                 var keys = [];
                 var sorted = new Discord.Collection();
                 bot.commands.forEach((value, key, map) => {
@@ -29,10 +32,23 @@ module.exports = (bot, command) => {
                     sorted.set(key, bot.commands.get(key));
                 });
                 bot.commands = sorted;
+                console.log(chalk.bgCyan.black(`Loading command ${cmd.help.name} ... ✓`));
                 resolve();
-            } else {
+            } 
+            /**
+             * Reload ALL commands
+             */
+            else {
                 bot.commands.forEach(command => {
-                    delete require.cache[require.resolve(`../commands/${command.conf.category}/${command.help.name}`)]
+                    fs.readFile(`./commands/${command.conf.category}/${command.help.name}.js`, (err, data) => {
+                        if (err && err.code === 'ENOENT') console.log(`Couldn't find file for ${command.help.name} in /${command.conf.category}/`);
+                        else if (err) throw err;
+                        else {
+                            if (typeof require.resolve(`../commands/${command.conf.category}/${command.help.name}`) !== 'undefined') {
+                                delete require.cache[require.resolve(`../commands/${command.conf.category}/${command.help.name}`)]
+                            }
+                        }
+                    });
                 });
                 bot.aliases.clear();
                 bot.commands.clear();
@@ -43,12 +59,12 @@ module.exports = (bot, command) => {
                             console.log(chalk.bgBlue(`Loading a total of ${files.length} commands from /${folder}/`));
                             files.forEach(f => {
                                 let contents = require(`../commands/${folder}/${f}`);
-                                console.log(chalk.bgCyan.black(`Loading command ${contents.help.name} ... ✓`));
                                 bot.commands.set(contents.help.name, contents);
                                 bot.commands.get(contents.help.name).conf.category = `${folder}`;
                                 contents.conf.aliases.forEach(alias => {
                                     bot.aliases.set(alias, contents.help.name);
                                 });
+                                console.log(chalk.bgCyan.black(`Loading command ${contents.help.name} ... ✓`));
                             });
                         });
                     })	

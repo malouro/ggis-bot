@@ -44,7 +44,8 @@ exports.reloadHandler = () => {
 exports.conf = {
     enabled: true,
     visible: true,
-    guildOnly: true,
+    guildOnly: false,
+    textChannelOnly: true,
     aliases: ["p", "petition"],
     permLevel: 0
 };

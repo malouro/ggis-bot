@@ -17,10 +17,10 @@ module.exports = {
             options.splice(optionEmojiLetters.length, options.length - optionEmojiLetters.length);
             tooBig = true;
         }
-        var str = `\`poll\`\n${tooBig ? `\n*__NOTE:__ Not all of your options were added; there were too many! (max is ${optionEmojiLetters.length})*\n` : ''}\n**${question}**\n\n${options.map((o, index) => `${optionEmojiLetters[index]} ${o}`).join('\n')}`;
+        var str = `\`poll\`\n${tooBig ? `\n*__NOTE:__ Not all of your options were added; there were too many! (max is ${optionEmojiLetters.length})*\n` : ''}${(question)?`\n**${question}**\n`:``}\n${options.map((o, index) => `${optionEmojiLetters[index]} ${o}`).join('\n')}`;
         message.channel.send(str).then(msg => {
             reactInOrder(msg, 0, options);
-            console.log(chalk.bgYellow.black(`[${moment().tz("America/New_York").format('hh:mm:ssA MM/DD/YY')}] ${message.author.username} has created a poll: "${question}"`));
+            console.log(chalk.bgHex('#7800ff').black(`[${moment().tz("America/New_York").format('hh:mm:ssA MM/DD/YY')}] ${message.author.username} has created a poll: "${question}"`));
         }).catch(err=>console.log(err));
     },
 
@@ -28,11 +28,11 @@ module.exports = {
     Creates a petition/poll (w/ two options {yay or nay}) >>
     * * */
     makePetition: function (bot, message, question) {
-        var str = `\`poll/petition\`\n\n**${question}**\n\nAll in favor: hit 👍  All against: hit 👎`;
+        var str = `\`poll/petition\`\n${(question)?`\n**${question}**\n`:``}\nAll in favor: hit 👍  All against: hit 👎`;
         message.channel.send(str).then(msg => {
             msg.react('👍').then(()=> {
                 msg.react('👎').then(
-                    console.log(chalk.bgYellow.black(`[${moment().tz("America/New_York").format('hh:mm:ssA MM/DD/YY')}] ${message.author.username} has created a petition; topic: "${question}"`))
+                    console.log(chalk.bgHex('#7800ff').black(`[${moment().tz("America/New_York").format('hh:mm:ssA MM/DD/YY')}] ${message.author.username} has created a petition; topic: "${question}"`))
                 ).catch(err=>console.log(err));
             }).catch(err=>console.log(err));
         }).catch(err=>console.log(err));
@@ -40,7 +40,7 @@ module.exports = {
 };
 
 // Recursive function that reacts to the message n times (up to 10)
-var reactInOrder = function(message, n, options) {
+reactInOrder = function(message, n, options) {
     if (n >= options.length) return;
     else {
         message.react(optionEmojiLetters[n]).then(()=> {

@@ -1,0 +1,10 @@
+{
+    "code": "lol",
+    "name": "League of Legends",
+    "aliases": ["league", "leagueoflegends", "leagueoflosers"],
+    "thumbnail": "http://i.imgur.com/Iljj8MJ.png",
+    "default_party_size": [5, 5, 5, 5, 5, 5, 5, 3, 5, 2, 5, 5, 5, 6, 5, 5, 5, 10, 10],
+    "modes": ["any", "aram", "coop", "bots", "normal", "normals", "sr", "3v3", "ranked", "duoq", "flexq", "urf", "poroking", "hexakill", "doombots", "nexussiege", "starguardian", "custom", "inhouse"],
+    "modes_proper": ["Any", "ARAM", "Co-op vs. AI", "Co-op vs. AI", "Normal - Summoner's Rift", "Normal - Summoner's Rift", "Normal - Summoner's Rift", "Normal - Twisted Treeline", "Ranked - Any", "Ranked - Duo Queue", "Ranked - Flex Queue", "U.R.F. Mode", "Poro King", "Hexakill", "Doom Bots of Doom", "Nexus Siege", "Star Guardian", "Custom Lobby", "In-House Lobby"],
+    "default_game_mode": "any"
+}

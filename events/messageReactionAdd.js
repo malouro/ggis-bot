@@ -1,9 +1,10 @@
+// Whenever an emoji reaction is added to a message
 
-var   lfg     = require('../util/lfgHandler');
-const chalk   = require('chalk');
+var lfg = require('../util/lfgHandler');
+const chalk = require('chalk');
 const Discord = require('discord.js');
-const fs      = require('fs');
-const moment  = require('moment-timezone');
+const fs = require('fs');
+const moment = require('moment');
 
 module.exports = (messageReaction, user) => {
 
@@ -31,28 +32,30 @@ module.exports = (messageReaction, user) => {
     }
 
     /**
-     * Random meme stuff
+     * Random memey stuff
      */
 
-    // If meme-ing isn't enabled, or not in a main guild, break out
-    if (!settings.memes && (messageReaction.message.guild.id === settings.mainguild || messageReaction.message.guild.id === settings.testguild)) return; 
+    // If "meme-ing" isn't enabled, or not in a main guild, break out
+    if (!settings.memes && (messageReaction.message.guild.id === settings.mainguild || messageReaction.message.guild.id === settings.testguild)) return;
 
     // 🤔 gifs -->
-    if (messageReaction.emoji.toString() === '🤔' && messageReaction.count >= memes.thinking.reaction_threshhold) {
-        let memes = JSON.parse(fs.readFileSync('./config/memes.json', 'utf8'));
-        let d = new Date();
-        let t = d.getTime();
-        if (t > memes.thinking.last_trigger + memes.thinking.reaction_cooldown * 60000) {
-            messageReaction.message.channel.send({ file: `../images/memes/thinking${Math.floor(Math.random() * memes.thinking.files) + 1}.gif` });
-            memes.thinking.last_trigger = t;
-            fs.writeFile("./config/memes.json", JSON.stringify(memes), (err) => {
-                if (err) console.error(moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY') + err);
-            });
+    if (messageReaction.emoji.toString() === '🤔') {
+        let memes = JSON.parse(fs.readFileSync('./config/memes.json', 'utf8'));        
+        if (messageReaction.count >= memes.thinking.reaction_threshhold) {
+            let d = new Date();
+            let t = d.getTime();
+            if (t > memes.thinking.last_trigger + memes.thinking.reaction_cooldown * 60000) {
+                messageReaction.message.channel.send(`${memes.thinking.files[Math.floor(Math.random() * memes.thinking.files)]}`);
+                memes.thinking.last_trigger = t;
+                fs.writeFile("./config/memes.json", JSON.stringify(memes), (err) => {
+                    if (err) console.error(moment().format('h:mm:ssA MM/DD/YY') + err);
+                });
+            }
         }
     }
 };
 
-module.exports.reloadHandler = function() {
+module.exports.reloadHandler = function () {
     return new Promise((resolve, reject) => {
         try {
             delete require.cache[require.resolve(`../util/lfgHandler`)];

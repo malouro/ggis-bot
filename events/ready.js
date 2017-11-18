@@ -1,13 +1,16 @@
-// The bot's locked & loaded & ready to go!
+// The bot's locked & loaded and ready to go!
+
 const chalk = require('chalk');
-const fs = require('fs');
-const moment = require('moment-timezone');
-const settings = JSON.parse(fs.readFileSync('./settings.json','utf8'));
+const moment = require('moment');
+const settings = require('../settings.json');
 
 module.exports = bot => {
-    bot.user.setPresence({ game: { name: `@ping me | ${settings.prefix}${settings.botname}`, type: 0 } });
+
+    bot.user.setPresence({ game: { name: `@ping me | ${settings.prefix}help`, type: 0 } });
+
     console.log('---------------------------------------------------------');
     console.log(chalk.bgGreen.black(`Connected as ${bot.user.username} bot!`));
-    console.log(chalk.bgGreen.gray(`Current date/time is ${moment().format('h:mm:ssA MM/DD/YY')}`)); 
+    console.log(chalk.bgGreen.gray(`Current date/time is ${moment().format(settings.timeFormat)}`)); 
     console.log('---------------------------------------------------------');
+
 }

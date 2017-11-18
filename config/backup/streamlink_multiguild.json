@@ -1,0 +1,180 @@
+{
+    "guilds": [
+        {
+            "id": "123875299501932546",
+            "guild_enable": true,
+            "users_enable": [
+                true,
+                true,
+                true,
+                true,
+                false,
+                true,
+                true,
+                true,
+                true,
+                false,
+                false,
+                false,
+                false,
+                true,
+                false
+            ],
+            "ban_list": []
+        },
+        {
+            "id": "292478819435282433",
+            "guild_enable": true,
+            "users_enable": [
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true,
+                true
+            ],
+            "ban_list": []
+        },
+        {
+            "id": "119264905395175425",
+            "guild_enable": true,
+            "users_enable": [
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "ban_list": []
+        },
+        {
+            "id": "246377870316929024",
+            "guild_enable": true,
+            "users_enable": [
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true,
+                true,
+                true,
+                true,
+                false,
+                false
+            ],
+            "ban_list": []
+        },
+        {
+            "id": "342817536263323648",
+            "guild_enable": true,
+            "users_enable": [
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "ban_list": []
+        },
+        {
+            "id": "364967434047717377",
+            "guild_enable": true,
+            "users_enable": [
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "ban_list": []
+        },
+        {
+            "id": "294294622891671554",
+            "guild_enable": true,
+            "users_enable": [
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "ban_list": []
+        },
+        {
+            "id": "277870558404804609",
+            "guild_enable": true,
+            "users_enable": [
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "ban_list": []
+        }
+    ]
+}

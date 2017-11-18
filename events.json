@@ -1,0 +1,29 @@
+{
+    "events": [
+        "message",
+        "messageDelete",
+        "messageReactionAdd",
+        "messageReactionRemove",
+        "guildCreate",
+        "guildDelete",
+        "guildMemberRemove",
+        "channelDelete",
+        "channelDelete"
+    ],
+    "handlers": [
+        "streamlinkHandler",
+        "lfgHandler",
+        "pollHandler",
+        "spoilerHandler"
+    ],
+    "functionsToReload": [
+        "streamlink",
+        "lfg",
+        "poll",
+        "spoiler"
+    ],
+    "reloaders": [
+        "reloadCommands",
+        "reloadLFG"
+    ]
+}

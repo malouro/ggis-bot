@@ -1,721 +1,685 @@
-// Handles all StreamLink and TwitchPS events & functions
-
-const chalk   = require('chalk');
-const Discord = require('discord.js');
-const fs      = require('fs');
-const main    = require('../bot');
-const moment  = require('moment-timezone');
-
-/** 
- * StreamLink settings content:
+/**
+ * StreamLink Handler
  * 
- * Client bot => {
- *    // General settings
- *    "settings" => {
- *      guilds: List of guilds that correspond to channels below
- *      channels: List of channels to push notifications to
- *      users: List of user IDs that have set up & configured w/ StreamLink
- *      userNames: List of corresponding users' usernames
- *      twitchChannels: List of corresponding users' Twitch channels
- *      defaultTimer: Timing threshold for next push (a notification "cooldown" per user)
- *    }
- *    // Per-user settings
- *    "userID#" => {
- *      id: User ID,
- *      isUser: always true
- *      userName: User's name
- *      twitchChannel: Linked Twitch channel for user
- *      status: Is the stream live or not?
- *      lastBroadcast: Last time user's stream went up
- *      game: Game user is streaming
- *      viewerCount: # of viewers on user's stream
- *    }
- *    // Per-guild settings
- *    "guildID#" => {
- *      id: Guild ID (server id)
- *      isGuild: always true
- *      guildEnable: Is StreamLink enabled on the server?
- *      usersEnable: List of users' enable setting on this server
- *      banList: List of users StreamLink-banned on the server
- *    }
- * }
+ * Handles all StreamLink functions, from all the !streamlink commands to all TwitchPS events emitted
+ * 
  */
 
-module.exports = {
-  // --------------------------------------------------------
-  //                  TwitchPS Events
-  // --------------------------------------------------------
-  /* * *
-  TwitchPS 'stream-up' Event (when a stream goes live) >>
-  * * */
-  streamUp: function (bot, data) {
-    try {
-      let settingsSL = JSON.parse(fs.readFileSync("./config/streamlink.json", "utf8"));
-      let settingsSLMG = JSON.parse(fs.readFileSync("./config/streamlink_multiguild.json", "utf8"));
-      let index = settingsSL.topics.indexOf(data.channel_name);
-      let uid = settingsSL.userIDs[index];
-      let sl = bot.streamLink.get(uid);
-      let difference = Number(data.time) - Number(sl.lastBroadcast);
-      let embed;
+const chalk = require('chalk');
+const Discord = require('discord.js');
+const fs = require('fs');
+const main = require('./init');
+const moment = require('moment');
+const settings = require('../settings.json');
 
-      if (index === -1 || !bot.streamLink.has(settingsSL.userIDs[index])) {return;}
+const RegExChannelName = /^[^_\W\s][a-zA-Z0-9_]{3,24}$/
 
-      // Get game:
-      bot.fetchUser(uid).then(u=> {
-        if (typeof u === 'undefined') return;
-        if (u.presence.game !== null) {
-          sl.game = u.presence.game.name;
-          settingsSL.stream_game[index] = u.presence.game.name;
-        } else {
-          sl.game = '';
-          settingsSL.stream_game[index] = '';
+/**
+ * @func init
+ * Initialize StreamLink elements -->
+ *  *  @param {Discord.Client} bot
+ *      @property {} bot.streamLink => {
+ *          bot.streamLink contains all updated information (in realtime) about StreamLink connections and channel status
+ *          bot.streamLink.conf contains general config and info
+ *          @property {Object} conf => {
+ *              @property {Boolean} reconnect Is reconnect enabled for the initial topics set in TwitchPS call?
+ *              @property {Boolean} debug Is debug enabled for the initial topics set in TwitchPS call?
+ *              @property {Object} defaults { Default values for certain things when elements are created
+ *                  @property {Boolean} userEnable
+ *                  @property {Boolean} guildEnable
+ *                  @property {Integer} timer
+ *                  @property {Integer} splitValue
+ *              }
+ *          },
+ *          @property {Collection} users (Snowflake, Object) => {
+ *              Here, every user that is StreamLinked will be listed in a Map that uses
+ *              their Discord ID Snowflake as the keys.
+ *              @var {Object} DiscordUserID => {
+ *                  @property {Snowflake} id: Discord User ID
+ *                  @property {String} name: Discord User Name
+ *                  @property {Boolean} isUser: (always true for users) [Deprecated]
+ *                  @property {Boolean} enabled: Is the user enabled?
+ *                  @property {String} stream: Twitch.tv channel name
+ *                  @property {Boolean} status: Is the stream online or offline?
+ *                  @property {String} game: The game currently being streamed, if available (otherwise, blank string)
+ *                  @property {Integer} viewers: Number of current viewers
+ *                  @property {Date} lastBroadcast: Last time stream went up
+ *                  @property {Date} lastOffline: Last time stream went down
+ *              }
+ *          }
+ *          @property {Collection} guilds (Snowflake, Object) => {
+ *              Every guild that the bot is connected to will show up here
+ *              @var {Object} DiscordGuildID => {
+ *                  @property {Snowflake} id: Discord Guild ID
+ *                  @property {Boolean} isGuild: (always true for guilds) [Deprecated]
+ *                  @property {Boolean} enabled: Is StreamLink enabled on this server?
+ *                  @property {Array [Snowflake]} channels: Text-channels to push notifications to
+ *                  @property {Array [Snowflake]} usersEnabled: List of user IDs that have enabled StreamLink here
+ *                  @property {Array [Snowflake]} banList: List of user IDs of users that are StreamLink banned
+ *                  @property {Integer} timer: Timer threshold for notifications to be pushed
+ *                  @property {String} style: The style for the StreamLink notifications on this server
+ *                      { can be "standard", "compact", "minimal", or "noembed" }
+ *              }
+ *          }
+ *      }
+ */
+exports.init = bot => {
+    return new Promise((resolve, reject) => {
+        try {
+            let users = new Discord.Collection();
+            let guilds = new Discord.Collection();
+            const path = './config/streamlink';
+            bot.streamLink.conf = JSON.parse(fs.readFileSync(`${path}/conf.json`, 'utf8'));
+            var topics = [];
+
+            console.log(chalk.bgMagenta.bold(`StreamLink connections:`));
+            fs.readdir(`${path}/users`, 'utf8', (err, files) => {
+
+                files.forEach(f => {
+                    let conf = JSON.parse(fs.readFileSync(`${path}/users/${f}`, 'utf8'));
+                    users.set(conf.id, conf);
+                    topics.push({topic:`video-playback.${conf.stream.toLowerCase()}`});
+                    console.log(chalk.bgMagenta(`User: ${conf.name} => Stream: https://www.twitch.tv/${conf.stream}`));
+                });
+                bot.streamLink.users = users;
+                fs.readdir(`${path}/guilds`, 'utf8', (err, files) => {
+                    files.forEach(f => {
+                        let conf = JSON.parse(fs.readFileSync(`${path}/guilds/${f}`, 'utf8'));
+                        guilds.set(conf.id, conf);
+                        console.log(chalk.bgMagenta.black(`Guild: ${conf.id} => Enabled?: ${conf.enabled}, Users: ${conf.usersEnabled}`));
+                    });
+                    bot.streamLink.guilds = guilds;
+                    resolve(topics);
+                });
+            });
+        } catch (err) {
+            reject(err);
         }
-        console.log('---------------------------------------------------------');
-        console.log(chalk.bgMagenta.bold('StreamLink >> STREAM-UP EVENT'));
-        console.log(`Channel: ${data.channel_name} has gone live!`);
-        console.log(`User: ${u.username} ${uid}`);
-        console.log(`Streaming: ${sl.game === '' ? '???' : sl.game}`);
-        console.log(`Time: ${data.time} (${moment().format('hh:mm:ssA MM/DD/YY')})`);
-        console.log('---------------------------------------------------------');
-      });
+    })
+};
 
-      // Update Client object and json config files
-      sl.status = true;
-      sl.lastBroadcast = data.time;
-      settingsSL.stream_status[index] = true;
-      settingsSL.last_broadcast[index] = data.time;
-      fs.writeFile("./config/streamlink.json", JSON.stringify(settingsSL), (err) => {
-        if (err) console.error(moment().format('hh:mm:ssA MM/DD/YY') + err);
-      });
-      bot.streamLink.set(uid, sl);
-      let botSL = bot.streamLink.get("settings");
+/**
+ * @func streamUp
+ * 
+ *  @param {Discord.Client} bot
+ *  @param {Object} data
+ *      TwitchPS 'stream-up' content:
+ *      @prop {Number} time - server time in RFC 3339 format (seconds)
+ *      @prop {String} channel_name - name of Twitch Channel
+ *      @prop {String} play_delay - delay of stream
+ * 
+ * Sets user's status to True (online)
+ * Sets user's lastBroadcast to data.time
+ * Try to get game user is playing (thru Discord)
+ * Send notification to eligible text channels
+ *      --> Get guilds that have StreamLink enabled
+ *      --> Get guilds that have that user enabled
+ *      --> Send to all SL channels in those SL guilds
+ */
+exports.streamUp = (bot, data) => {
+    console.log('stream up event\n' + data);
+    var user = bot.streamLink.users.find('stream', data.channel_name.toLowerCase()) || '';
+    if (user === '') return console.log(`[${moment().format(settings.timeformat)}] User is undefined in streamlinkHandler.streamUp for channel ${data.channel_name}`);
 
-      // Push a notification? -->
-      if (difference > botSL.defaultTimer * 60) {
-        let tmp; let tmpindex = -1;
-        for (let i = 0; i < botSL.channels.length; i++) {
-          settingsSLMG.guilds.forEach((g, gindex) => {
-            if (g.id === botSL.guilds[i]) tmpindex = gindex;
-          })
-          if (tmpindex !== -1 && bot.streamLink.has(settingsSLMG.guilds[tmpindex].id)) {
-            tmp = bot.streamLink.get(settingsSLMG.guilds[tmpindex].id);
-            if (tmp.guildEnable && tmp.usersEnable[index] && bot.guilds.get(botSL.guilds[tmpindex]).members.has(uid)) {
-              try {
-                let g = bot.guilds.get(botSL.guilds[i]);
-                let ch = g.channels.get(botSL.channels[i]);
-                let u = g.members.get(uid).user;
-                embed = new Discord.RichEmbed()
-                  .setTitle("StreamLink update:")
-                  .setDescription(`${u} has gone live on Twitch!`)
-                  .setColor(0x5a4194)
-                  .setThumbnail(u.avatarURL);
-                if (u.presence.game !== null) embed.addField("Link:", `${u.username} is now live & streaming **${u.presence.game.name}**! Check it out here:`);
-                else embed.addField("Link:", `${u.username}'s stream is now live! Check it out here:`);
-                ch.send({ embed })
-                  .then(ch.send(`https://www.twitch.tv/${data.channel_name}`))
-                  .catch(err => console.log(err));
-              } catch (err2) {
-                console.log(err2);
-              }
-            }
-          }
-        }
-      }
-    } catch (err1) {
-      console.log(err1);
-    }
-  },
+    bot.fetchUser(user.id).then(u => {
+        try {
+            let difference = Number(data.time) - Number(user.lastBroadcast);
 
-  /* * *
-  TwitchPS 'stream-down' Event (when a stream goes down) >>
-  * * */
-  streamDown: function (bot, data) {
-    let settingsSL = JSON.parse(fs.readFileSync("./config/streamlink.json", "utf8"));
-    let name = data.channel_name;
-    let time = data.time;
-    let index = settingsSL.topics.indexOf(name);
+            user.status = true;
+            user.lastBroadcast = data.time;
+            user.game = (u.presence.game !== null) ? u.presence.game.name : '';
+            bot.streamLink.users.set(user.id, user);
 
-    if (index === -1) return;
-    if (!bot.streamLink.has(settingsSL.userIDs[index])) return;
+            this.saveUser(user).then(
+                this.logEvent('stream-up', u, user)
+            ).catch(err => console.log(chalk.bgRed(`[${moment().format(settings.timeformat)}] ${err}`)));
 
-    // Update  & json config files
-    let sl = bot.streamLink.get(settingsSL.userIDs[index]);
-    sl.status = false;
-    sl.viewerCount = 0;
-    sl.game = '';
-    settingsSL.stream_status[index] = false;
-    fs.writeFile("./config/streamlink.json", JSON.stringify(settingsSL), (err) => {
-      if (err) console.error(moment().format('hh:mm:ssA MM/DD/YY') + err);
+            if (!user.enabled) return;
+
+            let embed = new Discord.RichEmbed()
+                .setTitle("StreamLink Update <:streamLink:376115635702202370>")
+                .setDescription(`${u} has gone live on Twitch!`)
+                .setColor(0x5a4194)
+
+            bot.streamLink.guilds.forEach(guild => {
+                if (guild.usersEnabled.includes(user.id) && bot.guilds.get(guild.id).members.has(user.id) && guild.enabled) {
+                    if (difference >= guild.timer * 60) {
+                        let customEmbed = embed;
+                        if (guild.style !== 'minimal') customEmbed.setThumbnail(u.avatarURL);
+                        customEmbed.addField("Info:", `${u.username} is now live${(u.presence.game !== null) ? ` & streaming **${u.presence.game.name}**!` : `!`} Check it out here:${(guild.style !== 'standard') ? `\n\nhttps://www.twitch.tv/${user.stream}` : ''}`);
+                        guild.channels.forEach(channel => {
+                            let c = bot.channels.get(channel);
+                            c.send({ embed: customEmbed })
+                                .then(() => { if (guild.style === 'standard') c.send(`https://www.twitch.tv/${user.stream}`); })
+                                .catch(console.error);
+                        });
+                    }
+                }
+            });
+        } catch (err) { console.log(chalk.bgRed(`[${moment().format(settings.timeformat)}] ${err}`)); }
+    }).catch(err => {
+        console.log(chalk.bgMagenta(`[${moment().format()}] Error fetching user (channel: ${data.channel_name}) in streamlinkHandler.streamUp!\n${err}`))
     });
-    bot.streamLink.set(settingsSL.userIDs[index], sl);
+}
 
-    // Log to console -->
-    console.log('---------------------------------------------------------');
-    console.log(chalk.bgMagenta.black('StreamLink >> STREAM-DOWN EVENT'));
-    console.log('Channel: ' + name + ' has gone down.');
-    console.log(`User: ${sl.userName} ${sl.id}`);
-    console.log('Time: ' + time + ' (' + moment().format('hh:mm:ssA MM/DD/YY') + ')');
-    console.log('---------------------------------------------------------');
-  },
+/**
+ * @func streamDown
+ * 
+ *  @param {Discord.Client} bot
+ *  @param {Object} data: {
+ *      TwitchPS 'stream-down' content:
+ *      @prop {Number} time - server time in RFC 3339 format (seconds)
+ *      @prop {String} channel_name - name of Twitch Channel
+ * }
+ * 
+ * Sets user's status to False (offline)
+ * Sets user's lastOffline to data.time
+ * Reset user's viewer count to 0
+ */
+exports.streamDown = (bot, data) => {
+    let user = bot.streamLink.users.find('channel', data.channel_name.toLowerCase());
+    if (typeof user === 'undefined') return console.log(`[${moment().format(settings.timeformat)}] User is undefined in streamlinkHandler.streamDown for channel ${data.channel_name}`);
 
-  /* * *
-  TwitchPS 'viewcount' Event  (viewer count updates) >>
-  * * */
-  viewCount: function (bot, data) {
-    let settingsSL = JSON.parse(fs.readFileSync("./config/streamlink.json", "utf8"));
-    let name = data.channel_name;
-    let index = settingsSL.topics.indexOf(name);
-    let game = "";
+    bot.fetchUser(user.id).then(u => {
+        try {
+            user.status = false;
+            user.viewers = 0;
+            user.lastOffline = data.time;
+            bot.streamLink.users.set(user.id, user);
 
-    if (index === -1) return;
-    if (!bot.streamLink.has(settingsSL.userIDs[index])) return;
-    let sl = bot.streamLink.get(settingsSL.userIDs[index]);
+            this.saveUser(user).then(
+                this.logEvent('stream-down', u, user)
+            ).catch(err => console.log(chalk.bgRed(`[${moment().format(settings.timeformat)}] ${err}`)));
+        } catch (err) { console.log(chalk.bgRed(`[${moment().format(settings.timeformat)}] ${err}`)); }
+    }).catch(err => {
+        console.log(chalk.bgMagenta(`[${moment().format()}] Error fetching user (channel: ${data.channel_name}) in streamlinkHandler.streamDown!\n${err}`))
+    });
+}
 
-    // Update
-    sl.viewerCount = data.viewers;
-    bot.fetchUser(sl.id).then(u => {
-      if (u.presence.game !== null) {
-        game = u.presence.game.name;
-      }
-      if (game !== settingsSL.stream_game[index]) {
-        sl.game = game;
-        settingsSL.stream_game[index] = game;
-        fs.writeFile("./config/streamlink.json", JSON.stringify(settingsSL), (err) => {
-          if (err) console.error(moment().format('hh:mm:ssA MM/DD/YY') + err);
-        });
-      }
+/**
+ * @func viewCount
+ * 
+ *  @param {Discord.Client} bot
+ *  @param {Object} data {
+ *      TwitchPS 'viewcount' content:
+ *      @prop {Number} time - server time in RFC 3339 format (seconds)
+ *      @prop {String} channel_name - name of Twitch Channel
+ *  }
+ * 
+ * Checks if the user's game (Playing: ...) has changed
+ * Update viewer count
+ */
+exports.viewCount = (bot, data) => {
+    let user = bot.streamLink.users.find('channel', data.channel_name.toLowerCase());
+    if (typeof user === 'undefined') return console.log(`[${moment().format(settings.timeformat)}] User is undefined in streamlinkHandler.viewCount for channel ${data.channel_name}`);
+
+    bot.fetchUser(user.id).then(u => {
+        try {
+            if (!user.status) return;
+            if (u.presence.game !== null) {
+                if (user.game !== u.presence.game.name) {
+                    user.game = u.presence.game.name;
+                }
+            }
+            user.viewers = data.viewers;
+            this.saveUser(user).then().catch(err => console.log(chalk.bgRed(`[${moment().format(settings.timeformat)}] ${err}`)));
+        } catch (err) { console.log(err); }
+    }).catch(err => {
+        console.log(chalk.bgMagenta(`[${moment().format()}] Error fetching user (channel: ${data.channel_name}) in streamlinkHandler.viewCount!\n${err}`))
+    });
+}
+
+/**
+ * @func enableUser
+ * !streamlink enable (@user)
+ * 
+ *  @param {Discord.Message} message
+ *  @param {Discord.Client} bot
+ *  @param {Discord.User} user
+ * 
+ */
+exports.enableUser = (message, bot, user) => {
+    if (!bot.streamLink.guilds.has(message.guild.id)) {
+        console.log(chalk.bgRed(`[${moment().format(settings.timeformat)}] Guild ${message.guild.name} #${message.guild.id} can't be located in bot.streamLink.guilds for streamlinkHandler.enableUser`));
+        return message.reply(`Oops! Something went wrong.\n\nServer config file was not found.`);
+    }
+
+    if (!bot.streamLink.users.has(user.id)) return message.reply(`Oops! Something went wrong.\n\nIt appears that there is no StreamLink connection set up for ${message.author}. Use \`${settings.prefix}streamlink add twitchName\` to set one up!`);
+
+    let guild = bot.streamLink.guilds.get(message.guild.id);
+
+    if (guild.usersEnabled.indexOf(user.id) > -1) {
+        return message.reply(`This user is already enabled on this server! Check \`${settings.prefix}streamlink status\` to see what connections are active on this server.`);
+    } else {
+        guild.usersEnabled.push(user.id);
+        this.saveGuild(guild).then(() => {
+            bot.streamLink.guilds.set(message.guild.id, guild);
+            message.reply(`The StreamLink connection for ${user} has been **enabled** on this server! :vibration_mode:`);
+        }).catch(err => console.log(err));
+    }
+}
+
+/**
+ * @func disableUser
+ * !streamlink disable (@user)
+ * 
+ *  @param {Discord.Message} message
+ *  @param {Discord.Client} bot
+ *  @param {Discord.User} user
+ * 
+ */
+exports.disableUser = (message, bot, user) => {
+    if (!bot.streamLink.guilds.has(message.guild.id)) {
+        console.log(chalk.bgRed(`[${moment().format(settings.timeformat)}] Guild ${message.guild.name} #${message.guild.id} can't be located in bot.streamLink.guilds for streamlinkHandler.enableUser`));
+        return message.reply(`Oops! Something went wrong.\n\nServer config file was not found.`);
+    }
+
+    if (!bot.streamLink.users.has(user.id)) return message.reply(`Oops! Something went wrong.\n\nIt appears that there is no StreamLink connection set up for ${message.author}. Use \`${settings.prefix}streamlink add twitchName\` to set one up!`);
+
+    let guild = bot.streamLink.guilds.get(message.guild.id);
+
+    if (guild.usersEnabled.indexOf(user.id) === -1) {
+        return message.reply(`This user is already disabled on this server! Check \`${settings.prefix}streamlink status\` to see what connections are active on this server.`);
+    } else {
+        guild.usersEnabled.splice(guild.usersEnabled.indexOf(user.id), 1);
+        this.saveGuild(guild).then(() => {
+            bot.streamLink.guilds.set(guild.id, guild);
+            message.reply(`The StreamLink connection for ${user} has been **disabled** on this server! :mobile_phone_off:`);
+        }).catch(err => console.log(err));
+    }
+}
+
+/**
+ * @func enableGuild
+ * !streamlink disable (@user)
+ * 
+ *  @param {Discord.Message} message
+ *  @param {Discord.Client} bot
+ *  @param {Discord.User} user
+ * 
+ */
+exports.enableGuild = (message, bot) => {
+    if (!bot.streamLink.guilds.has(message.guild.id)) {
+        console.log(chalk.bgRed(`[${moment().format(settings.timeformat)}] Guild ${message.guild.name} #${message.guild.id} can't be located in bot.streamLink.guilds for streamlinkHandler.enableUser`));
+        return message.reply(`Oops! Something went wrong.\n\nServer config file was not found.`);
+    }
+
+    let guild = bot.streamLink.guilds.get(message.guild.id);
+    guild.enabled = true;
+
+    this.saveGuild(guild).then(() => {
+        bot.streamLink.guilds.set(message.guild.id, guild);
+        message.reply(`StreamLink is now **enabled** on ${message.guild}! :ok:`);
     }).catch(err => console.log(err));
-    bot.streamLink.set(settingsSL.userIDs[index], sl);
-  },
+}
 
-  // --------------------------------------------------------
-  //                  StreamLink Functions
-  // --------------------------------------------------------
-  /* * *
-  !streamlink add [stream] (@user)
-  * * */
-  addStream: function (message, bot, stream, user) {
-    try {
-      // JSON configs
-      let settings = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
-      let settingsSL = JSON.parse(fs.readFileSync("./config/streamlink.json", "utf8"));
-      let settingsSLMG = JSON.parse(fs.readFileSync("./config/streamlink_multiguild.json", "utf8"));
-
-      // Build user and get correct user ID
-      let u;
-      let exists;
-      if (user && message.guild.members.has(user.id)) {
-        u = user;
-      } else if (user) {
-        message.reply("Error: User not recognized!\n\nThe specified Discord user doesn't seem to exist (or at least not on this server) [This error will be reported to @Sigg]");
-        console.log(chalk.bgRed.black('[' + moment().format('hh:mm:ssA MM/DD/YY') + '] ' + message.author.username + ' failed to add a StreamLink connection. UserID#' + id + ' was not found.'));
-        return;
-      } else {
-        u = message.author;
-      }
-
-      // Check for possible inconsistency?
-      if (typeof u !== 'undefined') {
-        let exists = bot.streamLink.has(u.id);
-      } else {
-        console.log(chalk.bgRed.black(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ERROR: User object is undefined in streamlink.addStream : ${u}`));
-        return;
-      }
-
-      // Check if user already has a StreamLink
-      if (exists) {
-        message.reply(`The specified Discord user <@${u.id}> is already connected to StreamLink under the Twitch channel <https://www.twitch.tv/${bot.streamLink.get(u.id).twitchChannel}` +
-          `>. If you're just trying to change the Twitch channel linked to your StreamLink, then simply use **!streamlink remove**, followed by **!streamlink add *twitchChannel*** to correct your info.` +
-          `\n\nContact an admin if you need help setting up your StreamLink. (or contact <@${settings.masterID}> directly)`);
-        console.log(chalk.bgRed.black(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${message.author.username} tried, and failed, to add a StreamLink connection for user w/ UserID# ${u.id} - User already existed in StreamLink!`));
-        return;
-      } else {
-        /* * *
-        First handle embedded vars in Client object -->
-        * * */
-        let sl = bot.streamLink.get('settings');
-        sl.users.push(u.id);
-        sl.userNames.push(u.username);
-        sl.twitchChannels.push(stream.toLowerCase());
-        bot.streamLink.set(u.id, {
-          isUser: true,
-          userName: u.username,
-          twitchChannel: stream.toLowerCase(),
-          status: false,
-          lastBroadcast: 0,
-          game: '',
-          viewerCount: NaN
-        });
-        settingsSLMG.guilds.forEach((guild, index) => {
-          let g = bot.streamLink.get(guild.id);
-          if (message.guild.id === guild.id) g.usersEnable.push(true);
-          else g.usersEnable.push(false);
-          bot.streamLink.set(guild.id, g);
-        });
-
-        /* * *
-        Then handle JSON configs -->
-        * * */
-        settingsSL.topics.push(stream.toLowerCase());
-        settingsSL.userNames.push(u.username);
-        settingsSL.userIDs.push(u.id);
-        settingsSL.last_broadcast.push(0);
-        settingsSL.stream_status.push(false);
-        settingsSL.stream_game.push("");
-        settingsSLMG.guilds.forEach(g => {
-          if (g.id === message.guild.id) g.users_enable.push(true);
-          else g.users_enable.push(false);
-        });
-
-        // Add Twitch topic back in bot.js
-        main.addTwitchTopic(stream);
-
-        // Write JSON configs:
-        fs.writeFile("./config/streamlink.json", JSON.stringify(settingsSL), (err) => {
-          if (err) console.error(moment().format('hh:mm:ssA MM/DD/YY') + err);
-        });
-        fs.writeFile("./config/streamlink_multiguild.json", JSON.stringify(settingsSLMG), (err) => {
-          if (err) console.error(moment().format('hh:mm:ssA MM/DD/YY') + err);
-        });
-
-        // Notify & log
-        message.reply(`StreamLink connection added for <@${u.id}> at <https://www.twitch.tv/${stream.toLowerCase()}>`);
-        console.log(chalk.bgMagenta(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${message.author.username} added a StreamLink connection!\nUser: ${u.username}\nID: ${u.id}\nTwitch: https://www.twitch.tv/${stream.toLowerCase()}`));
-      }
-    } catch (err) {
-      console.log(chalk.bgRed.bold(`[${moment().format('hh:mm:ssA MM/DD/YY')}] Error adding stream to StreamLink!\n${err}`));
+/**
+ * @func disableGuild
+ * !streamlink disable (@user)
+ * 
+ *  @param {Discord.Message} message
+ *  @param {Discord.Client} bot
+ *  @param {Discord.User} user
+ * 
+ */
+exports.disableGuild = (message, bot) => {
+    if (!bot.streamLink.guilds.has(message.guild.id)) {
+        console.log(chalk.bgRed(`[${moment().format(settings.timeformat)}] Guild ${message.guild.name} #${message.guild.id} can't be located in bot.streamLink.guilds for streamlinkHandler.enableUser`));
+        return message.reply(`Oops! Something went wrong.\n\nServer config file was not found.`);
     }
-  },
 
-  /* * *
-  !streamlink add channel
-  * * */
-  addChannel: function (message, bot, channel) {
-    try {
-      // JSON configs
-      let settingsSL = JSON.parse(fs.readFileSync("./config/streamlink.json", "utf8"));
+    let guild = bot.streamLink.guilds.get(message.guild.id);
+    guild.enabled = false;
 
-      // Get channel object
-      let ch;
-      if (channel) {
-        ch = channel; // if a channel is specified then we will use it
-      } else {
-        ch = message.channel; // otherwise get the channel that the message came from
-      }
+    this.saveGuild(guild).then(() => {
+        bot.streamLink.guilds.set(message.guild.id, guild);
+        message.reply(`StreamLink is now **disabled** on ${message.guild} :no_entry_sign:`);
+    }).catch(err => console.log(err));
+}
 
-      // Add the channel
-      // Check if channel already exists in settings
-      if (bot.streamLink.get("settings").channels.indexOf(ch.id) > -1) {
-        message.reply(`Channel #${ch.name} is already included in this server's list of StreamLink notification channels.`);
-      } else {
-        // If not, let's add it in!
-        let sl = bot.streamLink.get("settings");
-        sl.guilds.push(message.guild.id);
-        sl.channels.push(ch.id);
-        settingsSL.guilds.push(message.guild.id);
-        settingsSL.channels.push(ch.id);
-        bot.streamLink.set("settings", sl);
-        fs.writeFile("./config/streamlink.json", JSON.stringify(settingsSL), (err) => {
-          if (err) console.error(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${err}`);
-          else {
-            message.reply(`Channel <#${ch.id}> has been added to this server's list of StreamLink notification channels.`);
-            console.log(chalk.bgBlue(`[${moment().format('hh:mm:ssA MM/DD/YY')}] User ${message.author.username} added channel ${ch.name} (id#${message.channel.id}) to the StreamLink notification list.`));
-          }
-        });
-      }
-    } catch (err) {
-      console.log(chalk.bgRed.bold(`[${moment().format('hh:mm:ssA MM/DD/YY')}] Error adding guild channel to StreamLink!\n${err}`));
-    }
-  },
+/**
+ * @func addUser 
+ * !streamlink add [stream] (@user)
+ * 
+ *  @param {Discord.Message} message
+ *  @param {Discord.Client} bot
+ *  @param {String} stream Twitch.tv channel name
+ *  @param {Discord.User} user Discord user object
+ * 
+ *  Adds a StreamLink connection for a given user, given the user id, name, and Twitch stream
+ */
+exports.addUser = (message, bot, stream, user) => {
+    let object; let userToAdd; let existed; let oldStream;
+    if (!stream) return message.reply(`Oops! Something went wrong.\n\nIt appears that no stream name was given with the command usage! Proper format is \`${settings.prefix}streamlink add twitchName\` where \`twitchName\` is your Twitch.tv user name (ie: the end of the URL for your stream <https://www.twitch.tv/THIS_PART_HERE>)`);
+    if (!stream.match(RegExChannelName)) return message.reply(`The given Twitch.tv channel name doesn't comply with the Twitch.tv username requirements! (must be between 4-25 characters, alphanumeric or underscores ONLY [a-zA-Z0-9_])`);
 
-  /* * *
-  !streamlink remove (@user)
-  * * */
-  removeStream: function (message, bot, user) {
-    try {
-      // JSON configs
-      let settings = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
-      let settingsSL = JSON.parse(fs.readFileSync("./config/streamlink.json", "utf8"));
-      let settingsSLMG = JSON.parse(fs.readFileSync("./config/streamlink_multiguild.json", "utf8"));
+    stream = stream.toLowerCase();
 
-      // Build user and get correct user ID
-      let u, index, sl, slUser;
-      let noMessage = false;
-      if (typeof user !== 'undefined' && typeof message === 'undefined') {
-        noMessage = true;
-        u = user;
-      } else if (typeof user !== 'undefined' && message.guild.members.has(user.id)) {
-        u = user;
-      } else if (typeof user !== 'undefined') {
-        message.reply("The specified Discord user doesn't seem to exist (or at least not on this server).");
-        console.log(chalk.bgRed.black(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${message.author.username} failed to add a StreamLink connection. UserID#${user.id} was not found.`));
-        return;
-      } else if (typeof message !== 'undefined') {
-        u = message.author;
-      } else {
-        console.log(chalk.bgRed.black(`[${moment().format('hh:mm:ssA MM/DD/YY')}] `));
-        return;
-      }
-
-      // Check for possible inconsistency?
-      if (typeof u !== 'undefined') {
-        index = settingsSL.userIDs.indexOf(u.id);
-        slUser = bot.streamLink.get(u.id);
-      } else {
-        console.log(chalk.bgRed.black('[' + moment().format('hh:mm:ssA MM/DD/YY') + '] ERROR: user object is undefined.'));
-        return;
-      }
-
-      //!streamlink remove @user --> if user ID exists in list
-      if (index > -1) {
-        /* * *
-        First handle embedded vars in Client object -->
-        * * */
-        let stream = slUser.twitchChannel;
-        sl = bot.streamLink.get("settings");
-
-        /* * *
-        Then handle JSON configs -->
-        * * */
-        sl.users.splice(index, 1);
-        sl.userNames.splice(index, 1);
-        sl.twitchChannels.splice(index, 1);
-        settingsSL.topics.splice(index, 1);
-        settingsSL.userNames.splice(index, 1);
-        settingsSL.userIDs.splice(index, 1);
-        settingsSL.stream_status.splice(index, 1);
-        settingsSL.stream_game.splice(index, 1);
-        settingsSL.last_broadcast.splice(index, 1);
-        settingsSLMG.guilds.forEach(g => {
-          g.users_enable.splice(index, 1);
-        });
-        bot.streamLink.delete(u.id);
-        bot.streamLink.set("settings", sl)
-
-        // Remove Twitch topic back in bot.js
-        main.removeTwitchTopic(stream);
-
-        // Write JSON configs:
-        fs.writeFile("./config/streamlink.json", JSON.stringify(settingsSL), (err) => {
-          if (err) console.error(moment().format('hh:mm:ssA MM/DD/YY') + err);
-        });
-        fs.writeFile("./config/streamlink_multiguild.json", JSON.stringify(settingsSLMG), (err) => {
-          if (err) console.error(moment().format('hh:mm:ssA MM/DD/YY') + err);
-        });
-
-        // Notify & log
-        if (!noMessage) {
-          message.reply("StreamLink connection removed for <@" + u.id + ">, who was linked to <https://www.twitch.tv/" + stream + ">");
-          console.log(chalk.bgMagenta(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${message.author.username} removed a StreamLink connection!\nUser: ${u.username}\nID: ${u.id}\nTwitch: https://www.twitch.tv/${stream.toLowerCase()}`));
-        } else {
-          console.log(chalk.bgMagenta(`[${moment().format('hh:mm:ssA MM/DD/YY')}] User ${user.username} has left a server. StreamLink removed:\nID: ${user.id}\nTwitch: https://www.twitch.tv/${stream.toLowerCase()}`));
-        }
-      } else {
-        if (!noMessage) {
-          message.reply("Doesn't seem like you have a StreamLink connection set up... Try using **!streamlink add** or check **!streamlink help** for more info.");
-          console.log(chalk.bgRed.black(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${message.author.username} failed to remove StreamLink connection. UserID#${u.id} not found.`));
-        } else {
-          console.log(chalk.bgRed.black(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${user.username} has left a server, and failed to remove StreamLink connection. UserID#${u.id} not found.`));
-        }
-      }
-    } catch (err) {
-      console.log(chalk.bgRed.bold('[' + moment().format('hh:mm:ssA MM/DD/YY') + '] ' + err));
-    }
-  },
-
-  /* * *
-  !streamlink remove channel
-  * * */
-  removeChannel: function (message, bot, channel) {
-    try {
-      // JSON configs
-      let settingsSL = JSON.parse(fs.readFileSync("./config/streamlink.json", "utf8"));
-
-      // Get channel object
-      let ch;
-      if (channel) { // if a channel is specified then we will use it
-        ch = channel;
-      } else {
-        ch = message.channel; // otherwise get the channel that the message came from
-      }
-
-      // Remove the channel
-      // Check if channel already exists in settings
-      let index = bot.streamLink.get("settings").channels.indexOf(ch.id);
-      if (index === -1) {
-        message.reply(`Channel #${ch.name} is *not* in the list of StreamLink notification channels for this server.`);
-        console.log(chalk.bgBlue.black(`[${moment().format('hh:mm:ssA MM/DD/YY')}] User ${message.author.username} attempted to remove channel ${message.channel.name} (id#${ch.id}) from the StreamLink notification list. (but it wasn't on the list!)`));
-      } else {
-        // If yes, let's remove it!
-        let sl = bot.streamLink.get("settings");
-        sl.guilds.splice(index, 1);
-        sl.channels.splice(index, 1);
-        settingsSL.guilds.splice(index, 1);
-        settingsSL.channels.splice(index, 1);
-        bot.streamLink.set("settings", sl);
-        fs.writeFile("./config/streamlink.json", JSON.stringify(settingsSL), (err) => {
-          if (err) console.log(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${err}`);
-          else {
-            message.reply(`Channel <#${ch.id}> has been removed from this server's list of StreamLink notification channels.`);
-            console.log(chalk.bgBlue(`[${moment().format('hh:mm:ssA MM/DD/YY')}] User ${message.author.username} removed channel ${ch.name} (id#${message.channel.id}) from the StreamLink notification list.`));
-          }
-        });
-      }
-    } catch (err) {
-      console.log(chalk.bgRed.bold(`[${moment().format('hh:mm:ssA MM/DD/YY')}] Error removing guild channel to StreamLink!\n${err}`));
-    }
-  },
-
-  /* * *
-  !streamlink enable
-  * * */
-  enable: function (message, bot, user) {
-    try {
-      // JSON configs
-      let settingsSL = JSON.parse(fs.readFileSync("./config/streamlink.json", "utf8"));
-      let settingsSLMG = JSON.parse(fs.readFileSync("./config/streamlink_multiguild.json", "utf8"));
-
-      // Get user object
-      let uid;
-      if (typeof user !== 'undefined') uid = user.id;
-      else uid = message.author.id;
-
-      // Find user in StreamLink settings
-      let index = settingsSL.userIDs.indexOf(uid);
-      if (index > -1) {
-        // Somehow, user doesn't exist? Throw an error
-        if (typeof message.guild.members.get(uid) == 'undefined') {
-          message.reply(`ERROR: This user seems to be from another server.`);
-          console.log(chalk.bgRed(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${message.author.username} tried to enable user #${uid}'s StreamLink`));
-          return;
-        } else {
-          // Enable user's StreamLink in Client object and JSON config
-          bot.streamLink.get(message.guild.id).usersEnable[index] = true;
-          settingsSLMG.guilds.forEach(g => {
-            if (g.id === message.guild.id) g.users_enable[index] = true;
-          });
-          fs.writeFile("./config/streamlink_multiguild.json", JSON.stringify(settingsSLMG), (err) => {
-            if (err) console.error(moment().format('hh:mm:ssA MM/DD/YY') + err);
-            else {
-              message.reply(`StreamLink connection for <@${uid}> has been enabled on this server.`);
-              console.log(chalk.bgMagenta(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${message.author.username} has enabled ${message.guild.members.get(uid).user.username}'s StreamLink for server ${message.guild.name} (id: ${message.guild.id})`));
-            }
-          });
-        }
-      } else {
-        message.reply("This user doesn't have a StreamLink connection set up. Have you set one up with **!streamlink add** yet? Read the **help** menu by using command **!streamlink help** to learn more.");
-      }
-    } catch (err) {
-      console.log(chalk.bgRed.bold('[' + moment().format('hh:mm:ssA MM/DD/YY') + ']' + 'Error enabling StreamLink! ' + err));
-    }
-  },
-
-  /* * *
-  !streamlink globalEnable
-  * * */
-  globalEnable: function (message, bot) {
-    try {
-      let settingsSLMG = JSON.parse(fs.readFileSync("./config/streamlink_multiguild.json", "utf8"));
-      bot.streamLink.get(message.guild.id).guildEnable = true;
-      settingsSLMG.guilds.forEach(g => {
-        if (g.id === message.guild.id) g.guild_enable = true;
-      });
-      fs.writeFile("./config/streamlink_multiguild.json", JSON.stringify(settingsSLMG), (err) => {
-        if (err) console.error(moment().format('hh:mm:ssA MM/DD/YY') + err);
+    if (user) {
+        if (message.guild.members.has(user.id)) userToAdd = user;
         else {
-          message.reply(`StreamLink has been enabled for the **${message.guild.name}** server.`);
-          console.log(chalk.bgMagenta(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${message.author.username} has enabled StreamLink for server ${message.guild.name} (id: ${message.guild.id})`));
+            message.reply(`Oops! Something went wrong.\n\nThe specified Discord user doesn't seem to exist (or at least not on this server)`);
+            return console.log(chalk.bgRed(`[${moment().format(settings.timeformat)}] ${message.author.username} failed to add a StreamLink connection. User ID#${user.id} was not found.`));
         }
-      });
-    } catch (error) {
-      console.log(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${error}`);
+    } else {
+        userToAdd = message.author;
     }
-  },
 
-  /* * *
-  !streamilnk disable
-  * * */
-  disable: function (message, bot, user) {
-    try {
-      // JSON configs
-      let settingsSL = JSON.parse(fs.readFileSync("./config/streamlink.json", "utf8"));
-      let settingsSLMG = JSON.parse(fs.readFileSync("./config/streamlink_multiguild.json", "utf8"));
-
-      // Get user object
-      let uid;
-      if (typeof user !== 'undefined') uid = user.id;
-      else uid = message.author.id;
-
-      // Find user in StreamLink settings
-      let index = settingsSL.userIDs.indexOf(uid);
-      if (index > -1) {
-        // Somehow, user doesn't exist? Throw an error
-        if (typeof message.guild.members.get(uid) === 'undefined') {
-          message.reply(`ERROR: This user seems to be from another server.`);
-          console.log(chalk.bgRed(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${message.author.username} tried to enable user #${uid}'s StreamLink`));
-        } else {
-          // Disable user's StreamLink in Client object and JSON config
-          bot.streamLink.get(message.guild.id).usersEnable[index] = false;
-          settingsSLMG.guilds.forEach(g => {
-            if (g.id === message.guild.id) g.users_enable[index] = false;
-          });
-          fs.writeFile("./config/streamlink_multiguild.json", JSON.stringify(settingsSLMG), (err) => {
-            if (err) console.error(moment().format('hh:mm:ssA MM/DD/YY') + err);
-            else {
-              message.reply(`StreamLink connection for  <@${uid}> has been disabled on this server.`);
-              console.log(chalk.bgMagenta(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${message.author.username} has disabled ${message.guild.members.get(uid).user.username}'s StreamLink for server ${message.guild.name} (id: ${message.guild.id})`));
-            }
-          });
-        }
-      } else {
-        message.reply("This user doesn't have a StreamLink connection set up. Have you set one up with **!streamlink add** yet? Read the **help** menu by using command **!streamlink help** to learn more.");
-      }
-    } catch (err) {
-      console.log(chalk.bgRed.bold(`[${moment().format('hh:mm:ssA MM/DD/YY')}] Error disabling StreamLink! ${err}`));
+    if (bot.streamLink.users.has(userToAdd.id)) {
+        existed = true;
+        object = bot.streamLink.users.get(userToAdd.id);
+        oldStream = object.stream;
+    } else {
+        existed = false;
+        object = JSON.parse(fs.readFileSync('./config/streamlink/conf.json', 'utf8')).defaults.userObject;
     }
-  },
 
-  /* * *
-  !streamlink globalDisable
-  * * */
-  globalDisable: function (message, bot) {
-    try {
-      let settingsSLMG = JSON.parse(fs.readFileSync("./config/streamlink_multiguild.json", "utf8"));
-      bot.streamLink.get(message.guild.id).guildEnable = false;
-      settingsSLMG.guilds.forEach(g => {
-        if (g.id === message.guild.id) g.guild_enable = false;
-      });
-      fs.writeFile("./config/streamlink_multiguild.json", JSON.stringify(settingsSLMG), (err) => {
-        if (err) console.error(moment().format('hh:mm:ssA MM/DD/YY') + err);
-        else {
-          message.reply(`StreamLink is now disabled for the **${message.guild.name}** server.`);
-          console.log(chalk.bgMagenta(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${message.author.username} has disabled StreamLink for server ${message.guild.name} (id: ${message.guild.id})`));
-        }
-      });
-    } catch (err) {
-      console.log(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${err}`);
+    object.id = userToAdd.id;
+    object.name = userToAdd.username;
+    object.stream = stream;
+
+    if (!bot.streamLink.guilds.has(message.guild.id)) {
+        console.log(chalk.bgRed(`[${moment().format(settings.timeformat)}] Guild ${message.guild.name} #${message.guild.id} can't be located in bot.streamLink.guilds for streamlinkHandler.addUser`));
+        return message.reply(`Oops! Something went wrong.\n\nServer config file was not found.`);
+    } else if (!existed) {
+        bot.streamLink.guilds.get(message.guild.id).usersEnabled.push(userToAdd.id);
     }
-  },
 
-  /* * *
-  !streamlink status
-  * * */
-  status: function (message, bot) {
-    try {
-      // JSON configs
-      let settings = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
-      let settingsSLMG = JSON.parse(fs.readFileSync("./config/streamlink_multiguild.json", "utf8"));
+    this.saveUser(object).then(() => {
+        if (existed) bot.removeTwitchTopic(oldStream);
+        bot.addTwitchTopic(stream);
+        bot.streamLink.users.set(object.id, object);
+        if (existed) message.reply(`StreamLink connection for ${userToAdd} has been editted and is now connected to <https://www.twitch.tv/${object.stream}> and is currently ${(object.enabled) ? '**enabled**. :vibration_mode:' : '**disabled**. :mobile_phone_off:'} ✅`);
+        else message.reply(`StreamLink connection established for ${userToAdd} at <https://www.twitch.tv/${object.stream}> and has been **enabled** on this server. ✅`);
+        console.log(chalk.bgMagenta(`[${moment().format(settings.timeformat)}] ${message.author.username} ${existed ? 'editted' : 'added'} a StreamLink connection!\nUser: ${userToAdd.username}\nID: ${userToAdd.id}\nTwitch: https://www.twitch.tv/${stream.toLowerCase()}`));
+    }).catch(err => console.log(chalk.bgRed(`[${moment().format(settings.timeformat)}] ${err}`)));
+}
 
-      // Get guild ID
-      let gid = message.guild.id;
-      let g = bot.guilds.get(gid);
-      let gindex;
-      let channelsInServer = [];
+/**
+ * @func removeUser 
+ * !streamlink remove (@user)
+ * 
+ *  @param {Discord.Message} message
+ *  @param {Discord.Client} bot
+ *  @param {Discord.User} user Discord user object
+ * 
+ *  Remove a previously established StreamLink connection for a given user
+ */
+exports.removeUser = (message, bot, user) => {
+    if (!user && message) user = message.author;
+    if (!bot.streamLink.users.has(user.id)) return message.reply(`Oops! Something went wrong.\n\nIt appears that there is no StreamLink connection set up for ${message.author}. Use \`${settings.prefix}streamlink add twitchName\` to set one up!`);
+    if (!message.guild.members.has(user.id)) {
+        message.reply(`Oops! Something went wrong.\n\nThe specified Discord user doesn't seem to exist (or at least not on this server)`);
+        return console.log(chalk.bgRed(`[${moment().format(settings.timeformat)}] ${message.author.username} failed to add a StreamLink connection. User ID#${user.id} was not found.`));
+    }
 
-      // Get # streamers & streams live
-      let amountLive = 0;
-      let amountOfStreamers = 0;
-      bot.streamLink.get("settings").users.forEach((u, index) => {
-        if (g.members.has(u)) {
-          amountOfStreamers++;
-          if (bot.streamLink.get(u).status) amountLive++;
+    let guilds = bot.streamLink.guilds.filter(guild => guild.usersEnabled.includes(user.id));
+    guilds.forEach(g => g.usersEnabled.splice(g.usersEnabled.indexOf(user.id), 1));
+
+    fs.unlink(`./config/streamlink/users/${user.id}.json`, (err) => {
+        if (err) {
+            if (err.code === 'ENOENT') {
+                message.reply(`Oops! Something went wrong.\n\nLooks like the user's config has already been removed from the local directory.`);
+                return console.log(chalk.bgRed(`[${moment().format(settings.timeformat)}] ${message.author.username} failed to remove a StreamLink connection. File ${user.id}.json was not found.`));
+            } else throw err;
         }
-      });
+        message.reply(`StreamLink connection & info has been deleted for ${user}, who was connected to the stream at <https://www.twitch.tv/${bot.streamLink.users.get(user.id).stream}> ❌`);
+        console.log(chalk.bgMagenta(`[${moment().format(settings.timeformat)}] ${message.author.username} removed a StreamLink connection!\nUser: ${user.username}\nID: ${user.id}\nTwitch: https://www.twitch.tv/${bot.streamLink.users.get(user.id).stream}`));
+        bot.removeTwitchTopic(bot.streamLink.users.get(user.id).stream);
+        bot.streamLink.users.delete(user.id);
+    });
+}
 
-      gindex = settings.guilds.indexOf(gid);
-      bot.streamLink.get("settings").channels.forEach((c, index) => {
-        if (bot.streamLink.get("settings").guilds[index] === gid) {
-          channelsInServer.push(c);
-        }
-      });
+/**
+ * @func addGuild 
+ * Discord event -- guildCreate (passes Guild)
+ * 
+ *  @param {Discord.Client} bot
+ *  @param {Discord.Guild} guild
+ * 
+ *  Adds config for a new guild
+ */
+exports.addGuild = (bot, guild) => {
+    if (!bot.streamLink.guilds.has(guild.id)) {
+        let object = JSON.parse(fs.readFileSync('./config/streamlink/conf.json', 'utf8')).defaults.guildObject;
+        object.id = guild.id;
+        fs.writeFile(`./config/streamlink/guilds/${guild.id}.json`, JSON.stringify(object), (err) => {
+            if (err) throw err;
+            bot.streamLink.guilds.set(guild.id, object);
+            console.log(chalk.bgMagenta(`[${moment().format(settings.timeformat)}] Wrote to /config/streamlink/guilds/${guild.id}.json OK! (in streamlinkHandler.addGuild)\nJoined Guild "${guild.name}"! (ID ${guild.id})`));
+        });
+    }
+}
 
-      // Is StreamLink globally enabled?
-      let sl_status;
-      let str;
-      let str2;
-      if (bot.streamLink.get(settingsSLMG.guilds[gindex].id).guildEnable) sl_status = `\`StreamLink is ON\` Currently enabled on this server.`;
-      else sl_status = `\`StreamLink is OFF\` Enable StreamLink on this server with *${settings.prefix}streamlink enable server*`;
+/**
+ * @func removeGuild 
+ * Discord event -- guildDelete (passes Guild)
+ * 
+ *  @param {Discord.Client} bot
+ *  @param {Discord.Guild} guild
+ * 
+ *  Removes saved info for guild
+ */
+exports.removeGuild = (bot, guild) => {
+    if (bot.streamLink.guilds.has(guild.id)) {
+        fs.unlink(`./config/streamlink/guilds/${guild.id}.json`, (err) => {
+            if (err && err.code !== 'ENOENT') return console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] Failed to remove guild "${guild.name}" (ID ${guild.id})\n${err}`));
+            bot.streamLink.guilds.delete(guild.id);
+            console.log(chalk.bgMagenta(`[${moment().format(settings.timeformat)}] Wrote to /config/streamlink/guilds/${guild.id}.json OK! (in streamlinkHandler.removeGuild)\nRemoved Guild "${guild.name}"! (ID ${guild.id})`));
+        });
+    }
+}
 
-      // Shows how many users are StreamLink connected and currently live
-      if (amountOfStreamers === 0) str = `There are **no users** connected with StreamLink on this server.`;
-      else if (amountLive === 0) str = `There are **${amountOfStreamers} user(s)** connected with StreamLink on this server; but no streams are currently live.`;
-      else if (amountLive === 1) str = `There are **${amountOfStreamers} user(s)** connected with StreamLink on this server; **one stream is live**!`;
-      else str = `There are **${amountOfStreamers} users** connected with StreamLink on this server and **${amountLive} streams are live**!`;
+/**
+ * @func addChannel
+ * !streamlink add channel
+ * 
+ *  @param {Discord.Message} message
+ *  @param {Discord.Client} bot
+ *  @param {Discord.Chananel} channel
+ * 
+ * Adds text channel for StreamLink notifications
+ */
+exports.addChannel = (message, bot, channel) => {
+    if (!bot.streamLink.guilds.has(message.guild.id)) {
+        message.reply(`Oops! Something went wrong.\n\nServer config file was not found.`);
+        return console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] ${message.author.username} failed to add a channel to ${message.guild}. Guild not in bot.streamLink.guilds!`));
+    }
 
-      // Shows how many channels on the server are set up for StreamLink notifications
-      if (channelsInServer.length === 0) str2 = `**Notification channels**: \`NO CHANNELS SET UP!\`\n(please use *${settings.prefix}streamlink add channel* to add a channel for StreamLink notifications to be sent)`;
-      else str2 = `**Notification channels**:\n${channelsInServer.map(c => `<#${c}>`).join(' ')}`;
+    if (bot.streamLink.guilds.get(message.guild.id).channels.includes(channel.id)) {
+        return message.reply(`The ${channel} channel is already set up for StreamLink notifications. ✅`);
+    } else {
+        let guild = bot.streamLink.guilds.get(message.guild.id);
+        guild.channels.push(channel.id);
+        fs.writeFile(`./config/streamlink/guilds/${message.guild.id}.json`, JSON.stringify(guild), (err) => {
+            if (err) throw err;
+            bot.streamLink.guilds.set(message.guild.id, guild);
+            message.reply(`This channel has been **added** to this server's StreamLink notification list. ${channel} will now receive & push StreamLink notifications. :bell: ✅`);
+            console.log(chalk.bgMagenta(`[${moment().format(settings.timeformat)}] Wrote to /config/streamlink/guilds/${guild.id}.json OK! (in streamlinkHandler.addChannel)\nAdded Channel "${channel.name}"! (ID ${channel.id})`));
+        });
+    }
+}
 
-      // Build embeds >>
-      let embed = new Discord.RichEmbed()
-        .setTitle("__StreamLink Live Status:__")
-        .setDescription(sl_status + '\n\n' + str + '\n\n' + str2)
+/**
+ * @func removeChannel
+ * !streamlink remove channel
+ * 
+ *  @param {Discord.Message} message
+ *  @param {Discord.Client} bot
+ *  @param {Discord.Chananel} channel
+ * 
+ * Removes text channel from StreamLink notifications
+ */
+exports.removeChannel = (message, bot, channel) => {
+    if (!bot.streamLink.guilds.has(message.guild.id)) {
+        message.reply(`Oops! Something went wrong.\n\nServer config file was not found.`);
+        return console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] ${message.author.username} failed to remove a channel from ${message.guild}. Guild not in bot.streamLink.guilds!`));
+    }
+
+    if (!bot.streamLink.guilds.get(message.guild.id).channels.includes(channel.id)) {
+        return message.reply(`The ${channel} channel is *not* currently set up for StreamLink notifications.`);
+    } else {
+        let guild = bot.streamLink.guilds.get(message.guild.id);
+        guild.channels.splice(guild.channels.indexOf(channel.id), 1);
+        fs.writeFile(`./config/streamlink/guilds/${message.guild.id}.json`, JSON.stringify(guild), (err) => {
+            if (err) throw err;
+            bot.streamLink.guilds.set(message.guild.id, guild);
+            message.reply(`The ${channel} channel has been **removed** from this server's StreamLink notification list. :no_bell:`);
+            console.log(chalk.bgMagenta(`[${moment().format(settings.timeformat)}] Wrote to /config/streamlink/guilds/${guild.id}.json OK! (in streamlinkHandler.removeChannel)\nRemoved Channel #${channel.name} from "${message.guild.name}"! (ID ${channel.id})`));
+        });
+    }
+}
+
+/**
+ * @func statusMenu
+ * !streamlink status
+ * 
+ *  @param {Discord.Message} message
+ *  @param {Discord.Client} bot
+ * 
+ * Shows what users are connected via StreamLink in the guild
+ * Shows what streams are online
+ * Shows stats of live streams (like viewer count & game)
+ */
+exports.statusMenu = (message, bot) => {
+    if (!bot.streamLink.guilds.has(message.guild.id))
+        return console.log(`[${moment().format(settings.timeformat)}] Guild doesn't exist in bot.streamLink.guilds in streamlinkHandler.statusMenu (${message.guild.id})`);
+    let guild = bot.streamLink.guilds.get(message.guild.id);
+    let userList = bot.streamLink.users.filter(user => message.guild.members.has(user.id));
+    userList = sortLibrary(userList);
+    let liveUsers = userList.filter(user => user.status);
+
+    let embed = new Discord.RichEmbed()
+        .setTitle(`**StreamLink Settings & Live Status**`)
+        .setDescription(`Currently ${(guild.enabled) ? `\`enabled\` on this server` : `\`disabled\` on this server\n\nUse \`${settings.prefix}streamlink enable server\` to enable`}\n\n` +
+        `There ${(userList.size === 1) ? `is **one user**` : `are **${userList.size} users**`} connected with StreamLink on this server, ` +
+        `${(liveUsers.size === 0) ? 'but no streams are' : `and ${(liveUsers.size > 1) ? `${liveUsers.size} streams are` : `one stream is`}`} currently live\n\n` +
+        `**Notification Channels:**\n${(guild.channels.length > 0) ? guild.channels.map(c => `<#${c}>`).join(' ') : `*There are no channels set up for StreamLink notifications on this server*\n\n` +
+            `Use \`${settings.prefix}streamlink add channel\` in the channel(s) you wish to enable notifications on`}`)
         .setThumbnail('http://i.imgur.com/DZqF1Ro.png')
         .setColor(0x5a4194);
-      message.channel.send({ embed })
 
-      // Initialize vars
-      let i, j; let appendMsg = ['']; let count = 0; let page = 0;
-      let tempArray = [];
-      bot.streamLink.get("settings").userNames.forEach(e => {
-        tempArray.push(e);
-      });
+    message.channel.send({ embed }).then(() => {
+        if (userList.size > 0) this.perUserStatus(message, guild, userList)
+    }).catch(err => err => console.log(chalk.bgRed(`[${moment().format(settings.timeformat)}] ${err}`)));
+}
 
-      // Sort users alphabetically
-      tempArray.sort(function (a, b) {
-        return a.toLowerCase().localeCompare(b.toLowerCase());
-      });
+/**
+ * @func perUserStatus
+ * Applies after the use of !streamlink status, if the guild contains StreamLink'd users
+ * 
+ *  @param {Discord.Message} message
+ *  @param {bot.streamLink.guilds["message.guild.id"]} guild The guild's StreamLink object
+ *  @param {bot.streamLink.users.filter(Users in guild)} users Collection of StreamLink user objects for users in the guild
+ * 
+ * Displays status of all StreamLink connected members on the server
+ * Shows whether users are currently live, enabled, and if live: viewer count, game, etc.
+ */
+exports.perUserStatus = (message, guild, users) => {
+    let str = '`connected users:`\n\n';
+    let count = 0;
+    let splitValue = JSON.parse(fs.readFileSync(`./config/streamlink/conf.json`, 'utf8')).defaults.splitValue;
 
-      if (tempArray.length === 0) { // No users to show status of
-        appendMsg[page] = `\`No users connected!\`\nUse **${settings.prefix}streamlink add *twitchName*** to connect your Twitch account w/ StreamLink`;
-      } else { // There are users to show! -->
-        appendMsg[page] = `\`Users connected:\`\n\n`;
-        // Get info for each user
-        for (j = 0; j < tempArray.length; j++) {
-          let username = tempArray[j];
-          i = bot.streamLink.get("settings").userNames.indexOf(username);
-          // If user is on the server in question, fetch their info and push into string to send -->
-          if (g.members.has(bot.streamLink.get("settings").users[i])) {
-            // Declare vars
-            let live; let viewers; let game;
-            let user = g.members.get(bot.streamLink.get("settings").users[i]);
-            let slUser = bot.streamLink.get(user.id);
+    users.forEach(user => {
+        let viewers = user.viewers;
+        let enabled = (user.enabled && guild.usersEnabled.includes(user.id)) ? true : false;
+        let game = (user.game !== '') ? `Streaming: ${user.game}` : `Streaming: ???`;
 
-            // Live string
-            if (slUser.status && settingsSLMG.guilds[gindex].users_enable[i]) live = 'LIVE';
-            else if (settingsSLMG.guilds[gindex].users_enable[i]) live = 'OFFLINE';
-            else live = 'DISABLED';
-
-            // Viewer count string
-            if (typeof slUser.viewerCount === NaN) viewers = '???';
-            else viewers = slUser.viewerCount;
-            if (slUser.game !== "") game = `Streaming: ${slUser.game}`;
-            else game = `Streaming: ???`;
-
-            // Add to embed-->
-            if (slUser.status && settingsSLMG.guilds[gindex].users_enable[i]) {
-              appendMsg[page] = appendMsg[page] + `**${username}**\n<https://www.twitch.tv/${slUser.twitchChannel}> \`Status: ${live} with ${viewers} viewer(s)\` \`${game}\`\n`;
-            } else if (settingsSLMG.guilds[gindex].users_enable[i]) {
-              appendMsg[page] = appendMsg[page] + `**${username}**\n<https://www.twitch.tv/${slUser.twitchChannel}> \`Status: ${live}\`\n`;
-            } else {
-              appendMsg[page] = appendMsg[page] + `**${username}**\n~~<https://www.twitch.tv/${slUser.twitchChannel}>~~ \`Status: ${live}\`\n`;
-            }
-            count++;
-            if (count >= settings.streamlink.split_value) {
-              page++;
-              count = 0;
-              appendMsg.push('');
-            }
-          } else { // Otherwise, continue w/ for loop
-            continue;
-          }
+        /** Build str **/
+        str += `**${user.name}** `;
+        if (!enabled) str += '~~';
+        str += `<https://www.twitch.tv/${user.stream}>`;
+        if (!enabled) str += '~~';
+        if (enabled) {
+            if (user.status) str += ` \`LIVE\` \`${viewers} viewer(s)\` \`${game}\``;
+            else str += ' `OFFLINE`';
+        } else {
+            str += ' `DISABLED`';
         }
-        appendMsg.forEach(m => {
-          if (m.length > 0) message.channel.send(m);
-        });
-      }
-    } catch (err) {
-      console.log(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${err}`);
+        str += '\n';
+
+        /** Increment */
+        count++;
+        if (count >= splitValue) {
+            message.channel.send(str);
+            str = '';
+            count = 0;
+        }
+    });
+
+    /** Send remnants */
+    if (str !== '') message.channel.send(str);
+}
+
+/**
+ * @func saveUser
+ * Saves the user's StreamLink config file
+ *  @param {Snowflake} user StreamLink user object
+ */
+exports.saveUser = (user) => {
+    return new Promise((resolve, reject) =>
+        fs.writeFile(`./config/streamlink/users/${user.id}.json`, JSON.stringify(user), (err) => {
+            if (err) reject(err); else resolve();
+        })
+    );
+}
+
+/**
+ * @func saveGuild
+ * Saves the user's StreamLink config file
+ *  @param {Snowflake} guild StreamLink guild object
+ */
+exports.saveGuild = (guild) => {
+    return new Promise((resolve, reject) =>
+        fs.writeFile(`./config/streamlink/guilds/${guild.id}.json`, JSON.stringify(guild), (err) => {
+            if (err) reject(err); else resolve();
+        })
+    );
+}
+
+/**
+ * @func logEvent
+ * Logs TwitchPS events emitted
+ */
+exports.logEvent = (event, user, slUser) => {
+    const header = '---------------------------------------------------------';
+    const footer = header;
+    switch (event) {
+        case 'stream-up':
+            console.log(header);
+            console.log(chalk.bgMagenta.bold('StreamLink >> STREAM-UP EVENT'));
+            console.log(`Channel: ${slUser.stream}\nUser: ${user.username}\nStreaming: ${(slUser.game === '') ? '???' : slUser.game}\n\
+            Time: ${slUser.lastBroadcast} (${moment().format(settings.timeformat)})\nJSON: /config/streamlink/users/${slUser.id}.json`);
+            console.log(footer);
+            break;
+        case 'stream-down':
+            console.log(header);
+            console.log(chalk.bgMagenta.black('StreamLink >> STREAM-DOWN EVENT'));
+            console.log(`Channel: ${slUser.stream}\nUser: ${user.username}\n\
+            Time: ${slUser.lastOffline} (${moment().format(settings.timeformat)})\nJSON: /config/streamlink/users/${slUser.id}.json\n`);
+            console.log(footer);
+            break;
+        default:
+            console.log(header);
+            console.log(chalk.bgMagenta.bold('StreamLink >> OOPS, EVENT NOT FOUND!'));
+            console.log(footer);
+            break;
     }
-  }
-};
+}
+
+var sortLibrary = function (userList) {
+    try {
+        let names = [];
+        let sorted = new Discord.Collection();
+        userList.forEach((value, key, map) => {
+            names.push(value.name.toLowerCase());
+        });
+        names.sort().map((value) => {
+            let entry = userList.find(val => val.name.toLowerCase() === value);
+            sorted.set(entry.id, entry);
+        });
+        return sorted;
+    } catch (err) {
+        console.log(err);
+    }
+}

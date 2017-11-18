@@ -1,0 +1,32 @@
+{
+    "reconnect": true,
+    "debug": false,
+    "defaults": {
+        "userEnable": true,
+        "guildEnable": false,
+        "timer": 60,
+        "splitValue": 15,
+        "userObject": {
+            "id": "",
+            "name": "",
+            "isUser": true,
+            "enabled": true,
+            "stream": "",
+            "status": false,
+            "game": "",
+            "viewers": 0,
+            "lastBroadcast": 0,
+            "lastOffline": 0
+        },
+        "guildObject": {
+            "id": "",
+            "isGuild": true,
+            "enabled": true,
+            "channels": [],
+            "usersEnabled": [],
+            "banList": [],
+            "timer": 60,
+            "style": "standard"
+        }
+    }
+}
