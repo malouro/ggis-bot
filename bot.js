@@ -8,8 +8,8 @@
  * 
  *  @name	Ggis
  *	@author	Michael Louro
- *	@version 1.4.0
- *  Last edit - Nov 20, 2017
+ *	@version 1.5.0
+ *  Last edit - Nov 26, 2017
  *
  ************************************************/
 

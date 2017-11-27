@@ -1,0 +1,29 @@
+{
+  "name": "ggis-bot",
+  "version": "1.5.0",
+  "description": "A Discord chat bot for the Christian Mingle Discord server.",
+  "main": "bot.js",
+  "scripts": {
+    "test": "node bot.js"
+  },
+  "author": "Michael Louro",
+  "license": "ISC",
+  "dependencies": {
+    "canvas": "^1.6.7",
+    "chalk": "^2.2.0",
+    "discord.js": "^11.2.1",
+    "feed-read-parser": "0.0.6",
+    "gifencoder": "^1.1.0",
+    "iconv-lite": "^0.4.19",
+    "imgur2rss": "^1.0.4",
+    "lyrics-fetcher": "^1.0.2",
+    "mkdirp": "^0.5.1",
+    "moment": "^2.19.1",
+    "moment-timezone": "^0.5.13",
+    "node-schedule": "^1.2.5",
+    "rmdir": "^1.2.0",
+    "sqlite": "^2.8.0",
+    "twitchps": "^0.5.5"
+  },
+  "false": {}
+}
