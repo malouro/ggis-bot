@@ -5,14 +5,15 @@
 // Useful for testing response of bot
 
 const moment = require('moment');
+const settings = require('../../settings');
 
 exports.run = (bot, message, args) => {
     try {
         let ping = Math.round(bot.ping);
         message.reply(`Pong! \`${ping} ms\``);
-        console.log(`[${moment().format('hh:mm:ssA MM/DD/YY')}] Ping! Pong! ${ping} ms`);
+        console.log(`[${moment().format(settings.timeFormat)}] Ping! Pong! ${ping} ms`);
     } catch (err) {
-        console.log(chalk.bgRed.bold(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${err}`));
+        console.log(chalk.bgRed.bold(`[${moment().format(settings.timeFormat)}] ${err}`));
     }
 };
 

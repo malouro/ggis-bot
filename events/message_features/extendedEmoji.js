@@ -1,10 +1,24 @@
-/**
- * @func extendedEmoji
- *  (Only applies to main guild)
+/******************************************************************************************
+ * ExtendedEmoji
+ *  This feature only works within the MainGuild or the TestGuild!
  * 
- *  Extendeds test guild emoji into the main guild
- *  Checks for :EMOJI: use and replaces the message with a new one that contains the called emoji!
- */
+ *  @func extendedEmoji
+ *      @param {Discord.Message} message
+ *      @param {JSON} settings
+ *  
+ *  Extends TestGuild emoji into the MainGuild
+ *  Checks for :EMOJI: use reacts appropriately based on settings
+ * 
+ *      @desc {Method 1}
+ *          Replace message w/ an embed that places in the ExtendedEmoji
+ *          Deletes old message & have Ggis send a new one:
+ *          @desc {Embed}
+ *              ON - If Embed is On => Sends a RichEmbed that has author, thumbnail, etc
+ *              OFF - If Embed is Off => Sends a regular Discord message
+ *      @desc {Method 2}
+ *          React to the message with the ExtendedEmoji
+ * 
+ ******************************************************************************************/
 
 const Discord = require('discord.js');
 const RegExExtendedEmojis = /:\w+:(?!\d+>)/g
@@ -27,14 +41,12 @@ module.exports = (message, settings) => {
                 let emoji = emojiCodes[0].toString().slice(1, emojiCodes[0].length - 1);
                 if (emojis.has(emoji)) {
                     let e = emojis.get(emoji);
-                    // Method (1): replace message with an embed that contains the extended emoji
                     if (settings.rules.extended_emoji.edit) {
                         edit = true;
                         str = str.replace(`:${e.name}:`, `<:${e.name}:${e.id}>`);
-                        // Method (2): just react to the message with the emoji instead
                     } else {
                         message.react(e.id).then().catch(err => console.log(err));
-                        return resolve(message);
+                        resolve(message);
                     }
                 }
             }
@@ -49,11 +61,11 @@ module.exports = (message, settings) => {
                             .setAuthor(msg.author.username, msg.author.displayAvatarURL)
                             .setThumbnail(msg.author.displayAvatarURL);
                         msg.channel.send({ embed }).then(m => {
-                            return resolve(m);
+                            resolve(m);
                         }).catch(err => console.log(err));
                     } else {
                         msg.channel.send(`\`${msg.author.username}:\`\n${str}`).then(m => {
-                            return resolve(m);
+                            resolve(m);
                         }).catch(err => console.log(err));
                     }
                 }).catch(err => console.log(err));

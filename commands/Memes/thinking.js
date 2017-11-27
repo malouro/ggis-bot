@@ -8,6 +8,7 @@ const fs = require('fs');
 exports.run = (bot, message, args) => {
     let memes = JSON.parse(fs.readFileSync('./config/memes.json', 'utf8'));
     message.channel.send(`${memes.thinking.files[Math.floor(Math.random() * memes.thinking.files.length)]}`);
+    console.log(`[${moment().format(settings.timeFormat)}] User ${message.author.username} is really 🤔`);
 }
 
 exports.conf = {

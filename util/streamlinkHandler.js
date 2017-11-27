@@ -8,7 +8,6 @@
 const chalk = require('chalk');
 const Discord = require('discord.js');
 const fs = require('fs');
-const main = require('./init');
 const moment = require('moment');
 const settings = require('../settings.json');
 
@@ -78,7 +77,7 @@ exports.init = bot => {
                 files.forEach(f => {
                     let conf = JSON.parse(fs.readFileSync(`${path}/users/${f}`, 'utf8'));
                     users.set(conf.id, conf);
-                    topics.push({topic:`video-playback.${conf.stream.toLowerCase()}`});
+                    topics.push({ topic: `video-playback.${conf.stream.toLowerCase()}` });
                     console.log(chalk.bgMagenta(`User: ${conf.name} => Stream: https://www.twitch.tv/${conf.stream}`));
                 });
                 bot.streamLink.users = users;
@@ -89,7 +88,7 @@ exports.init = bot => {
                         console.log(chalk.bgMagenta.black(`Guild: ${conf.id} => Enabled?: ${conf.enabled}, Users: ${conf.usersEnabled}`));
                     });
                     bot.streamLink.guilds = guilds;
-                    resolve(topics);
+                    resolve({ topics: topics, client: bot });
                 });
             });
         } catch (err) {
@@ -117,7 +116,6 @@ exports.init = bot => {
  *      --> Send to all SL channels in those SL guilds
  */
 exports.streamUp = (bot, data) => {
-    console.log('stream up event\n' + data);
     var user = bot.streamLink.users.find('stream', data.channel_name.toLowerCase()) || '';
     if (user === '') return console.log(`[${moment().format(settings.timeformat)}] User is undefined in streamlinkHandler.streamUp for channel ${data.channel_name}`);
 
@@ -142,6 +140,7 @@ exports.streamUp = (bot, data) => {
                 .setColor(0x5a4194)
 
             bot.streamLink.guilds.forEach(guild => {
+                if (!bot.guilds.has(guild.id)) return;
                 if (guild.usersEnabled.includes(user.id) && bot.guilds.get(guild.id).members.has(user.id) && guild.enabled) {
                     if (difference >= guild.timer * 60) {
                         let customEmbed = embed;
@@ -177,8 +176,8 @@ exports.streamUp = (bot, data) => {
  * Reset user's viewer count to 0
  */
 exports.streamDown = (bot, data) => {
-    let user = bot.streamLink.users.find('channel', data.channel_name.toLowerCase());
-    if (typeof user === 'undefined') return console.log(`[${moment().format(settings.timeformat)}] User is undefined in streamlinkHandler.streamDown for channel ${data.channel_name}`);
+    let user = bot.streamLink.users.find('stream', data.channel_name.toLowerCase()) || '';
+    if (user === '') return console.log(`[${moment().format(settings.timeformat)}] User is undefined in streamlinkHandler.streamDown for channel ${data.channel_name}`);
 
     bot.fetchUser(user.id).then(u => {
         try {
@@ -210,8 +209,8 @@ exports.streamDown = (bot, data) => {
  * Update viewer count
  */
 exports.viewCount = (bot, data) => {
-    let user = bot.streamLink.users.find('channel', data.channel_name.toLowerCase());
-    if (typeof user === 'undefined') return console.log(`[${moment().format(settings.timeformat)}] User is undefined in streamlinkHandler.viewCount for channel ${data.channel_name}`);
+    let user = bot.streamLink.users.find('stream', data.channel_name.toLowerCase()) || '';
+    if (user === '') return console.log(`[${moment().format(settings.timeformat)}] User is undefined in streamlinkHandler.viewCount for channel ${data.channel_name}`);
 
     bot.fetchUser(user.id).then(u => {
         try {
@@ -511,23 +510,24 @@ exports.addChannel = (message, bot, channel) => {
  * Removes text channel from StreamLink notifications
  */
 exports.removeChannel = (message, bot, channel) => {
-    if (!bot.streamLink.guilds.has(message.guild.id)) {
-        message.reply(`Oops! Something went wrong.\n\nServer config file was not found.`);
-        return console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] ${message.author.username} failed to remove a channel from ${message.guild}. Guild not in bot.streamLink.guilds!`));
+    if (!bot.streamLink.guilds.has(channel.guild.id)) {
+        if (message) message.reply(`Oops! Something went wrong.\n\nServer config file was not found.`);
+        return console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] Failed to remove a channel from ${channel.guild}. Guild not in bot.streamLink.guilds!`));
+    }
+    if (message) {
+        if (!bot.streamLink.guilds.get(message.guild.id).channels.includes(channel.id)) {
+            return message.reply(`The ${channel} channel is *not* currently set up for StreamLink notifications.`);
+        }
     }
 
-    if (!bot.streamLink.guilds.get(message.guild.id).channels.includes(channel.id)) {
-        return message.reply(`The ${channel} channel is *not* currently set up for StreamLink notifications.`);
-    } else {
-        let guild = bot.streamLink.guilds.get(message.guild.id);
-        guild.channels.splice(guild.channels.indexOf(channel.id), 1);
-        fs.writeFile(`./config/streamlink/guilds/${message.guild.id}.json`, JSON.stringify(guild), (err) => {
-            if (err) throw err;
-            bot.streamLink.guilds.set(message.guild.id, guild);
-            message.reply(`The ${channel} channel has been **removed** from this server's StreamLink notification list. :no_bell:`);
-            console.log(chalk.bgMagenta(`[${moment().format(settings.timeformat)}] Wrote to /config/streamlink/guilds/${guild.id}.json OK! (in streamlinkHandler.removeChannel)\nRemoved Channel #${channel.name} from "${message.guild.name}"! (ID ${channel.id})`));
-        });
-    }
+    let guild = bot.streamLink.guilds.get(channel.guild.id);
+    guild.channels.splice(guild.channels.indexOf(channel.id), 1);
+    fs.writeFile(`./config/streamlink/guilds/${message.guild.id}.json`, JSON.stringify(guild), (err) => {
+        if (err) throw err;
+        bot.streamLink.guilds.set(channel.guild.id, guild);
+        if (message) message.reply(`The ${channel} channel has been **removed** from this server's StreamLink notification list. :no_bell:`);
+        console.log(chalk.bgMagenta(`[${moment().format(settings.timeformat)}] Wrote to /config/streamlink/guilds/${guild.id}.json OK! (in streamlinkHandler.removeChannel)\nRemoved Channel #${channel.name} from "${message.guild.name}"! (ID ${channel.id})`));
+    });
 }
 
 /**
@@ -546,7 +546,7 @@ exports.statusMenu = (message, bot) => {
         return console.log(`[${moment().format(settings.timeformat)}] Guild doesn't exist in bot.streamLink.guilds in streamlinkHandler.statusMenu (${message.guild.id})`);
     let guild = bot.streamLink.guilds.get(message.guild.id);
     let userList = bot.streamLink.users.filter(user => message.guild.members.has(user.id));
-    userList = sortLibrary(userList);
+    userList = sortUserList(userList);
     let liveUsers = userList.filter(user => user.status);
 
     let embed = new Discord.RichEmbed()
@@ -598,7 +598,7 @@ exports.perUserStatus = (message, guild, users) => {
         }
         str += '\n';
 
-        /** Increment */
+        /** Increment **/
         count++;
         if (count >= splitValue) {
             message.channel.send(str);
@@ -607,7 +607,7 @@ exports.perUserStatus = (message, guild, users) => {
         }
     });
 
-    /** Send remnants */
+    /** Send remnants **/
     if (str !== '') message.channel.send(str);
 }
 
@@ -648,15 +648,15 @@ exports.logEvent = (event, user, slUser) => {
         case 'stream-up':
             console.log(header);
             console.log(chalk.bgMagenta.bold('StreamLink >> STREAM-UP EVENT'));
-            console.log(`Channel: ${slUser.stream}\nUser: ${user.username}\nStreaming: ${(slUser.game === '') ? '???' : slUser.game}\n\
-            Time: ${slUser.lastBroadcast} (${moment().format(settings.timeformat)})\nJSON: /config/streamlink/users/${slUser.id}.json`);
+            console.log(`Channel: ${slUser.stream}\nUser: ${user.username}\nStreaming: ${(slUser.game === '') ? '???' : slUser.game}\n` +
+                `Time: ${slUser.lastBroadcast} (${moment().format(settings.timeformat)})\nJSON: /config/streamlink/users/${slUser.id}.json`);
             console.log(footer);
             break;
         case 'stream-down':
             console.log(header);
             console.log(chalk.bgMagenta.black('StreamLink >> STREAM-DOWN EVENT'));
-            console.log(`Channel: ${slUser.stream}\nUser: ${user.username}\n\
-            Time: ${slUser.lastOffline} (${moment().format(settings.timeformat)})\nJSON: /config/streamlink/users/${slUser.id}.json\n`);
+            console.log(`Channel: ${slUser.stream}\nUser: ${user.username}\n` +
+                `Time: ${slUser.lastOffline} (${moment().format(settings.timeformat)})\nJSON: /config/streamlink/users/${slUser.id}.json\n`);
             console.log(footer);
             break;
         default:
@@ -667,7 +667,7 @@ exports.logEvent = (event, user, slUser) => {
     }
 }
 
-var sortLibrary = function (userList) {
+sortUserList = (userList) => {
     try {
         let names = [];
         let sorted = new Discord.Collection();

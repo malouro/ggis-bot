@@ -5,13 +5,14 @@
 
 const moment = require('moment');
 const chalk = require('chalk');
+const settings = require('../../settings');
 
 exports.run = (bot, message, args) => {
     try {
         message.channel.send(``, { file: "../images/memes/doge.png" });
-        console.log(`[${moment().format('hh:mm:ssA MM/DD/YY')}] User ${message.author.username} summoned a big ol' doge`);
+        console.log(`[${moment().format(settings.timeFormat)}] User ${message.author.username} summoned a big ol' doge`);
     } catch (err) {
-        console.log(chalk.bgRed(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${err}`));
+        console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] ${err}`));
     }
 };
 

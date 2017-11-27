@@ -2,7 +2,10 @@
  * AutoReactions
  *  This feature only works within the MainGuild or the TestGuild!
  *  
- *  @func autoReact (message, settings)
+ *  @func autoReact 
+ *      @param {Discord.Message} message
+ *      @param {JSON} settings
+ * 
  *  Returns a new message back to 'message' event
  *  Executes proper reaction based on the criteria met, if any
  *      @desc {TxtReactions}
@@ -14,8 +17,8 @@
  * 
  ********************************************************************************************/
 
-var getAtReactions = require('../../util/getAtReactions');
-var getTxtReactions = require('../../util/getTxtReactions');
+var getAtReactions = require('./getAtReactions');
+var getTxtReactions = require('./getTxtReactions');
 var AtReactions = getAtReactions(new Map());
 var TxtReactions = getTxtReactions(new Map());
 
@@ -63,7 +66,7 @@ module.exports = (message, settings) => {
 
 // React to the message in a promise based fashion with every emoji in the given array, in ascending index order
 
-reactInOrder = function (message, emojis, i) {
+reactInOrder = (message, emojis, i) => {
     if (emojis.length === 0) return;
     else if (i < emojis.length) {
         message.react(emojis[i]).then(() => {
@@ -75,7 +78,7 @@ reactInOrder = function (message, emojis, i) {
 
 // Reply to the message correctly, with the given file and/or string
 
-replyReaction = function (message, reply) {
+replyReaction = (message, reply) => {
     if (reply.file !== "") message.reply(reply.message, { file: reply.file });
     else message.reply(reply.message);
 };

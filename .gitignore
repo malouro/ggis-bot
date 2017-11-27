@@ -12,14 +12,22 @@ package-lock.json
 Thumbs.db
 
 # Privacy
-# config/
+/config/backup
+/config/squads/*
+/config/streamlink/users/*
+/config/streamlink/guilds/*
+!/config/streamlink/conf.json
 settings.json
 settings-backup.json
 
 # Commands not to include
-# **/Memes/*.js
-# **/plug.js
 **/test.js
 **/weeklytest.js
 **/insult.js
 **/magic8.js
+**/slbuild.js
+**/slget.js
+**/nj.js
+**/sayreville.js
+**/bitchholdon.js
+**/blazertov.js

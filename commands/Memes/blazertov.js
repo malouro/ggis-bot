@@ -4,6 +4,7 @@
 
 exports.run = (bot, message, args) => {
     message.channel.send(`Witness the beginning! <:blazertov:306263138980855808>\nhttps://www.twitch.tv/videos/137947484 `);
+    console.log(`[${moment().format(settings.timeFormat)}] User ${message.author.username} is witnessing Blazertov history`);
 }
 
 exports.conf = {

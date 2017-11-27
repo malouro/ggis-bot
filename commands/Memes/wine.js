@@ -16,15 +16,16 @@ const catchPhrases = [
     "Grievous injury, palpable fear...",
     "The walls close in – the shadows whispers of conspiracy.",
     "Reeling, gasping! Taken over the edge into madness!!"
-]
+];
+const settings = require('../../settings');
 
 exports.run = (bot, message, args) => {
     try {
         let filepath = "../images/memes/wine.png";
         message.channel.send(`*splurt*  **"${catchPhrases[Math.floor(Math.random()*catchPhrases.length)]}"**`, { file: filepath });
-        console.log(`[${moment().format('hh:mm:ssA MM/DD/YY')}] User ${message.author.username} splurted wine everywhere. Kinda rude, huh?`);
+        console.log(`[${moment().format(settings.timeFormat)}] User ${message.author.username} splurted wine everywhere. Kinda rude, huh?`);
     } catch (err) {
-        console.log(chalk.bgRed(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${err}`));
+        console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] ${err}`));
     }
 };
 

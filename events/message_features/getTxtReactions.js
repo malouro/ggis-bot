@@ -1,5 +1,6 @@
 // Changes TxtReactions object in 'autoReact' event
 const fs = require('fs');
+
 module.exports = function (TxtReactions) {
     try {
         TxtReactions.clear();

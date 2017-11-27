@@ -29,5 +29,5 @@ exports.conf = {
 exports.help = {
     name: 'randomizer',
     description: 'Randomly chooses something out of a list of items given',
-    usage: 'randomizer (item#1) (item#2) ... (item#N)'
+    usage: 'randomizer item#1 item#2 ... item#n\nYou can also seperate the items with "or"'
 };

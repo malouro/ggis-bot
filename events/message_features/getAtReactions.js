@@ -1,5 +1,6 @@
-// Changes AtReactions object in 'autoReact' event
+// Changes AtReactions object in 'autoReact' event (in /events/message_features/)
 const fs = require('fs');
+
 module.exports = function (AtReactions) {
     try {
         AtReactions.clear();

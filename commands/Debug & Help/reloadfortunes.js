@@ -14,9 +14,12 @@ exports.run = (bot, message, args) => {
     var obj = { fortunes: [] };
     var settings = JSON.parse(fs.readFileSync('./settings.json', 'utf8'));
     let clientID = settings.fortune.token;
+
     message.channel.send('Reloading fortunes...').then (m => {
         i2rss.album2rss(clientID, 'd5drq', (err, data) => {
-            // Research what errors can be thrown by i2rss ? 
+
+            /** @todo Research what errors can be thrown by i2rss ? **/
+
             if (err) throw err;
             images = getImgs(data, 'img', 'src');
             images.forEach(img => {
@@ -28,7 +31,7 @@ exports.run = (bot, message, args) => {
                 fs.writeFile("./settings.json", JSON.stringify(settings), (err) => {
                     if (err) throw err;
                     bot.commandsReload(bot, 'fortune')
-                        .then(console.log(chalk.bgHex('#ffcc52').black(`[${moment().format('hh:mm:ssA MM/DD/YY')}] Fortunes reloaded & settings.json updated with new fortune amount!`)))
+                        .then(console.log(chalk.bgHex('#ffcc52').black(`[${moment().format(settings.timeFormat)}] Fortunes reloaded & settings.json updated with new fortune amount!`)))
                         .catch(err => console.log(err));
                 });
             }
@@ -39,12 +42,12 @@ exports.run = (bot, message, args) => {
                     .then(m.delete(1500)
                     .then(() => {
                         message.delete(1500);
-                        console.log(chalk.bgHex('#ffcc52').black(`[${moment().format('hh:mm:ssA MM/DD/YY')}] Fortunes reloaded!`));
+                        console.log(chalk.bgHex('#ffcc52').black(`[${moment().format(settings.timeFormat)}] Fortunes reloaded!`));
                     }).catch(err => console.log(err)))
                 .catch(err => console.log(err));
             });
         });
-    }).catch(err => console.log(`[${moment().format('hhh:mm:ssA MM/DD/YY')}] ${err}`));
+    }).catch(err => console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] ${err}`)));
 }
 
 function getImgs(str, node, attr) {

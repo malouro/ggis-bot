@@ -1,8 +1,12 @@
-/**
+/*********************************************************************************************
+ * MesageFilter
+ *  For now, this only applies to the MainGuild or TestGuild
+ * 
  * @func messageFilter
  *  Deletes/filters messages
  *  Returns whether or not a message has been deleted/filtered
- */
+ * 
+ ********************************************************************************************/
 
 const moment = require('moment');
 const chalk = require('chalk');

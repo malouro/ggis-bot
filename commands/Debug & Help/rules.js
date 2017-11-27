@@ -39,7 +39,7 @@ exports.run = (bot, message, args) => {
                 message.reply('"NoSailorMoon" rule enabled.');
                 settings.rules.sailormoon = true;
                 fs.writeFile("./settings.json", JSON.stringify(settings), (err) => {
-                    if (err) console.error(moment().format('hh:mm:ssA MM/DD/YY') + err);
+                    if (err) console.error(moment().format(settings.timeFormat) + err);
                 });
             }
             //!rules smoon disable
@@ -47,7 +47,7 @@ exports.run = (bot, message, args) => {
                 message.reply('"NoSailorMoon" rule disabled.');
                 settings.rules.sailormoon = false;
                 fs.writeFile("./settings.json", JSON.stringify(settings), (err) => {
-                    if (err) console.error(moment().format('hh:mm:ssA MM/DD/YY') + err);
+                    if (err) console.error(moment().format(settings.timeFormat) + err);
                 });
             }
             //!rules smoon help
@@ -99,7 +99,7 @@ exports.run = (bot, message, args) => {
                 message.reply("AutoReactions enabled.");
                 settings.rules.autoreact.enable = true;
                 fs.writeFile("./settings.json", JSON.stringify(settings), (err) => {
-                    if (err) console.error(moment().format('hh:mm:ssA MM/DD/YY') + err);
+                    if (err) console.error(moment().format(settings.timeFormat) + err);
                 });
             }
             //!rules autoreact disable
@@ -107,7 +107,7 @@ exports.run = (bot, message, args) => {
                 message.reply("AutoReactions disabled.");
                 settings.rules.autoreact.enable = false;
                 fs.writeFile("./settings.json", JSON.stringify(settings), (err) => {
-                    if (err) console.error(moment().format('hh:mm:ssA MM/DD/YY') + err);
+                    if (err) console.error(moment().format(settings.timeFormat) + err);
                 });
             }
             //!rules autoreact at
@@ -117,7 +117,7 @@ exports.run = (bot, message, args) => {
                     message.reply("AutoReactions for @mentions enabled.");
                     settings.rules.autoreact.atmentions = true;
                     fs.writeFile("./settings.json", JSON.stringify(settings), (err) => {
-                        if (err) console.error(moment().format('hh:mm:ssA MM/DD/YY') + err);
+                        if (err) console.error(moment().format(settings.timeFormat) + err);
                     });
                 }
                 //!rules autoreact at disable
@@ -125,7 +125,7 @@ exports.run = (bot, message, args) => {
                     message.reply("AutoReactions for @mentions disabled.");
                     settings.rules.autoreact.atmentions = false;
                     fs.writeFile("./settings.json", JSON.stringify(settings), (err) => {
-                        if (err) console.error(moment().format('hh:mm:ssA MM/DD/YY') + err);
+                        if (err) console.error(moment().format(settings.timeFormat) + err);
                     });
                 }
                 //!rules autoreact at help
@@ -193,7 +193,7 @@ exports.run = (bot, message, args) => {
                     message.reply("AutoReactions for text enabled.");
                     settings.rules.autoreact.txtmentions = true;
                     fs.writeFile("./settings.json", JSON.stringify(settings), (err) => {
-                        if (err) console.error(moment().format('hh:mm:ssA MM/DD/YY') + err);
+                        if (err) console.error(moment().format(settings.timeFormat) + err);
                     });
                 }
                 //!rules autoreact text disable
@@ -201,7 +201,7 @@ exports.run = (bot, message, args) => {
                     message.reply("AutoReactions for text disabled.");
                     settings.rules.autoreact.txtmentions = false;
                     fs.writeFile("./settings.json", JSON.stringify(settings), (err) => {
-                        if (err) console.error(moment().format('hh:mm:ssA MM/DD/YY') + err);
+                        if (err) console.error(moment().format(settings.timeFormat) + err);
                     });
                 }
                 //!rules autoreact text help

@@ -2,12 +2,12 @@
  * Adds functions to the Client's event listeners
  * 
  * @param {String} event 
- *  Does Node require for each events .js file
+ *  Performs 'require' for each event's .js file
  */
 
 var reqEvent = (event) => require(`../events/${event}`)
 
-exports.init = bot => {
+module.exports = bot => {
     
     bot.on('ready', () => reqEvent('ready')(bot));
     bot.on('reconnecting', () => reqEvent('reconnecting')(bot));

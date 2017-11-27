@@ -33,8 +33,7 @@ exports.run = (bot, message, args, perms) => {
 
     // CHANGE THIS?; as of now there is no way to add LFG games in directly through commands
     if (args[1] === 'add') {
-        message.channel.send(this.addLfgMessage);
-        return;
+        return message.channel.send(this.addLfgMessage);
     }
 
     /**

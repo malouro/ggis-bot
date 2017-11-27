@@ -5,12 +5,14 @@
 
 const moment = require('moment');
 const chalk = require('chalk');
+const settings = require('../../settings');
 
 exports.run = (bot, message, args) => {
     try {
         message.channel.send(`🍌🦇 http://i.imgur.com/ym5ek1y.gifv 🍌🦇`);
+        console.log(`[${moment().format(settings.timeFormat)}] User ${message.author.username} used 🍌🦇`);
     } catch (err) {
-        console.log(chalk.bgRed(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${err}`));
+        console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] ${err}`));
     }
 };
 

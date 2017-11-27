@@ -5,7 +5,7 @@
 
 const fs = require('fs');
 const moment = require('moment-timezone');
-const settings = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
+const settings = require('../../settings');
 
 exports.run = (bot, message, args) => {
     var fortuneList = JSON.parse(fs.readFileSync("./config/fortunes.json", "utf8"));

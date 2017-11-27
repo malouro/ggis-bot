@@ -41,7 +41,7 @@
         "default_setting": true,
         "enable": true,
         "timer": 60,
-        "split_value": 10
+        "split_value": 15
     },
     "lfg": {
         "ttl_default": 15,

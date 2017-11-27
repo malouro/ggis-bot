@@ -3,11 +3,11 @@
 // =====================================================================================
 
 exports.run = (bot, message, args) => {
-    // Grab the squad
-    var settings = require('../../config/nj_squad.json');
+    
+    var settings = require('../../config/squads/nj_squad.json');
     var str = '';
     var squad = settings.squad;
-    // Build string with squad members, except the member who issued it
+
     squad.forEach((s, index) => {
         if (message.author.id !== s) {
             if (index === squad.length - 1) {
@@ -18,14 +18,14 @@ exports.run = (bot, message, args) => {
         }
     });
     if (typeof args[1] != 'undefined')
-    str = str + `\`${message.author.username}:\``;
-    // Add on the arguments
+    str = str + `\n\`${message.author.username} says:\` `;
+
     args.forEach((arg, index) => {
         if (index > 0) {
             str = str + ` ${arg} `;
         }
     });
-    // Send message
+
     message.channel.send(str);
 }
 
