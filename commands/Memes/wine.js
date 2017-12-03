@@ -21,7 +21,7 @@ const settings = require('../../settings');
 
 exports.run = (bot, message, args) => {
     try {
-        let filepath = "../images/memes/wine.png";
+        let filepath = "./img/memes/wine.png";
         message.channel.send(`*splurt*  **"${catchPhrases[Math.floor(Math.random()*catchPhrases.length)]}"**`, { file: filepath });
         console.log(`[${moment().format(settings.timeFormat)}] User ${message.author.username} splurted wine everywhere. Kinda rude, huh?`);
     } catch (err) {
