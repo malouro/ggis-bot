@@ -31,15 +31,28 @@ module.exports = (message, settings) => {
                     if (message.content.toLowerCase().match(regex)) {
                         switch (t.type) {
                             case "react":
-                                reactInOrder(message, t.reaction, 0);
+                                if (t.reaction.length > 0) {
+                                    reactInOrder(message, t.reaction[Math.floor(Math.random()*t.reaction.length)], 0);
+                                } else {
+                                    console.log(`No reactions in reaction array for "${t.description}" AutoReaction for a 'react' type AutoReact`);
+                                }
                                 break;
                             case "reply":
-                                replyReaction(message, t.reply);
+                                if (t.reply.message !== '') {
+                                    replyReaction(message, t.reply);
+                                } else {
+                                    console.log(`No reply message for "${t.description}" AutoReaction for a 'reply' type AutoReact`);
+                                }
                                 break;
                             case "react-reply":
                             case "reply-react":
-                                replyReaction(message, t.reply);
-                                reactInOrder(message, t.reaction, 0);
+                                if (t.reaction.length > 0 && t.reply.message !== '') {
+                                    replyReaction(message, t.reply);
+                                    reactInOrder(message, t.reaction[Math.floor(Math.random()*t.reaction.length)], 0);
+                                } else {
+                                    if (t.reply.message === '') console.log(`No reply message for "${t.description}" AutoReaction for a 'reply' type AutoReact`);
+                                    if (t.reaction.length <= 0) console.log(`No reactions in reaction array for "${t.description}" for a 'react' type AutoReact`);
+                                }
                                 break;
                             default:
                                 console.log("Unexpected TxtReaction type in autoReact.js");

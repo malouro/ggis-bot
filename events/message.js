@@ -4,8 +4,6 @@
 const chalk	 	= require('chalk');
 const Discord 	= require('discord.js');
 const fs 		= require('fs');
-const moment 	= require('moment');
-
 const settings	= require('../settings.json');
 var cmd 		= require('./commands');
 var msgFilter 	= require('./message_features/messageFilter');
