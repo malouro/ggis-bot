@@ -9,17 +9,19 @@ package-lock.json
 .DS_Store
 Thumbs.db
 
-# Include ggis module folder
+# Include ggis node_module folder
 node_modules/*
 !node_modules/ggis
 
-# Privacy
+# Fix for img/spoiler directory
+/img/spoilers/gifs/*
+
+# Privacy & security
 /config/atreactions.json
 /config/txtreactions.json
 /config/streamlink/users/*
 /config/streamlink/guilds/*
 !/config/streamlink/conf.json
-
 settings.json
 settings.backup.json
 
