@@ -1,4 +1,6 @@
-var lfg    = require('../util/lfgHandler');
+// Whenever a message is deleted / removed
+
+var lfg = require('ggis/LFGHandler');
 
 module.exports = message => {
 
@@ -13,11 +15,11 @@ module.exports = message => {
 module.exports.reloadHandler = function () {
     return new Promise((resolve, reject) => {
         try {
-            delete require.cache[require.resolve(`../util/lfgHandler`)];
-            lfg = require(`../util/lfgHandler`);
+            delete require.cache[require.resolve(`ggis/LFGHandler`)];
+            lfg = require(`ggis/LFGHandler`);
             resolve();
         } catch (err) {
             reject(err);
         }
     });
-}
+};

@@ -5,8 +5,7 @@ const chalk      = require('chalk');
 const fs         = require('fs');
 const moment     = require('moment');
 const rmdir      = require('rmdir');
-
-var   streamlink = require('../util/streamlinkHandler');
+var   streamlink = require('ggis/StreamLinkHandler');
 
 module.exports = guild => {
     try {
@@ -19,7 +18,7 @@ module.exports = guild => {
             fs.writeFile("./settings.json", JSON.stringify(settings), (err) => {
                 if (err) console.error(`[${moment().format(settings.timeFormat)}] ${err}`);
                 console.log(chalk.bgCyan.black(`[${moment().format(settings.timeFormat)}] Wrote to settings.json OK! Left Guild "${guild.name}" (ID ${guild.id})`));
-                streamlink.removeGuild(guild); // Remove from streamLink.guilds
+                streamlink.removeGuild(guild.client, guild); // Remove from streamLink.guilds
             });
         } else {
             console.log(chalk.bgRed.bold(`[${moment().format(settings.timeFormat)}] ERROR LEAVING GUILD: Somehow, guild not found`));
@@ -50,8 +49,8 @@ module.exports = guild => {
 module.exports.reloadHandler = function () {
     return new Promise((resolve, reject) => {
         try {
-            delete require.cache[require.resolve(`../util/streamlinkHandler`)];
-            streamlink = require(`../util/streamlinkHandler`);
+            delete require.cache[require.resolve(`ggis/StreamLinkHandler`)];
+            streamlink = require(`ggis/StreamLinkHandler`);
             resolve();
         } catch (err) {
             reject(err);

@@ -2,7 +2,7 @@
 //                              ! poll command
 // =====================================================================================
 
-var   polls     = require('../../util/pollHandler');
+var   polls     = require('ggis/PollHandler');
 const chalk     = require('chalk');
 const fs        = require('fs');
 const moment    = require('moment-timezone');
@@ -32,8 +32,8 @@ exports.run = (bot, message, args) => {
 exports.reloadHandler = () => {
     return new Promise((resolve, reject) => {
         try {
-            delete require.cache[require.resolve(`../../util/pollHandler`)];
-            polls = require(`../../util/pollHandler`);
+            delete require.cache[require.resolve(`ggis/PollHandler`)];
+            polls = require(`ggis/PollHandler`);
             resolve();
         } catch (err) {
             reject(err);

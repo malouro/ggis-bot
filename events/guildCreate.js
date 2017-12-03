@@ -4,16 +4,16 @@
 const chalk      = require('chalk');
 const fs         = require('fs');
 const moment     = require('moment');
-var   streamlink = require('../util/streamlinkHandler');
+var   streamlink = require('ggis/StreamLinkHandler');
 
 module.exports = guild => {
     try {
-        streamlink.addGuild(guild);
+        streamlink.addGuild(guild.client, guild);
         var settings = JSON.parse(fs.readFileSync('./settings.json'), 'utf8');
         let index = settings.guilds.indexOf(guild.id);
         if (index === -1) {
             settings.guilds.push(guild.id);
-            fs.writeFile("./settings.json", JSON.stringify(settings), (err) => {
+            fs.writeFile('./settings.json', JSON.stringify(settings), (err) => {
                 if (err) console.error(`[${moment().format(settings.timeFormat)}] ${err}`);
                 else console.log(chalk.bgCyan.black(`[${moment().format(settings.timeFormat)}] Wrote to settings.json OK! Joined Guild "${guild.name}" (ID ${guild.id})`));
             });
@@ -26,8 +26,8 @@ module.exports = guild => {
 module.exports.reloadHandler = function () {
     return new Promise((resolve, reject) => {
         try {
-            delete require.cache[require.resolve(`../util/streamlinkHandler`)];
-            streamlink = require(`../util/streamlinkHandler`);
+            delete require.cache[require.resolve(`ggis/StreamLinkHandler`)];
+            streamlink = require(`ggis/StreamLinkHandler`);
             resolve();
         } catch (err) {
             reject(err);

@@ -4,7 +4,7 @@
 // Gives link to main Plug.dj channel.
 
 const fs = require('fs');
-const moment = require('moment-timezone')
+const moment = require('moment')
 const settings = require("../../settings.json");
 
 exports.run = (bot, message, args) => {
@@ -23,7 +23,7 @@ exports.run = (bot, message, args) => {
                 message.reply(`New Plug.dj link set to ${args[2]}`);
                 settings.plugdj.main_url = args[2];
                 fs.writeFile("./settings.json", JSON.stringify(settings), (err) => {
-                    if (err) console.error(moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY') + err);
+                    if (err) console.error(moment().format('settings.timeFormat') + err);
                 });
             } else if (args[2].startsWith("plug.dj/")) {
                 let str = "https://";
@@ -31,7 +31,7 @@ exports.run = (bot, message, args) => {
                 message.reply(`New Plug.dj link set to ${str}`);
                 settings.plugdj.main_url = str;
                 fs.writeFile("./settings.json", JSON.stringify(settings), (err) => {
-                    if (err) console.error(moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY') + err);
+                    if (err) console.error(moment().format('settings.timeFormat') + err);
                 });
             } else {
                 let str = "https://plug.dj/";
@@ -39,7 +39,7 @@ exports.run = (bot, message, args) => {
                 message.reply(`New Plug.dj link set to ${str}`);
                 settings.plugdj.main_url = str;
                 fs.writeFile("./settings.json", JSON.stringify(settings), (err) => {
-                    if (err) console.error(moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY') + err);
+                    if (err) console.error(moment().format('settings.timeFormat') + err);
                 });
             }
         }

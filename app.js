@@ -8,15 +8,13 @@
  * 
  *  @name	Ggis
  *	@author	Michael Louro
- *	@version 1.5.0
- *  Last edit - Nov 26, 2017
+ *	@version 2.0.0
+ *  Last edit - Dec 3, 2017
  *
  ************************************************/
 
 const Discord = require('discord.js');
 const settings = require('./settings.json');
 const bot = new Discord.Client();
-
-require('./util/init')(bot, settings);
-
+require('ggis/setup')(bot, settings);
 bot.login(settings.token);

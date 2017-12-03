@@ -1,0 +1,18 @@
+{
+    "reactions": [
+        {
+            "description": "Some descriptive text",
+            "type": "react",
+            "reaction": [":CustomEmoji:01234567897", "🤔"],
+            "reply": {"message": "Text", "file": "./file/path/to/something"},
+            "regex": "\\bReaction\\sTrigger\\sRegExp\\b"
+        },
+        {
+            "description": "This can be whatever you want",
+            "type": "This can be 'react', 'reply', 'react-reply', 'reply-react'. React will react to the message with an emoji from reaction[], and reply will reply to the message with some text and/or file/image. 'react-reply' or 'reply-react' will do both",
+            "reaction": [ "put emojis here", "as many as you want", "Use backslash before the emoji in discord to get the appropriate emoji code to put here" ],
+            "reply": {"message": "Put text to reply with", "file": "The path to the file (starting from app's root dir)"},
+            "regex": "A RegularExpression formatted as a string. "
+        }
+    ]
+}

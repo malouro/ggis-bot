@@ -1,6 +1,9 @@
+// Event triggers upon a disconnect
+
 const chalk = require('chalk');
-const moment = require('moment-timezone');
+const moment = require('moment');
+const settings = require('../settings.json');
 
 module.exports = bot => {
-    console.log(chalk.bgRed('['+moment().tz("America/New_York").format('h:mm:ssA MM/DD/YY')+'] Disconnected :('));
-}
+    console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] Bot disconnected :(`));
+};

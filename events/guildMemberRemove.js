@@ -1,7 +1,7 @@
 // This event triggers whenever a user leaves a guild (aka server) Ggis is in
 // Ggis will remove the user from StreamLink and/or !squad config files
 
-var streamlink = require('../util/streamlinkHandler');
+var streamlink = require('ggis/StreamLinkHandler');
 
 module.exports = member => {
     // Firstly, is the member connected with StreamLink?
@@ -22,8 +22,8 @@ module.exports = member => {
 module.exports.reloadHandler = function () {
     return new Promise((resolve, reject) => {
         try {
-            delete require.cache[require.resolve(`../util/streamlinkHandler`)];
-            streamlink = require(`../util/streamlinkHandler`);
+            delete require.cache[require.resolve(`ggis/StreamLinkHandler`)];
+            streamlink = require(`ggis/StreamLinkHandler`);
             resolve();
         } catch (err) {
             reject(err);

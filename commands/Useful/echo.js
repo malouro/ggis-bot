@@ -6,10 +6,12 @@
 
 const chalk = require('chalk');
 const moment = require('moment-timezone');
+const settings = require('../../settings');
 const msPerChar = 35;
 
 exports.run = (bot, message, args, perms) => {
     try {
+        if (!args[1]) return;
         let opts = { channel: message.channel, del: true, type: true, time: 0};
         let lastArg; let givenArgs = false, twoArgsLast = false, finishedWithArgs = false;
         args.splice(0,1);
@@ -72,7 +74,7 @@ exports.run = (bot, message, args, perms) => {
             this.sendMessage(message, str, opts);
         }
     } catch (err) {
-        console.log(chalk.bgRed.bold(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${err}`));
+        console.log(chalk.bgRed.bold(`[${moment().format(settings.timeFormat)}] ${err}`));
     }
 };
 
@@ -84,12 +86,12 @@ exports.sendMessage = function (message, str, opts) {
         var func = setTimeout(function () {
             opts.channel.stopTyping(true);
             opts.channel.send(str);
-            console.log(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${message.author.username} echo'd the message "${str}"`);
+            console.log(`[${moment().format(settings.timeFormat)}] ${message.author.username} echo'd the message "${str}"`);
         }, opts.time);
     } else {
         if (opts.del && message.channel.type === 'text') message.delete().then(() => {
             opts.channel.send(str);
-            console.log(`[${moment().format('hh:mm:ssA MM/DD/YY')}] ${message.author.username} echo'd the message "${str}"`);            
+            console.log(`[${moment().format(settings.timeFormat)}] ${message.author.username} echo'd the message "${str}"`);            
         }).catch(err => console.log(err));
         else opts.channel.send(str);
     }

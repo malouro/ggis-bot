@@ -4,8 +4,7 @@
 
 const fs = require('fs');
 const settings = require('../../settings.json');
-
-var streamlink = require('../../util/streamlinkHandler');
+var streamlink = require('ggis/StreamLinkHandler');
 var slFuncGC = require('../../events/guildCreate');
 var slFuncGD = require('../../events/guildDelete');
 var slFuncGMR = require('../../events/guildMemberRemove');
@@ -26,7 +25,7 @@ exports.run = (bot, message, args, perms) => {
                 message.channel.send(
                     `\`${settings.prefix}streamlink enable\`\n` +
                     `This command will enable a StreamLink connection. This means that the next time the StreamLink'd stream goes live on Twitch, ${settings.botnameproper} will push out notifications to the StreamLink-enabled Discord text-channels. Can also be used to enable StreamLink on the current server.\n\n` +
-                    `\`${settings.prefix}streamlink enable [self/@user/server/help]\` is the command format (choose one of the three [options]!)\n\n**Command Descriptions**\n` +
+                    `\`${settings.prefix}streamlink enable [self/@user/server/help]\` is the command format (choose one of the three [options]!)\n\n**In-Depth Command Descriptions**\n` +
                     `\`${settings.prefix}streamlink enable self\`\nEnables your own StreamLink connection, allowing ${settings.botnameproper} to notify the server when you go live. (This can be written as either "${settings.prefix}streamlink enable self" or "${settings.prefix}streamlink enable", with no extra argument)\n\n` +
                     `\`${settings.prefix}streamlink enable @user\`\nEnables another user's StreamLink connection. __Admin-only.__\n(Though nothing will stop an admin from enabling/disabling someone's StreamLink, it should not be abused! Don't be a jerk.)\n\n` +
                     `\`${settings.prefix}streamlink enable server\`\nEnables StreamLink notifications for your Discord server. StreamLink notifications will now be pushed onto the server. __Admin-only.__\n\n` +
@@ -36,12 +35,13 @@ exports.run = (bot, message, args, perms) => {
             } else {
                 if (message.mentions.users.size > 0) {
                     if (perms < 2) {
-                        message.reply(`Sorry, but enabling another user's StreamLink is **admin exclusive**.\n\nIf you are attempting to enable your own StreamLink, you can simply use \`${settings.prefix}streamlink enable self\` or \`${settings.prefix}streamlink enable\``);
+                        message.reply(`Sorry, but enabling another user's StreamLink is **admin exclusive**.\n\n`+
+                        `If you are attempting to enable your own StreamLink, you can simply use \`${settings.prefix}streamlink enable self\` or \`${settings.prefix}streamlink enable\``);
                     } else {
                         streamlink.enableUser(message, message.client, message.mentions.users.first());
                     }
                 } else {
-                    message.reply(`If you are trying to enable another user's StreamLink connection, you must @mention them at the end of the command. (however, this is **admin exclusive)\n\nIf you are trying to enable your own StreamLink, you can simply use \`${settomgs.prefix}streamlink enable self\` or \`${settings.prefix}streamlink enable\``);
+                    message.reply(`If you are trying to enable another user's StreamLink connection, you must @mention them at the end of the command. (however, this is **admin exclusive)\n\nIf you are trying to enable your own StreamLink, you can simply use \`${settings.prefix}streamlink enable self\` or \`${settings.prefix}streamlink enable\``);
                 }
             }
             break;
@@ -59,7 +59,7 @@ exports.run = (bot, message, args, perms) => {
                 message.channel.send(
                     `\`${settings.prefix}streamlink disable\`\n` +
                     `This command will disable a StreamLink connection. This means that ${settings.botnameproper} will *NOT* push out notifications to the server when you go live. This will only affect the server you use this command in. Can also be used to disable StreamLink entirely on the current server.\n\n\`` +
-                    `${settings.prefix}streamlink disable [self/@user/server/help]\` is the command format (choose one of the three [options]!)\n\n**Command Descriptions**\n\`` +
+                    `${settings.prefix}streamlink disable [self/@user/server/help]\` is the command format (choose one of the three [options]!)\n\n**In-Depth Command Descriptions**\n\`` +
                     `${settings.prefix}streamlink disable self\`\nDisables your own StreamLink connection. ${settings.botnameproper} will no longer notify the server when you go live. (This can be written as either "${settings.prefix}streamlink disable self" or "${settings.prefix}streamlink disable", with no extra arguments)\n\n\`` +
                     `${settings.prefix}streamlink disable @user\`\nDisables another user's StreamLink connection. __Admin-only.__\n(Though nothing will stop an admin from enabling/disabling someone's StreamLink, it should not be abused! Don't be a jerk.)\n\n\`` +
                     `${settings.prefix}streamlink disable server\`\nDisables StreamLink notifications for your Discord server. StreamLink notifications will no longer be pushed onto the server. __Admin-only.__\n\n\`` +
@@ -74,7 +74,7 @@ exports.run = (bot, message, args, perms) => {
                         streamlink.disableUser(message, message.client, message.mentions.users.first());
                     }
                 } else {
-                    message.reply(`If you are trying to enable another user's StreamLink connection, you must @mention them at the end of the command. (however, this is **admin exclusive)\n\nIf you are trying to enable your own StreamLink, you can simply use \`${settomgs.prefix}streamlink enable self\` or \`${settings.prefix}streamlink enable\``);
+                    message.reply(`If you are trying to enable another user's StreamLink connection, you must @mention them at the end of the command. (however, this is **admin exclusive)\n\nIf you are trying to enable your own StreamLink, you can simply use \`${settings.prefix}streamlink enable self\` or \`${settings.prefix}streamlink enable\``);
                 }
             }
             break;
@@ -107,7 +107,7 @@ exports.run = (bot, message, args, perms) => {
                     else {
                         if (perms >= 2) {
                             if (message.mentions.users.size > 0) streamlink.addUser(message, message.client, args[2], message.mentions.users.first());
-                            else message.reply(`If you are trying to create a StreamLink connection for another user, you must @mention them at the end of the command. (or if you are trying to make your own StreamLink, you can simply use \`${settomgs.prefix}streamlink add twitchName\` with no extra arguments or @mentions)`);
+                            else message.reply(`If you are trying to create a StreamLink connection for another user, you must @mention them at the end of the command. (or if you are trying to make your own StreamLink, you can simply use \`${settings.prefix}streamlink add twitchName\` with no extra arguments or @mentions)`);
                         } else message.reply(`Sorry, but this command is **admin exclusive**. For \`${settings.prefix}streamlink add\`, non-admins are only allowed to add their own StreamLink connection (by using \`${settings.prefix}streamlink add twitchName\`, with no user @mentions given).`);
                     }
                 }
@@ -122,7 +122,7 @@ exports.run = (bot, message, args, perms) => {
         case "remove":
         case "delete":
         case "disconnect":
-            if (typeof args[2] !== 'undefined' || args[2] !== 'self') {
+            if (args[2] && args[2] !== 'self') {
                 if (args[2] === 'channel') {
                     streamlink.removeChannel(message, message.client, message.channel);
                 } else if (args[2] === 'help') {
@@ -139,7 +139,7 @@ exports.run = (bot, message, args, perms) => {
                 } else {
                     if (perms >= 2) {
                         if (message.mentions.users.size > 0) streamlink.removeUser(message, message.client, message.mentions.users.first());
-                        else message.reply(`If you are trying to remove a StreamLink connection for another user, you must @mention them at the end of the command. (or if you are trying to remove your own StreamLink, you can simply use \`${settomgs.prefix}streamlink remove\` with no extra arguments or @mentions)`);
+                        else message.reply(`If you are trying to remove a StreamLink connection for another user, you must @mention them at the end of the command. (or if you are trying to remove your own StreamLink, you can simply use \`${settings.prefix}streamlink remove\` with no extra arguments or @mentions)`);
                     } else message.reply(`Sorry, but this command is **admin exclusive**. For \`${settings.prefix}streamlink remove\`, non-admins are only allowed to remove their own StreamLink connection (by using \`${settings.prefix}streamlink remove\`, with no user @mentions given).`);
                 }
             } else {
@@ -161,16 +161,20 @@ exports.run = (bot, message, args, perms) => {
          */
         case "help":
         case "?":
-            message.channel.send(`${defaulted ? 'Oops! Incorrect command\n\n' : ''}\`${settings.prefix}streamlink help\`\n` +
-                `StreamLink connects your Discord account to a Twitch.tv account and allows ${settings.botnameproper} to post a notification and link to your Twitch stream whenever you go live. It is not to be confused with Discord's integration with Twitch through User Settings > Connections; the two are mutually exclusive features.\n\n` +
-                `**How to use**\n1. Add your StreamLink connection with "${settings.prefix}streamlink add *twitchChannel*"\n2. Though it should be enabled by default, you can enable your StreamLink with "${settings.prefix}streamlink enable" and disable with "${settings.prefix}streamlink disable"\n3. Add a channel on the server to send notifications to by using "${settings.prefix}streamlink add channel" in the chosen channel\n4. Check "${settings.prefix}streamlink status" to see if your information saved properly!\n\n` +
-                `**Command List**\n` +
-                `\`${settings.prefix}streamlink add\`\nAdds a StreamLink connection, linking a Discord user to a Twitch.tv channel. You also need to add a Use command "${settings.prefix}streamlink add help" for more info.\n\n` +
-                `\`${settings.prefix}streamlink remove\`\nRemoves a StreamLink connection that has already been established. Use command "${settings.prefix}streamlink remove help" for more info.\n\n` +
-                `\`${settings.prefix}streamlink enable\`\nEnables a specific user's StreamLink, meaning that ${settings.botnameproper} will announce when your stream goes live. Can also be used to enable StreamLink on the whole server w/ "${settings.prefix}streamlink enable server". Use command "${settings.prefix}streamlink enable help" for more info.\n\n` +
-                `\`${settings.prefix}streamlink disable\`\nDisables a specific user's StreamLink. ${settings.botnameproper} will no longer announce when your stream goes live. Doesn't remove the users info from StreamLink, merely disables it. Can also be used to disable StreamLink on the whole server w/ "${settings.prefix}streamlink disable server". Use command "${settings.prefix}streamlink disable help" for more info.\n\n` +
-                `\`${settings.prefix}streamlink status\`\nShows current StreamLink connections & which stream(s) are live currently.\n\n` +
-                `\`${settings.prefix}streamlink help\`\nThe menu you are looking at right now. ;)\n\n**Issues?**\nFeel free to contact <@${settings.masterID}> for any questions, problems or concerns that you may face with StreamLink or anything ${settings.botnameproper}-bot related.`
+            message.channel.send(`\`${settings.prefix}streamlink help\`\n` +
+                `StreamLink connects your Discord account to a Twitch.tv account and allows ${settings.botnameproper} to post a notification and link to your Twitch stream whenever you go live. It is *not* to be confused with Discord's integration with Twitch through User Settings > Connections; the two are mutually exclusive features.\n\n` +
+                `**How to use**\n\n`+
+                `:one: Add your StreamLink connection with \`${settings.prefix}streamlink add twitchChannel\`\n*ex:* If your stream is located at <http://www.twitch.tv/example>, then you would use \`${settings.prefix}streamlink add example\`\n\n`+
+                `:two: Though it should be enabled by default, you can enable your StreamLink with \`${settings.prefix}streamlink enable\` and disable with \`${settings.prefix}streamlink disable\`\n\n`+
+                `:three: Add a channel on the server to send notifications to by using \`${settings.prefix}streamlink add channel\` in the chosen channel\n\n`+
+                `:four: Check \`${settings.prefix}streamlink status\` to see if your information saved properly, and to see the current server settings\n\n`+
+                `**Command List**\n\n` +
+                `\`${settings.prefix}streamlink add\`\n` +
+                `\`${settings.prefix}streamlink remove\`\n` +
+                `\`${settings.prefix}streamlink enable\`\n` +
+                `\`${settings.prefix}streamlink disable\`\n` +
+                `\`${settings.prefix}streamlink status\`\n` +
+                `\`${settings.prefix}streamlink help\`\n\n**Issues, questions, concerns?**\nFeel free to contact <@${settings.masterID}> for any questions, problems or concerns that you may face with StreamLink or anything ${settings.botnameproper}-bot related.`
             );
             break;
         default:
@@ -182,8 +186,8 @@ exports.run = (bot, message, args, perms) => {
 exports.reloadHandler = () => {
     return new Promise((resolve, reject) => {
         try {
-            delete require.cache[require.resolve(`../../util/streamlinkHandler`)];
-            streamlink = require(`../../util/streamlinkHandler`);
+            delete require.cache[require.resolve(`ggis/StreamLinkHandler`)];
+            streamlink = require(`ggis/StreamLinkHandler`);
             slFuncGC.reloadHandler().then(
                 slFuncGD.reloadHandler().then(
                     slFuncGMR.reloadHandler().then(
