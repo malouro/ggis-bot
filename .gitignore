@@ -4,20 +4,22 @@ logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-node_modules/*
-!node_modules/ggis
 package-lock.json
 .npm
 .DS_Store
 Thumbs.db
 
+# Include ggis module folder
+node_modules/*
+!node_modules/ggis
+
 # Privacy
-/config/backup
+/config/atreactions.json
+/config/txtreactions.json
 /config/streamlink/users/*
 /config/streamlink/guilds/*
 !/config/streamlink/conf.json
-atreactions.json
-txtreactions.json
+
 settings.json
 settings.backup.json
 
@@ -34,4 +36,4 @@ settings.backup.json
 **/blazertov.js
 
 # Misc
-quotes.json
+/config/quotes.json
