@@ -6,7 +6,7 @@
 const fs              = require('fs');
 const moment          = require('moment-timezone')
 const settings        = require('../../settings.json');
-var   SpoilerHandler  = require('ggis/spoilerHandler');
+var   SpoilerHandler  = require('ggis/SpoilerHandler');
 
 const SEPARATOR = /\|/;
 const MAX_LINES       = 8;

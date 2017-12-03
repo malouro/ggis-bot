@@ -3,8 +3,7 @@
   "version": "2.0.0",
   "description": "A Discord chat bot for the Christian Mingle Discord server.",
   "main": "app.js",
-  "scripts": {
-  },
+  "scripts": {},
   "author": "Michael Louro",
   "license": "MIT",
   "dependencies": {
