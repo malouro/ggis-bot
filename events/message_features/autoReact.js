@@ -32,7 +32,7 @@ module.exports = (message, settings) => {
                         switch (t.type) {
                             case "react":
                                 if (t.reaction.length > 0) {
-                                    reactInOrder(message, t.reaction[Math.floor(Math.random()*t.reaction.length)], 0);
+                                    reactInOrder(message, t.reaction, 0);
                                 } else {
                                     console.log(`No reactions in reaction array for "${t.description}" AutoReaction for a 'react' type AutoReact`);
                                 }
@@ -48,7 +48,7 @@ module.exports = (message, settings) => {
                             case "reply-react":
                                 if (t.reaction.length > 0 && t.reply.message !== '') {
                                     replyReaction(message, t.reply);
-                                    reactInOrder(message, t.reaction[Math.floor(Math.random()*t.reaction.length)], 0);
+                                    reactInOrder(message, t.reaction, 0);
                                 } else {
                                     if (t.reply.message === '') console.log(`No reply message for "${t.description}" AutoReaction for a 'reply' type AutoReact`);
                                     if (t.reaction.length <= 0) console.log(`No reactions in reaction array for "${t.description}" for a 'react' type AutoReact`);
@@ -80,7 +80,7 @@ module.exports = (message, settings) => {
 
 // React to the message in a promise based fashion with every emoji in the given array, in ascending index order
 
-reactInOrder = (message, emojis, i) => {
+const reactInOrder = (message, emojis, i) => {
     if (emojis.length === 0) return;
     else if (i < emojis.length) {
         message.react(emojis[i]).then(() => {
@@ -92,7 +92,7 @@ reactInOrder = (message, emojis, i) => {
 
 // Reply to the message correctly, with the given file and/or string
 
-replyReaction = (message, reply) => {
+const replyReaction = (message, reply) => {
     if (reply.file !== "") message.reply(reply.message, { file: reply.file });
     else message.reply(reply.message);
 };
