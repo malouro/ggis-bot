@@ -46,7 +46,11 @@ module.exports = (bot, message, settings) => {
         if (perms < cmd.conf.permLevel) return;
         if (cmd.conf.textChannelOnly && message.channel.type === 'dm') return message.reply(`Sorry, but this command doesn't work via DM!`);
         if (cmd.conf.guildOnly && (message.guild.id !== settings.mainguild && message.guild.id !== settings.testguild)) return;
-        cmd.run(bot, message, args, perms);
+        try {
+            cmd.run(bot, message, args, perms);
+        } catch (err) {
+            console.log(`[${moment().format(settings.timeFormat)}] Error trying to run a command (${cmd.help.name})\n${err.stack}`);
+        }
     }
 
 };

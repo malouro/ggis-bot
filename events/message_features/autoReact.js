@@ -11,7 +11,7 @@
  *      @desc {TxtReactions}
  *          - Reads message, tests every RegEx needed to check for
  *          - If one, or more, matches: react appropriately
- *      @desc {AtRections}
+ *      @desc {AtReactions}
  *          - If a user is mentioned, check if the user has any registered AtReaction emoji
  *          - If so, react appropriately
  * 
@@ -37,6 +37,7 @@ module.exports = (message, settings) => {
                                 replyReaction(message, t.reply);
                                 break;
                             case "react-reply":
+                            case "reply-react":
                                 replyReaction(message, t.reply);
                                 reactInOrder(message, t.reaction, 0);
                                 break;

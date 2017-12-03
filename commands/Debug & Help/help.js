@@ -83,8 +83,8 @@ exports.run = (bot, message, args, perms) => {
          * Generate help menu for a command category 
          */
 
-        else if (bot.commandGC.has(arg)) {
-            category = bot.commandGroups.get(bot.commandGC.get(arg));
+        else if (bot.commandGroupCategories.has(arg)) {
+            category = bot.commandGroups.get(bot.commandGroupCategories.get(arg));
             let str = `=== ${category.name} Commands ===\nCategory :: ${category.name}\nDescription :: ${category.description}\nCategory aliases :: ${category.code.join(', ')}` +
                 `\n\nFor help & info, use: ${settings.prefix}${this.help.usage.substr(0, this.help.usage.indexOf('\n'))}\n\n=== Command List ===\n`;
             let substr;

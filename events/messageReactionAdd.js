@@ -1,8 +1,7 @@
 // Whenever an emoji reaction is added to a message
 
-var lfg = require('../util/lfgHandler');
+var lfg = require('ggis/LFGHandler');
 const chalk = require('chalk');
-const Discord = require('discord.js');
 const fs = require('fs');
 const moment = require('moment');
 
@@ -13,7 +12,9 @@ module.exports = (messageReaction, user) => {
     var bot = messageReaction.message.client;
 
     /**
-     * LFG stuff
+     * LFG
+     *  - ThumbsUp --> adds member to party, if possible
+     *  - NoEntrySign --> cancels party, if possible
      */
 
     if (messageReaction.emoji.toString() === '👍') {
@@ -35,12 +36,12 @@ module.exports = (messageReaction, user) => {
 module.exports.reloadHandler = function () {
     return new Promise((resolve, reject) => {
         try {
-            delete require.cache[require.resolve(`../util/lfgHandler`)];
-            lfg = require(`../util/lfgHandler`);
+            delete require.cache[require.resolve(`ggis/LFGHandler`)];
+            lfg = require(`ggis/LFGHandler`);
             resolve();
         }
         catch (err) {
             reject(err);
         }
     });
-}
+};

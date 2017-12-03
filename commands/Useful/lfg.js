@@ -6,15 +6,13 @@
 
 const chalk     = require('chalk');
 const Discord   = require('discord.js');
-const fs        = require('fs');
-const moment    = require('moment-timezone');
 
 // Events for LFG handling:
-var lfgHandler  = require('../../util/lfgHandler');
+var lfgHandler  = require('ggis/LFGHandler');
 var lfgFuncMRA  = require('../../events/messageReactionAdd');
 var lfgFuncMRR  = require('../../events/messageReactionRemove');
 var lfgFuncMD   = require('../../events/messageDelete');
-var settings    = JSON.parse(fs.readFileSync("./settings.json", "utf8")); // Bot config JSON
+var settings    = require('../../settings');
 
 exports.run = (bot, message, args, perms) => {
 
@@ -261,8 +259,8 @@ exports.run = (bot, message, args, perms) => {
 exports.reloadHandler = () => {
     return new Promise((resolve, reject) => {
         try {
-            delete require.cache[require.resolve('../../util/lfgHandler')];
-            lfgHandler = require('../../util/lfgHandler');
+            delete require.cache[require.resolve('ggis/LFGHandler')];
+            lfgHandler = require('ggis/LFGHandler');
             lfgFuncMRA.reloadHandler().then(
                 lfgFuncMRR.reloadHandler().then(
                     lfgFuncMD.reloadHandler().then(

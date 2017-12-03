@@ -4,6 +4,8 @@
 // Sends a random thinking gif
 
 const fs = require('fs');
+const moment = require('moment');
+const settings = require('../../settings');
 
 exports.run = (bot, message, args) => {
     let memes = JSON.parse(fs.readFileSync('./config/memes.json', 'utf8'));

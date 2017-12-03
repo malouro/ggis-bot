@@ -1,0 +1,63 @@
+{
+    "botname": "ggis",
+    "botnameproper": "Ggis",
+    "token": "MzIxODE4MDM1MTkzMTE4NzIy.DJj0nA.VlQNawMGUik38eWUIfjfCGW4W90",
+    "prefix": "!",
+    "commandGroups": [
+        {"code": ["debug","help"], "name":"Debug & Help", "description": "Help menus & debug"},
+        {"code": ["useful"],"name":"Useful", "description": "Commands that do useful things"},
+        {"code": ["random","rng"],"name":"Random", "description": "Random, fun commands"},
+        {"code": ["memes"], "name":"Memes", "description": "Memes & dreams"}
+    ],
+    "guilds": [
+        "123875299501932546",
+        "292478819435282433",
+        "119264905395175425",
+        "246377870316929024"
+    ],
+    "masterID": "94983799854596096",
+    "mainguild": "123875299501932546",
+    "mainchannel": "123875299501932546",
+    "testguild": "292478819435282433",
+    "rules": {
+        "enable": true,
+        "sailormoon": true,
+        "autoreact": {
+            "enable": true,
+            "atmentions": true,
+            "txtmentions": true
+        },
+        "extended_emoji": {
+            "enable": true,
+            "edit": true,
+            "embed": true
+        },
+        "memes": true
+    },
+    "fortune": {
+        "amount": 93
+    },
+    "streamlink": {
+        "default_setting": true,
+        "enable": true,
+        "timer": 60,
+        "split_value": 10
+    },
+    "plugdj": {
+        "main_url": "https://plug.dj/cuties-only"
+    },
+    "lfg": {
+        "ttl_default": 15,
+        "ttl_warning": true,
+        "ttl_max": 180,
+        "ttl_threshold": 30,
+        "max_party_size": 32,
+        "split_value": 25
+    },
+    "squad": {
+        "server_max": 25
+    },
+    "poll": {
+        "divider": "|"
+    }
+}

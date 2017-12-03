@@ -1,40 +1,43 @@
 // =====================================================================================
 //                                  ! rules command
 // =====================================================================================
-// General bot configuration.
-// Changes most settings, especially the message 'moderating' settings, and
-// the more fun AutoReaction settings
 
 /**
- * !rules smoon 
+ * Controls message features & rules (such as AutoReat & chat filters)
+ * 
+ * @desc Command usage:
+ * rules smoon [enable/disable/help]
  *      "No Sailor Moon" rule that filters & deletes message containing "Sailor Moon" expression.
- * 
- * !rules autoreact (at)
+ * rules autoreact [at/txt] [enable/disable/help]
  *      AutoReaction emojis: Ggis will react with emojis when people or phrases are mentioned
- * 
+ * rules help
  */
 
- /**
-  * @todo 
-  *     Better documentation
-  *     Better structure
-  *     Maybe avoid using so many embeds? (or at least migrate to RichEmbeds)
-  */
+/**
+ * @todo 
+ *  - Better documentation
+ *  - Better structure
+ *  - Maybe avoid using so many embeds? (or at least migrate to RichEmbeds)
+ */
 
-  
+const Discord = require('discord.js');
 const fs = require('fs');
 const moment = require('moment');
-const settings = JSON.parse(fs.readFileSync("./settings.json", "utf8"));
+const settings = require('../../settings');
 
-const BOT_NAME_PROPER = settings.botnameproper;
-const MASTER_ID = settings.masterID;
-
-exports.run = (bot, message, args) => {
+exports.run = (bot, message, args, perms) => {
     switch (args[1]) {
-        //NO SAILOR MOON RULE
-        //!rules smoon
+        /**
+         * @summary 'NoSailorMoon' filter
+         *  @param enable - Turn on filter
+         *  @param disable - Turn off filter
+         *  @param help - Help menu 
+         *  @param {Command not found} - Error message AND/OR help menu
+         */
         case "smoon":
-            //!rules smoon enable
+        case "nosmoon":
+        case "sailormoon":
+        case "nosailormoon":
             if (args[2] == 'enable') {
                 message.reply('"NoSailorMoon" rule enabled.');
                 settings.rules.sailormoon = true;
@@ -42,7 +45,6 @@ exports.run = (bot, message, args) => {
                     if (err) console.error(moment().format(settings.timeFormat) + err);
                 });
             }
-            //!rules smoon disable
             else if (args[2] == 'disable') {
                 message.reply('"NoSailorMoon" rule disabled.');
                 settings.rules.sailormoon = false;
@@ -50,19 +52,18 @@ exports.run = (bot, message, args) => {
                     if (err) console.error(moment().format(settings.timeFormat) + err);
                 });
             }
-            //!rules smoon help
             else if (args[2] == 'help') {
                 message.channel.send({
                     embed: {
                         hexColor: "#4cff22",
                         title: `${settings.prefix}` + "rules smoon help:",
                         description: "How to use:\n\n**!" + "rules smoon** *[options]*\n\nThe NoSailorMoon rule purges any incoming text that mentions " +
-                        "\"sailor moon\" or any variation of the name, " +
-                        "but only in a specific \"NoSailorMoon\" text-channel (that is, a text channel with that name).\n\n__Available *[options]* :__",
+                            "\"sailor moon\" or any variation of the name, " +
+                            "but only in a specific \"NoSailorMoon\" text-channel (that is, a text channel with that name).\n\n__Available *[options]* :__",
                         fields: [
-                        {name: "enable", value: "Enables the NoSailorMoon rule."},
-                        {name: "disable",value: "Disables the NoSailorMoon rule."},
-                        {name: "help",value: "Shows the menu you're looking at right now. ;)"}
+                            { name: "enable", value: "Enables the NoSailorMoon rule." },
+                            { name: "disable", value: "Disables the NoSailorMoon rule." },
+                            { name: "help", value: "Shows the menu you're looking at right now. ;)" }
                         ]
                     }
                 });
@@ -135,8 +136,8 @@ exports.run = (bot, message, args) => {
                             hexColor: "#4cff22",
                             title: `${settings.prefix}` + "rules autoreact at help:",
                             description: "How to use:\n\n**!" + "rules autoreact at** *[options]*\n\nAutoReact is the automated attachment of an emoji reaction to certain messages." +
-                            "The **at** portion refers to 'at mentions', or '@mentions'. (Basically, when you mention/tag someone with the @ symbol." +
-                            "\n\n__Available *[options]* :__",
+                                "The **at** portion refers to 'at mentions', or '@mentions'. (Basically, when you mention/tag someone with the @ symbol." +
+                                "\n\n__Available *[options]* :__",
                             fields: [{
                                 name: "enable]",
                                 value: "Enables auto reactions to @mentions."
@@ -151,7 +152,7 @@ exports.run = (bot, message, args) => {
                             },
                             {
                                 name: "__**Issues?**__",
-                                value: "Feel free to contact <@" + MASTER_ID + "> for any questions, problems or concerns that you may face in using AutoReact (or anything " + BOT_NAME_PROPER + "-bot related)."
+                                value: "Feel free to contact <@" + settings.masterID + "> for any questions, problems or concerns that you may face in using AutoReact (or anything " + settings.botnameproper + "-bot related)."
                             }
                             ]
                         }
@@ -164,7 +165,7 @@ exports.run = (bot, message, args) => {
                             hexColor: "#ff2222",
                             title: "Error: Command not recognized.",
                             description: "Command ***" + message.toString() + "*** was not a proper command.\n\n__Proper example commands for **" + settings.prefix + "rules" +
-                            " autoreact at** are listed below:__",
+                                " autoreact at** are listed below:__",
                             fields: [{
                                 name: `${settings.prefix}` + "rules autoreact at enable",
                                 value: "Enables auto reactions to @mentions."
@@ -179,7 +180,7 @@ exports.run = (bot, message, args) => {
                             },
                             {
                                 name: "__**Issues?**__",
-                                value: "Feel free to contact <@" + MASTER_ID + "> for any questions, problems or concerns that you may face in using AutoReact (or anything " + BOT_NAME_PROPER + "-bot related).",
+                                value: "Feel free to contact <@" + settings.masterID + "> for any questions, problems or concerns that you may face in using AutoReact (or anything " + settings.botnameproper + "-bot related).",
                             }
                             ]
                         }
@@ -211,10 +212,10 @@ exports.run = (bot, message, args) => {
                             hexColor: "#4cff22",
                             title: `${settings.prefix}` + "rules autoreact text help:",
                             description: "How to use:\n\n**!" + "rules autoreact text** *[options]*\n\nAutoReact is the automated attachment of an emoji reaction to certain messages. " +
-                            "The **text** feature of AutoReact will make " + "rules react to certain messages, depending on the text in the message. " +
-                            "This feature is designed to react minimally, and not where every other message will trigger the AutoReact.\n\n" +
-                            "Some examples include reactions for: all-caps messages, message with nothing but question marks, and some other stuff." +
-                            "\n\n__Available *[options]* :__",
+                                "The **text** feature of AutoReact will make " + "rules react to certain messages, depending on the text in the message. " +
+                                "This feature is designed to react minimally, and not where every other message will trigger the AutoReact.\n\n" +
+                                "Some examples include reactions for: all-caps messages, message with nothing but question marks, and some other stuff." +
+                                "\n\n__Available *[options]* :__",
                             fields: [{
                                 name: "enable",
                                 value: "Enables emoji reactions to certain text."
@@ -229,7 +230,7 @@ exports.run = (bot, message, args) => {
                             },
                             {
                                 name: "__**Issues?**__",
-                                value: "Feel free to contact <@" + MASTER_ID + "> for any questions, problems or concerns that you may face in using AutoReact (or anything " + BOT_NAME_PROPER + "-bot related).",
+                                value: "Feel free to contact <@" + settings.masterID + "> for any questions, problems or concerns that you may face in using AutoReact (or anything " + settings.botnameproper + "-bot related).",
                             }
                             ]
                         }
@@ -242,7 +243,7 @@ exports.run = (bot, message, args) => {
                             hexColor: "#ff2222",
                             title: "Error: Command not recognized.",
                             description: "Command ***" + message.toString() + "*** was not a proper command.\n\n__Proper example commands for **" + settings.prefix + "rules" +
-                            " autoreact text** are listed below:__",
+                                " autoreact text** are listed below:__",
                             fields: [{
                                 name: `${settings.prefix}` + "rules autoreact text enable",
                                 value: "Enables emoji reactions to certain text."
@@ -257,7 +258,7 @@ exports.run = (bot, message, args) => {
                             },
                             {
                                 name: "__**Issues?**__",
-                                value: "Feel free to contact <@" + MASTER_ID + "> for any questions, problems or concerns that you may face in using AutoReact (or anything " + BOT_NAME_PROPER + "-bot related).",
+                                value: "Feel free to contact <@" + settings.masterID + "> for any questions, problems or concerns that you may face in using AutoReact (or anything " + settings.botnameproper + "-bot related).",
                             }
                             ]
                         }
@@ -271,9 +272,9 @@ exports.run = (bot, message, args) => {
                         hexColor: "#4cff22",
                         title: `${settings.prefix}` + "rules autoreact help:",
                         description: "How to use:\n\n**!" + "rules autoreact** *[options]*\n\nAutoReact is the automated attachment of an emoji reaction to certain messages. " +
-                        "" + "rules will react to messages depending on whether certain users are mentioned, or certains phrases are detected within the message. " +
-                        "Any of the AutoReact features can be disabled or controlled via command." +
-                        "\n\n__Available *[options]* :__",
+                            "" + "rules will react to messages depending on whether certain users are mentioned, or certains phrases are detected within the message. " +
+                            "Any of the AutoReact features can be disabled or controlled via command." +
+                            "\n\n__Available *[options]* :__",
                         fields: [{
                             name: "at *[enable/disable/help]*",
                             value: "Refers to settings involving @mentions and if AutoReact will react to them."
@@ -288,7 +289,7 @@ exports.run = (bot, message, args) => {
                         },
                         {
                             name: "__**Issues?**__",
-                            value: "Feel free to contact <@" + MASTER_ID + "> for any questions, problems or concerns that you may face in using AutoReact (or anything " + BOT_NAME_PROPER + "-bot related).",
+                            value: "Feel free to contact <@" + settings.masterID + "> for any questions, problems or concerns that you may face in using AutoReact (or anything " + settings.botnameproper + "-bot related).",
                         }
                         ]
                     }
@@ -315,7 +316,7 @@ exports.run = (bot, message, args) => {
                         },
                         {
                             name: "__**Issues?**__",
-                            value: "Feel free to contact <@" + MASTER_ID + "> for any questions, problems or concerns that you may face in using AutoReact (or anything " + BOT_NAME_PROPER + "-bot related).",
+                            value: "Feel free to contact <@" + settings.masterID + "> for any questions, problems or concerns that you may face in using AutoReact (or anything " + settings.botnameproper + "-bot related).",
                         }
                         ]
                     }
@@ -328,9 +329,9 @@ exports.run = (bot, message, args) => {
                 embed: {
                     hexColor: "#4cff22",
                     title: `${settings.prefix}` + "rules help:",
-                    description: `${BOT_NAME_PROPER} has special rules within the Christian Mingle server, that trigger upon @mentions of certain users, or with certain text. They can be enabled/disabled at any time` +
-                    ` by the owner of the server, or by <@${settings.masterID}>.`+
-                    "\n\n__Available commands & rules:__",
+                    description: `${settings.botnameproper} has special rules within the Christian Mingle server, that trigger upon @mentions of certain users, or with certain text. They can be enabled/disabled at any time` +
+                        ` by the owner of the server, or by <@${settings.masterID}>.` +
+                        "\n\n__Available commands & rules:__",
                     fields: [{
                         name: `${settings.prefix}` + "rules autoreact *[enable/disable/help]*",
                         value: "Refers to settings involving @mentions and if AutoReact will react to them."
@@ -345,7 +346,7 @@ exports.run = (bot, message, args) => {
                     },
                     {
                         name: "__**Issues?**__",
-                        value: "Feel free to contact <@" + MASTER_ID + "> for any questions, problems or concerns that you may face with anything " + BOT_NAME_PROPER + "-bot related.",
+                        value: "Feel free to contact <@" + settings.masterID + "> for any questions, problems or concerns that you may face with anything " + settings.botnameproper + "-bot related.",
                     }
                     ]
                 }
@@ -373,7 +374,7 @@ exports.run = (bot, message, args) => {
                     },
                     {
                         name: "__**Issues?**__",
-                        value: "Feel free to contact <@" + MASTER_ID + "> for any questions, problems or concerns that you may face in using StreamLink (or anything " + BOT_NAME_PROPER + "-bot related).",
+                        value: "Feel free to contact <@" + settings.masterID + "> for any questions, problems or concerns that you may face in using StreamLink (or anything " + settings.botnameproper + "-bot related).",
                     }
                     ]
                 }
@@ -386,13 +387,13 @@ exports.conf = {
     enabled: true,
     visible: true,
     guildOnly: true,
-    textChannelOnly: true,    
+    textChannelOnly: true,
     aliases: [`${settings.botname}rules`],
     permLevel: 3
 };
 
 exports.help = {
     name: 'rules',
-    description: `Set up and configure ${BOT_NAME_PROPER}-bot settings and rules (in the main server only)`,
+    description: `Set up and configure ${settings.botnameproper}-bot settings and rules (in the main server only)`,
     usage: `rules <category> [option]\n<category> can be (smoon/autoreact/help)\n[option] depends on the category in question (use the option "help" for more info on the category) (ie: ${settings.prefix}rules autoreact help)`
 };

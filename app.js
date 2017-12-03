@@ -16,7 +16,5 @@
 const Discord = require('discord.js');
 const settings = require('./settings.json');
 const bot = new Discord.Client();
-
-require('./util/init')(bot, settings);
-
+require('ggis/setup')(bot, settings);
 bot.login(settings.token);
