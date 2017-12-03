@@ -16,10 +16,10 @@ Thumbs.db
 /config/streamlink/users/*
 /config/streamlink/guilds/*
 !/config/streamlink/conf.json
-/config/attreactions.json
-/config/txtreactions.json
+atreactions.json
+txtreactions.json
 settings.json
-settings-backup.json
+settings.backup.json
 
 # Commands not to include
 **/test.js
@@ -32,3 +32,6 @@ settings-backup.json
 **/sayreville.js
 **/bitchholdon.js
 **/blazertov.js
+
+# Misc
+quotes.json
