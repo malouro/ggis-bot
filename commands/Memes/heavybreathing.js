@@ -9,7 +9,7 @@ const settings = require('../../settings');
 
 exports.run = (bot, message, args) => {
     try {
-        message.channel.send(``, { file: "../images/memes/heavybreathing.png" });
+        message.channel.send(``, { file: "./img/memes/heavybreathing.png" });
         console.log(`[${moment().format(settings.timeFormat)}] User ${message.author.username} summoned a heavy breathing cat. *heavy breathing*`);
     } catch (err) {
         console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] ${err}`));

@@ -11,6 +11,9 @@
  *  Additionally, @pinging the bot will trigger the help menu (aka: the !help command)
  */
 
+const chalk = require('chalk');
+const moment = require('moment');
+
 module.exports = (bot, message, settings) => {
 
     if (message.content.startsWith(`<@${bot.user.id}>`)) bot.commands.get('help').run(bot, message, message.content.split(/ +/), bot.getPerms(message));
@@ -35,6 +38,7 @@ module.exports = (bot, message, settings) => {
 
     // if something was found, check to see if we can appropriately run the command
     if (cmd) {
+
         /**
          * Disallow the command use IF
          *  (a) Command isn't enabled
@@ -49,7 +53,7 @@ module.exports = (bot, message, settings) => {
         try {
             cmd.run(bot, message, args, perms);
         } catch (err) {
-            console.log(`[${moment().format(settings.timeFormat)}] Error trying to run a command (${cmd.help.name})\n${err.stack}`);
+            console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] Error trying to run a command (${cmd.help.name})\n${err.stack}`));
         }
     }
 
