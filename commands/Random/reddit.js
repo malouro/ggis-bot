@@ -25,7 +25,7 @@ exports.run = (bot, message, args) => {
     feed(url, function (err, articles) {
         if (err) throw err;
 
-        let links = [], titles = [], authors = [];
+        let links = [], titles = [], authors = [], images = [];
         articles.forEach(article => {
             titles.push(article.title);
             authors.push(article.author);
@@ -37,11 +37,11 @@ exports.run = (bot, message, args) => {
             }
         });
 
-        if (links.length === 0) {
+        if (articles.length === 0) {
             message.reply(`Oops! The subreddit **/r/${args[1]}** is either empty or non-existent. :(`);
         } else {
             let rng = Math.floor(Math.random() * links.length);
-            if (images[rng] !== "") message.channel.send(`**${titles[rng]}** posted by ${authors[rng]}\n${links[rng]}`);
+            if (images[rng] === "") message.channel.send(`**${titles[rng]}** posted by ${authors[rng]}\n${links[rng]}`);
             else message.channel.send(`**${titles[rng]}** posted by ${authors[rng]}\n${images[rng]}\n<${links[rng]}>`);
         }     
     });
