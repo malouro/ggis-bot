@@ -4,7 +4,6 @@
 // Returns a random fortune cookie message from ./fortunes/ folder
 
 const fs = require('fs');
-const moment = require('moment-timezone');
 const settings = require('../../settings');
 
 exports.run = (bot, message, args) => {

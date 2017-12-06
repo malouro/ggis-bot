@@ -3,7 +3,6 @@
 // =====================================================================================
 // Gives a random front-page image/post from reddit.com/r/aww
 
-const moment = require('moment-timezone');
 const feed = require('feed-read-parser');
 
 exports.run = (bot, message, args) => {

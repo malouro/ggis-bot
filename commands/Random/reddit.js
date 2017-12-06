@@ -3,8 +3,7 @@
 // =====================================================================================
 // Gives a random front-page post from given subreddit
 
-const feed   = require('feed-read-parser');
-const moment = require('moment-timezone');
+const feed = require('feed-read-parser');
 
 exports.run = (bot, message, args) => {
 
@@ -19,7 +18,7 @@ exports.run = (bot, message, args) => {
     // -------------------------------------------------------------------
 
     if (!args[1]) {
-        return message.reply('You must specify a subreddit to search!')
+        return message.reply('You must specify a subreddit to search!');
     }
 
     let url = `https://www.reddit.com/r/${args[1].toLowerCase()}/.rss`;
@@ -31,15 +30,30 @@ exports.run = (bot, message, args) => {
             titles.push(article.title);
             authors.push(article.author);
             links.push(article.link);
+            if (article.content.includes('img src')) {
+                images.push(getImg(article.content, 'a', 'href')[2]);
+            } else {
+                images.push("");
+            }
         });
 
         if (links.length === 0) {
-            message.reply(`Oops! The subreddit "**/r/${args[1]}**" is either empty or non-existent. <:FeelsBadMan:230445576133541888>`);
+            message.reply(`Oops! The subreddit **/r/${args[1]}** is either empty or non-existent. :(`);
         } else {
             let rng = Math.floor(Math.random() * links.length);
-            message.channel.send(`**${titles[rng]}** posted by ${authors[rng]}\n${links[rng]}`);
+            if (images[rng] !== "") message.channel.send(`**${titles[rng]}** posted by ${authors[rng]}\n${links[rng]}`);
+            else message.channel.send(`**${titles[rng]}** posted by ${authors[rng]}\n${images[rng]}\n<${links[rng]}>`);
         }     
     });
+}
+
+function getImg(str, node, attr) {
+    var regex = new RegExp('<'+node+' .*?'+attr+'="(.*?)">', "gi")
+    var result, res = [];
+    while ((result = regex.exec(str))) {
+        res.push(result[1]);
+    }
+    return res;
 }
 
 exports.conf = {

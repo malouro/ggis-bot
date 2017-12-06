@@ -3,7 +3,6 @@
 // =====================================================================================
 // Gives a random front-page image/post from reddit.com/r/food or /r/FoodPorn
 
-const moment = require('moment-timezone');
 const feed = require('feed-read-parser');
 
 exports.run = (bot, message, args) => {
@@ -25,8 +24,7 @@ exports.run = (bot, message, args) => {
         if (err) throw err;
         articles.forEach((article, index) => {
             if (index > 0 && article.content.includes('img src')) {
-                let tmp = getImg(article.content, 'a', 'href');
-                images.push(tmp[2]);
+                images.push(getImg(article.content, 'a', 'href')[2]);
                 titles.push(article.title);
                 links.push(article.link);
             }
@@ -35,8 +33,7 @@ exports.run = (bot, message, args) => {
             if (err2) throw err2;
             articles.forEach((article, index) => {
                 if (index > 0 && article.content.includes('img src')) {
-                    let tmp = getImg(article.content, 'a', 'href');
-                    images.push(tmp[2]);
+                    images.push(getImg(article.content, 'a', 'href')[2]);
                     titles.push(article.title);
                     links.push(article.link);
                 }
