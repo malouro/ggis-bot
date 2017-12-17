@@ -3,7 +3,9 @@
   "version": "2.0.0",
   "description": "A Discord chat bot for the Christian Mingle Discord server.",
   "main": "app.js",
-  "scripts": {},
+  "scripts": {
+    "start": "node app.js"
+  },
   "author": "Michael Louro",
   "license": "MIT",
   "dependencies": {
@@ -27,5 +29,10 @@
     "type": "git",
     "url": "https://github.com/malouro/ggis-bot"
   },
-  "false": {}
+  "false": {},
+  "devDependencies": {
+    "eslint": "^4.12.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0"
+  }
 }
