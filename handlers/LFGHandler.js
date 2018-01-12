@@ -51,7 +51,7 @@ module.exports = {
       const g = bot.games.get(obj.code);
       const index = g.modes.indexOf(obj.mode);
       const d = new Date();
-      const expireDate = new Date(d.getTime() + 6000(obj.ttl));
+      const expireDate = new Date(d.getTime() + (6000 * obj.ttl));
 
       const embed = new Discord.RichEmbed()
         .setTitle(`${obj.party_leader_name} is looking for a ${obj.game} group!`)
