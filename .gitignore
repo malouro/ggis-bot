@@ -8,13 +8,11 @@ package-lock.json
 .npm
 .DS_Store
 Thumbs.db
-
-# Include ggis node_module folder
-node_modules/*
-!node_modules/ggis
+node_modules
 
 # Fix for img/spoiler directory
 /img/spoilers/gifs/*
+/img/memes/bitchholdon.jpg
 
 # Privacy & security
 /config/atreactions.json
@@ -26,16 +24,13 @@ settings.json
 settings.backup.json
 
 # Commands not to include
-**/test.js
-**/weeklytest.js
-**/insult.js
-**/magic8.js
-**/slbuild.js
-**/slget.js
+**/temp.js
 **/nj.js
 **/sayreville.js
 **/bitchholdon.js
 **/blazertov.js
+**/bananabat.js
+**/wine.js
 
 # Misc
 /config/quotes.json

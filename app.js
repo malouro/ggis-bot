@@ -6,9 +6,10 @@
  *  \______  /\___  /|__/____  >
  *         \//_____/         \/
  *
- * @name Ggis
+ * @name Ggis-bot
  * @author Michael Louro
- * @version 2.0.0
+ * @version 1.3.1
+ * @license MIT
  *
  */
 
@@ -16,6 +17,7 @@ const Discord = require('discord.js');
 const settings = require('./settings.json');
 
 const bot = new Discord.Client();
-require('ggis/setup')(bot, settings);
+
+require('./handlers/Setup')(bot, settings);
 
 bot.login(settings.token);

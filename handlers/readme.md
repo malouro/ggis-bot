@@ -1,10 +1,10 @@
-## Ggis Modules & Handlers
+## Ggis Handlers
 
-This directory contains all core Ggis modules that get accessed across several commands, events, etc.
+This directory contains core modules that get accessed across several commands, events, etc.
 
 | File                  | Description                                     |
 | --------------------- | ----------------------------------------------- |
-| setup                 | Start up file that sets up everything           |
+| Setup                 | Start up file that sets up everything           |
 | EventLoader           | Ties JavaScript to eventListeners<br>(ie: message, guildCreate, channelDelete, etc)|
 | ReloadCommands        | Reloads required files for all commands         |
 | ReloadLFG             | reloads the LFG game library                    |

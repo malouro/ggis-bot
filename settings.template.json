@@ -1,60 +1,89 @@
 {
-    "botname": "ggis",
-    "botnameproper": "Ggis",
-    "token": "Discord OAuth token for the bot goes here!",
-    "prefix": "!",
-    "commandGroups": [
-        {"code": ["debug","help"], "name":"Debug & Help", "description": "Help menus & debug"},
-        {"code": ["useful"],"name":"Useful", "description": "Commands that do useful things"},
-        {"code": ["random","rng"],"name":"Random", "description": "Random, fun commands"},
-        {"code": ["memes"], "name":"Memes", "description": "Memes & dreams"}
-    ],
-    "eventHandlers": ["streamlinkHandler", "lfgHandler", "pollHandler", "spoilerHandler"],
-    "functionsToReload": ["streamlink", "lfg", "poll", "spoiler"],
-    "reloaders": ["commandsReload", "lfgReload"],
-    "guilds": [],
-    "masterID": "Your User ID (bot owner)",
-    "mainguild": "Main server ID, for guildOnly commands",
-    "mainchannel": "Main channel in main guild",
-    "testguild": "Test server ID, where most if not all testing takes place (also where extended emoji come from)",
-    "rules": {
-        "enable": true,
-        "sailormoon": true,
-        "autoreact": {
-            "enable": true,
-            "atmentions": true,
-            "txtmentions": true
-        },
-        "extended_emoji": {
-            "enable": true,
-            "edit": true,
-            "embed": true
-        },
-        "memes": true
+  "botName": "ggis",
+  "botNameProper": "Ggis",
+  "token": "Discord OAuth token for the bot goes here!",
+  "prefix": "!",
+  "commandGroups": [
+    {
+      "code": ["debug","help"],
+      "name": "Debug & Help",
+      "description": "Help menus & debug"
     },
-    "fortune": {
-        "token": "IMGUR API Client Token",
-        "album": "Album to look thru",
-        "amount": 0
+    {
+      "code": ["useful"],
+      "name": "Useful",
+      "description": "Commands that do useful things"
     },
-    "streamlink": {
-        "default_setting": true,
-        "enable": true,
-        "timer": 60,
-        "split_value": 15
+    {
+      "code": ["random","rng"],
+      "name": "Random",
+      "description": "Random, fun commands"
     },
-    "lfg": {
-        "ttl_default": 15,
-        "ttl_warning": true,
-        "ttl_max": 180,
-        "ttl_threshold": 30,
-        "max_party_size": 32,
-        "split_value": 25
-    },
-    "squad": {
-        "server_max": 25
-    },
-    "poll": {
-        "divider": "|"
+    {
+      "code": ["memes"],
+      "name": "Memes",
+      "description": "Memes & dreams"
     }
+  ],
+  "guilds": [],
+  "masterID": "Your User ID (bot owner)",
+  "mainGuild": "Main server ID, for guildOnly commands",
+  "mainChannel": "Main channel in main guild",
+  "testGuild": "Test server ID, where most if not all testing takes place (also where extended emoji come from)",
+  "timeFormat": "hh:mm:ssA MM/DD/YY",
+  "rules": {
+    "enable": true,
+    "filters": {
+      "enable": true,
+      "sailorMoon": true
+    },
+    "autoReact": {
+      "enable": true,
+      "atMentions": true,
+      "txtMentions": true
+    },
+    "extendedEmoji": {
+      "enable": true,
+      "edit": true,
+      "embed": true
+    },
+    "memes": true
+  },
+  "helpMenu": {
+    "split_value": 20
+  },
+  "fortune": {
+    "token": "IMGUR API Client Token",
+    "album": "Album to look thru",
+    "amount": 0
+  },
+  "streamlink": {
+    "default_setting": true,
+    "enable": true,
+    "timer": 60,
+    "split_value": 15
+  },
+  "lfg": {
+    "ttl_default": 15,
+    "ttl_warning": true,
+    "ttl_max": 180,
+    "ttl_threshold": 30,
+    "max_party_size": 32,
+    "split_value": 25
+  },
+  "echo": {
+    "ms_per_char": 35
+  },
+  "plugdj": {
+    "main_url": "https://plug.dj/"
+  },
+  "squad": {
+    "server_max": 25
+  },
+  "poll": {
+    "divider": "|"
+  },
+  "spoiler": {
+    "separator": "|"
+  }
 }

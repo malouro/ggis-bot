@@ -1,6 +1,6 @@
 {
-  "name": "ggis",
-  "version": "2.0.0",
+  "name": "ggis-bot",
+  "version": "1.3.1",
   "description": "A Discord chat bot for the Christian Mingle Discord server.",
   "main": "app.js",
   "scripts": {
@@ -19,10 +19,8 @@
     "lyrics-fetcher": "^1.0.2",
     "mkdirp": "^0.5.1",
     "moment": "^2.19.1",
-    "moment-timezone": "^0.5.13",
     "node-schedule": "^1.2.5",
     "rmdir": "^1.2.0",
-    "sqlite": "^2.8.0",
     "twitchps": "^0.5.5"
   },
   "repository": {
@@ -31,8 +29,10 @@
   },
   "false": {},
   "devDependencies": {
+    "chai": "^4.1.2",
     "eslint": "^4.12.1",
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.8.0"
+    "eslint-plugin-import": "^2.8.0",
+    "mocha": "^4.1.0"
   }
 }

@@ -1,32 +1,29 @@
-// =====================================================================================
-//                                    ! doge command
-// =====================================================================================
-// Big doge
+/**
+ * @func !doge
+ *
+ * @desc much doge, such meme
+ */
 
 const moment = require('moment');
-const chalk = require('chalk');
 const settings = require('../../settings');
 
-exports.run = (bot, message, args) => {
-    try {
-        message.channel.send(``, { file: "./img/memes/doge.png" });
-        console.log(`[${moment().format(settings.timeFormat)}] User ${message.author.username} summoned a big ol' doge`);
-    } catch (err) {
-        console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] ${err}`));
-    }
+exports.help = {
+  name: 'doge',
+  description: 'such doge wow, much big',
+  usage: 'doge',
 };
 
 exports.conf = {
-    enabled: true,
-    visible: true,
-    guildOnly: false,
-    textChannelOnly: false,
-    aliases: ["bigdoge","giganticdoge"],
-    permLevel: 0
+  enabled: true,
+  visible: true,
+  guildOnly: false,
+  textChannelOnly: false,
+  aliases: [],
+  permLevel: 0,
 };
 
-exports.help = {
-    name: 'doge',
-    description: `such doge wow, much big`,
-    usage: 'doge'
+exports.run = (bot, message) => {
+  message.channel.send('', { file: './img/memes/doge.png' });
+
+  console.log(`[${moment().format(settings.timeFormat)}] User ${message.author.username} summoned a big ol' doge`);
 };

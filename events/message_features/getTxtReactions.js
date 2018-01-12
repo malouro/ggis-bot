@@ -1,15 +1,20 @@
-// Changes TxtReactions object in 'autoReact' event
+/**
+ * Updates TxtReactions object in 'autoReact' event (in ~/events/message_features/)
+ */
 const fs = require('fs');
 
-module.exports = function (TxtReactions) {
-    try {
-        TxtReactions.clear();
-        let reactions = JSON.parse(fs.readFileSync('./config/txtreactions.json', 'utf8'));
-        reactions.reactions.forEach(r => {
-            TxtReactions.set(r.regex, r);
-        });
-        return TxtReactions;
-    } catch (err) {
-        console.log(err);
-    }
+module.exports = (TxtReactions) => {
+  try {
+    TxtReactions.clear();
+
+    const reactions = JSON.parse(fs.readFileSync('./config/txtreactions.json', 'utf8'));
+
+    reactions.reactions.forEach((r) => {
+      TxtReactions.set(r.regex, r);
+    });
+
+    return TxtReactions;
+  } catch (err) {
+    return console.error(err);
+  }
 };

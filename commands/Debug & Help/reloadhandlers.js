@@ -1,7 +1,23 @@
-// =====================================================================================
-//                               ! reloadhandlers command
-// =====================================================================================
-// Useful for changing command handlers in /util/
+/**
+ * @func !reloadhandlers
+ *
+ * @desc Reloads handlers (in the ~/handlers/ directory)
+ */
+
+exports.help = {
+  name: 'reloadhandlers',
+  description: 'Reloads most command handler files (in /util/)',
+  usage: 'reloadhandlers',
+};
+
+exports.conf = {
+  enabled: true,
+  visible: false,
+  guildOnly: false,
+  textChannelOnly: true,
+  aliases: ['rlh'],
+  permLevel: 4,
+};
 
 exports.run = (bot, message) => {
   message.channel.send('Reloading handlers ...').then((m) => {
@@ -15,19 +31,4 @@ exports.run = (bot, message) => {
       m.edit(`Handler reload failed:\n\`\`\`${e.stack}\`\`\``);
     });
   }).catch(console.error());
-};
-
-exports.conf = {
-  enabled: true,
-  visible: false,
-  guildOnly: false,
-  textChannelOnly: true,
-  aliases: ['rlh'],
-  permLevel: 4,
-};
-
-exports.help = {
-  name: 'reloadhandlers',
-  description: 'Reloads most command handler files (in /util/)',
-  usage: 'reloadhandlers',
 };

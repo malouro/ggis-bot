@@ -1,7 +1,8 @@
-// =====================================================================================
-//                              ! reloadfortunes command
-// =====================================================================================
-// Reloads fortune images from the fortunes Imgur album
+/**
+ * @func !reloadfortunes
+ *
+ * @desc Reloads fortune images from the fortunes Imgur album
+ */
 
 const chalk = require('chalk');
 const fs = require('fs');
@@ -9,19 +10,32 @@ const i2rss = require('imgur2rss');
 const moment = require('moment');
 const conf = require('../../settings.json');
 
+exports.help = {
+  name: 'reloadfortunes',
+  description: `Reload fortune images from Imgur album (currently, there are ${conf.fortune.amount} fortunes)`,
+  usage: 'reloadfortunes',
+};
+
+exports.conf = {
+  enabled: true,
+  visible: true,
+  guildOnly: false,
+  textChannelOnly: true,
+  aliases: ['rf'],
+  permLevel: 4,
+};
+
 /* eslint-disable */
 
 const getImgs = (str, node, attr) => {
   const regex = new RegExp(`<${node} ${attr}="(.*?)" alt="`, 'gi');
-  let result;
   const res = [];
+  let result;
   while ((result = regex.exec(str)) !== null) {
     res.push(result[1]);
   }
   return res;
 };
-
-/* eslint-enable */
 
 exports.run = (bot, message) => {
   let images;
@@ -64,19 +78,4 @@ exports.run = (bot, message) => {
       });
     });
   }).catch(err => console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] ${err}\n${err.stack}`)));
-};
-
-exports.conf = {
-  enabled: true,
-  visible: true,
-  guildOnly: false,
-  textChannelOnly: true,
-  aliases: ['rf'],
-  permLevel: 4,
-};
-
-exports.help = {
-  name: 'reloadfortunes',
-  description: `Reload fortune images from Imgur album (currently, there are ${conf.fortune.amount} fortunes)`,
-  usage: 'reloadfortunes',
 };

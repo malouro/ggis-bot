@@ -1,25 +1,22 @@
 // Whenever a message is deleted / removed
 
-var lfg = require('ggis/LFGHandler');
+let lfg = require('../handlers/LFGHandler');
 
-module.exports = message => {
+module.exports = (message) => {
+  const bot = message.client;
 
-    var bot = message.client;
+  if (bot.lfgStack.has(message.id)) {
+    lfg.cancel(bot, message.id, true);
+  }
+};
 
-    if (bot.lfgStack.has(message.id)) {
-        lfg.cancel(bot, message.id, true);
+module.exports.reloadHandler = () =>
+  new Promise((resolve, reject) => {
+    try {
+      delete require.cache[require.resolve('../handlers/LFGHandler')];
+      lfg = require('../handlers/LFGHandler');
+      resolve();
+    } catch (err) {
+      reject(err);
     }
-
-};
-
-module.exports.reloadHandler = function () {
-    return new Promise((resolve, reject) => {
-        try {
-            delete require.cache[require.resolve(`ggis/LFGHandler`)];
-            lfg = require(`ggis/LFGHandler`);
-            resolve();
-        } catch (err) {
-            reject(err);
-        }
-    });
-};
+  });

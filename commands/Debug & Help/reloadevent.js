@@ -1,8 +1,25 @@
-// =====================================================================================
-//                                  ! reloadevent command
-// =====================================================================================
-// Reloads the events files
-// Useful for debugging changes to events without restarting the bot
+/**
+ * @func !reloadevent
+ *
+ * @desc Reloads events (in the ~/events/ directory)
+ *
+ * @todo Currently, this is not an implemented or working feature. Hence, it is disabled
+ */
+
+exports.help = {
+  name: 'reloadevent',
+  description: 'Reloads the event listener & event files',
+  usage: 'reloadevent',
+};
+
+exports.conf = {
+  enabled: false,
+  visible: false,
+  guildOnly: false,
+  textChannelOnly: true,
+  aliases: ['rle', 'reloadevents'],
+  permLevel: 4,
+};
 
 exports.run = (bot, message, args) => {
   message.channel.send('Reloading event(s) ...').then((m) => {
@@ -18,19 +35,4 @@ exports.run = (bot, message, args) => {
       m.edit(`Event reload failed:\n\`\`\`${err.stack}\`\`\``);
     });
   }).catch(console.error());
-};
-
-exports.conf = {
-  enabled: false,
-  visible: false,
-  guildOnly: false,
-  textChannelOnly: true,
-  aliases: ['rle', 'reloadevents'],
-  permLevel: 4,
-};
-
-exports.help = {
-  name: 'reloadevent',
-  description: 'Reloads the event listener & event files',
-  usage: 'reloadevent',
 };

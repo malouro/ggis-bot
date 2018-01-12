@@ -1,8 +1,24 @@
-// =====================================================================================
-//                                  ! reload command
-// =====================================================================================
-// Reloads the command(s)
-// Useful for debugging/updating commands without restarting the bot
+/**
+ * @func !reload
+ *
+ * @desc Reloads the command(s) specified
+ *       Useful for debugging/updating commands without restarting the bot
+ */
+
+exports.help = {
+  name: 'reload',
+  description: 'Reloads the command file, if it\'s been updated or modified.',
+  usage: 'reload [command]',
+};
+
+exports.conf = {
+  enabled: true,
+  visible: true,
+  guildOnly: false,
+  textChannelOnly: true,
+  aliases: ['rc', 'rl', 'reloadcommand'],
+  permLevel: 4,
+};
 
 exports.run = (bot, message, args) => {
   let command;
@@ -50,19 +66,4 @@ exports.run = (bot, message, args) => {
       });
     }
   }
-};
-
-exports.conf = {
-  enabled: true,
-  visible: true,
-  guildOnly: false,
-  textChannelOnly: true,
-  aliases: ['rc', 'rl', 'reloadcommand'],
-  permLevel: 4,
-};
-
-exports.help = {
-  name: 'reload',
-  description: 'Reloads the command file, if it\'s been updated or modified.',
-  usage: 'reload [command]',
 };

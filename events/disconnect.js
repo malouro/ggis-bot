@@ -2,8 +2,7 @@
 
 const chalk = require('chalk');
 const moment = require('moment');
-const settings = require('../settings.json');
 
-module.exports = bot => {
-    console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] Bot disconnected :(`));
+module.exports = (settings) => {
+  console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] ${settings.botNameProper}-bot has disconnected :(`));
 };
