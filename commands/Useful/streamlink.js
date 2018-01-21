@@ -5,7 +5,9 @@
  */
 
 const settings = require('../../settings.json');
+
 let streamlink = require('../../handlers/StreamLinkHandler');
+
 const slFuncGC = require('../../events/guildCreate');
 const slFuncGD = require('../../events/guildDelete');
 const slFuncGMR = require('../../events/guildMemberRemove');

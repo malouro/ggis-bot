@@ -50,7 +50,7 @@ const addLfgMessage =
 
 exports.run = (bot, message, args, perms) => {
   let game;
-  let index;
+  let j;
   let ttl;
   let partySize;
 
@@ -162,7 +162,7 @@ exports.run = (bot, message, args, perms) => {
     const width = (Math.round(longestMode / 2) * 2) + (Math.round(longestModeProper / 2) * 2);
     str += `\n\nThumbnail :: ${game.thumbnail}\n\n= Game Mode List =\n`;
     str += `╔${'═'.repeat(Math.round(longestMode / 2) - 2)}Code${'═'.repeat(Math.round(longestMode / 2) + (Math.round(longestModeProper / 2) - 4))}GameMode${'═'.repeat(Math.round(longestModeProper / 2) - 2)}Size══╗\n`;
-    game.modes.forEach((m) => {
+    game.modes.forEach((m, index) => {
       str += (index !== game.modes.length - 1) ?
         `║${m}${' '.repeat(longestMode - m.length)} :: ${game.modes_proper[index]}${' '.repeat(width - longestMode - (game.modes_proper[index].length - 2))}${(game.default_party_size[index] / 10 >= 1) ? `${game.default_party_size[index]}` : ` ${game.default_party_size[index]}`}  ║\n` :
         `║${m}${' '.repeat(longestMode - m.length)} :: ${game.modes_proper[index]}${' '.repeat(width - longestMode - (game.modes_proper[index].length - 2))}${(game.default_party_size[index] / 10 >= 1) ? `${game.default_party_size[index]}` : ` ${game.default_party_size[index]}`}  ║\n` +
@@ -201,22 +201,22 @@ exports.run = (bot, message, args, perms) => {
     if (args[2]) {
       if (args[2] === 'default') {
         // if "default" is given, set to that game's default game mode
-        index = game.modes.indexOf(game.default_game_mode);
+        j = game.modes.indexOf(game.default_game_mode);
       } else if (game.modes.indexOf(args[2]) > -1) {
         // if the game mode exists, set it
-        index = game.modes.indexOf(args[2]);
+        j = game.modes.indexOf(args[2]);
       } else {
         // otherwise, warn the user that the game was not found
         return message.reply(`Game mode **${args[2]}** for **${game.name}** was not found. For more information about this game (like available game modes, aliases, etc.), use \`${settings.prefix}lfg list ${args[1]}\``);
       }
     } else {
       // set to default game mode for that game, if a game mode isn't given
-      index = game.modes.indexOf(game.default_game_mode);
+      j = game.modes.indexOf(game.default_game_mode);
     }
 
     /** Get the party size: */
     if (args[3] && typeof args[3] !== 'number') {
-      partySize = (args[3] === 'default') ? game.default_party_size[index] : parseInt(args[3], 10);
+      partySize = (args[3] === 'default') ? game.default_party_size[j] : parseInt(args[3], 10);
       if (partySize < 2) {
         // if the party size is too small, send an error message to user
         return message.reply('Party size must be more than 1!');
@@ -226,7 +226,7 @@ exports.run = (bot, message, args, perms) => {
       }
     } else {
       // if nothing is given, or what is given is NOT a number, set to default value
-      partySize = game.default_party_size[index];
+      partySize = game.default_party_size[j];
     }
 
     // Get the TTL:
@@ -269,7 +269,7 @@ exports.run = (bot, message, args, perms) => {
      */
     const d = new Date();
     const time = d.getTime();
-    const expireDate = new Date(d.getTime() + 60000(ttl));
+    const expireDate = new Date(d.getTime() + (60000 * ttl));
 
     const lfgObject = {
       id: '',
@@ -277,7 +277,7 @@ exports.run = (bot, message, args, perms) => {
       party_leader_id: message.author.id,
       code: game.code,
       game: game.name,
-      mode: game.modes[index],
+      mode: game.modes[j],
       time,
       expire_date: expireDate,
       ttl,

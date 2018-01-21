@@ -18,7 +18,7 @@ exports.help = {
 };
 
 exports.conf = {
-  enabled: false,
+  enabled: true,
   visible: false,
   guildOnly: false,
   textChannelOnly: false,

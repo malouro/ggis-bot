@@ -59,13 +59,13 @@ exports.run = (bot, message, args) => {
       args.splice(0, 1);
       msg.content = args.join(' ');
 
-      if (msg.content.match(separator)) {
+      if (msg.content.toString().includes(separator)) {
         args = msg.content.toString().split(separator, 2);
         topic = args[0].trim();
         content = args[1].trim();
       } else {
         topic = '';
-        content = msg.content.trim();
+        content = msg.content.toString().trim();
       }
 
       const spoiler = { message: msg, topic, content };

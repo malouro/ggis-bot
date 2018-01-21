@@ -129,18 +129,18 @@ module.exports = (bot, settings) => {
    *          @property {Boolean} visible -- whether or not the command shows up in help menus
    *          @property {Boolean} guildOnly -- whether the command is for the main guild only or not
    *          @property {Boolean} textChannelOnly -- whether the command is ONLY for text channels
-   *                                             (as opposed to DM channels)
+   *                                                 (as opposed to DM channels)
    *          @property {Array[String]} aliases -- aliases for the command
    *          @property {Integer} permLevel -- the permission level needed to use the command
-   *                             (always at least 0, where 0 means anyone can use the command)
+   *            (always at least 0, where 0 means anyone can use the command)
    *          @property {String} category -- folder the command is located in
    *      }
    *  @property {Object} help - Help menu information, as well as the command's main name
    *      {
    *          @property {String} name -- the command's main name
    *          @property {String} description -- short description
-   *          @property {String} usage -- in depth description on how to use the command,
-   *                                      and w/e else needs to be stated about the command
+   *          @property {String} usage -- in depth description on how to use the command
+   *                                      (and w/e else needs to be stated about the command)
    *      }
    */
   fs.readdir('./commands/', (err, folders) => {
@@ -306,8 +306,10 @@ module.exports = (bot, settings) => {
    *
    * @param {String} event
    */
-  bot.reloadEvents = (event) => { /* eslint-disable */
-    new Promise((resolve, reject) => {
+
+  /*
+  bot.reloadEvents = (event) => {
+    Promise((resolve, reject) => {
       try {
         if (event) eventLoader.reloadHandler(bot, event).then().catch(console.error);
         else eventLoader.reloadHandler(bot).then().catch(console.error);
@@ -317,7 +319,7 @@ module.exports = (bot, settings) => {
       }
     });
   }
+  */
 
-  /** FINISHED **/
-
+  /** FINISHED */
 };

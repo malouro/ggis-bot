@@ -46,28 +46,25 @@ module.exports = {
   addLFG(bot, object) {
     try {
       let firstEntry;
-      const obj = object;
       if (bot.lfgStack.size === 0) firstEntry = true;
-      const g = bot.games.get(obj.code);
-      const index = g.modes.indexOf(obj.mode);
-      const d = new Date();
-      const expireDate = new Date(d.getTime() + 6000(obj.ttl));
+      const g = bot.games.get(object.code);
+      const index = g.modes.indexOf(object.mode);
 
       const embed = new Discord.RichEmbed()
-        .setTitle(`${obj.party_leader_name} is looking for a ${obj.game} group!`)
-        .setDescription(`**Game mode:** ${g.modes_proper[index]}\n**Party size:** ${obj.max_party_size}`)
+        .setTitle(`${object.party_leader_name} is looking for a ${object.game} group!`)
+        .setDescription(`**Game mode:** ${g.modes_proper[index]}\n**Party size:** ${object.max_party_size}`)
         .setColor(0x009395)
         .setThumbnail(g.thumbnail)
         .setFooter('Expires at: ')
-        .setTimestamp(expireDate)
-        .addField('Want to join?', `Click the 👍 below to reserve a spot!\n${obj.party_leader_name}: click the 🚫 below to cancel the party.\n\n**Party:** <@${obj.party_leader_id}> (1/${obj.max_party_size})`);
-      bot.channels.get(obj.channel).send({ embed }).then((message) => {
-        obj.id = message.id;
-        bot.lfgStack.set(obj.id, obj);
+        .setTimestamp(object.expire_date)
+        .addField('Want to join?', `Click the 👍 below to reserve a spot!\n${object.party_leader_name}: click the 🚫 below to cancel the party.\n\n**Party:** <@${object.party_leader_id}> (1/${object.max_party_size})`);
+      bot.channels.get(object.channel).send({ embed }).then((message) => {
+        object.id = message.id;
+        bot.lfgStack.set(object.id, object);
         if (firstEntry) bot.lfgUpdate(true, INTERVAL);
         message.react('👍').then(() => {
           message.react('🚫').then(() => {
-            console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${obj.party_leader_name} made an LFG for ${obj.game} | ${obj.mode} | party of ${obj.max_party_size} | ${obj.ttl} minutes`));
+            console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${object.party_leader_name} made an LFG for ${object.game} | ${object.mode} | party of ${object.max_party_size} | ${object.ttl} minutes`));
           }).catch(err => console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] ${err}`)));
         }).catch(err => console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] ${err}`)));
       }).catch(err => console.log(err));

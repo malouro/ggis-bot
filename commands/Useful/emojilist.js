@@ -29,7 +29,7 @@ const buildEmojiList = (bot, message, pageGiven) => {
   const g = bot.guilds.get(testGuild);
   const { emojis } = g;
   const embeds = new Map();
-  const splitValue = settings.rules.extended_emoji.split_value;
+  const splitValue = settings.rules.extendedEmoji.split_value;
   if (pageGiven > Math.ceil(emojis.size / splitValue) || pageGiven < -1) pageGiven = -1;
   if (pageGiven === 0) pageGiven = 1;
   let currentPage = (pageGiven === -1 || typeof pageGiven === 'undefined' || typeof pageGiven !== 'number') ? 0 : pageGiven;
@@ -40,7 +40,7 @@ const buildEmojiList = (bot, message, pageGiven) => {
         const embed = new Discord.RichEmbed();
         embeds.set(currentPage, embed);
         embeds.get(currentPage).setTitle('Extended Emoji List').setDescription(`\`page ${currentPage + 1}/${Math.ceil(emojis.size / splitValue)}\`` +
-          ` \`Showing emojis ${currentPage(splitValue) + 1} ~ ${(emojis.size - 1 < (currentPage + 1) * splitValue) ? emojis.size : (currentPage + 1) * splitValue}\``);
+          ` \`Showing emojis ${(currentPage * splitValue) + 1} ~ ${(emojis.size - 1 < (currentPage + 1) * splitValue) ? emojis.size : (currentPage + 1) * splitValue}\``);
       }
 
       /* eslint-disable */
