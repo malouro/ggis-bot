@@ -37,7 +37,7 @@ const roll = (noOfDice, noOfSides) => {
   for (let i = 0; i < noOfDice; i++) {
     rolls.push(Math.ceil(Math.random() * noOfSides));
   }
-  return `You rolled **${(rolls.length > 1) ? `${rolls.join(', ')}** for an average of **${getAverage(rolls)}**!` : `a **${rolls[0]}**!`}`;
+  return `You rolled ${(rolls.length > 1) ? `**${rolls.join(', ')}** for an average of **${getAverage(rolls)}**!` : `a **${rolls[0]}**!`}`;
 };
 
 exports.run = (bot, message, args) => {
