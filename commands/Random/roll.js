@@ -10,7 +10,7 @@ exports.help = {
   name: 'roll',
   description: 'Roll the dice',
   usage: 'roll xdy\n\nx - Number of dice to roll\nd - (static, do not change)\ny - Number of sides for the dice' +
-    `\n\nExample 1 :: ${settings.prefix}roll 1d20\nRolls a single 20-sided die.\n\nExample 2 :: ${settings.prefix}roll 3d10\nRolls three 10-sided dice`,
+  `\n\nExample 1 :: ${settings.prefix}roll 1d20\nRolls a single 20-sided die.\n\nExample 2 :: ${settings.prefix}roll 3d10\nRolls three 10-sided dice`,
 };
 
 exports.conf = {
@@ -26,25 +26,31 @@ exports.conf = {
 
 const getAverage = (rolls) => {
   let ac = 0;
+
   rolls.forEach((r) => {
     ac += r;
   });
+
   return ac / rolls.length;
 };
 
 const roll = (noOfDice, noOfSides) => {
   const rolls = [];
+
   for (let i = 0; i < noOfDice; i++) {
     rolls.push(Math.ceil(Math.random() * noOfSides));
   }
+
   return `You rolled ${(rolls.length > 1) ? `**${rolls.join(', ')}** for an average of **${getAverage(rolls)}**!` : `a **${rolls[0]}**!`}`;
 };
 
 exports.run = (bot, message, args) => {
   let rollArgs;
+
   if (args.length > 0) {
     args.splice(0, 1);
     rollArgs = args.join('');
+
     if (rollArgs.includes('d')) {
       rollArgs = rollArgs.split('d', 2);
       rollArgs.forEach((arg, index) => {
