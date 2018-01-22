@@ -6,7 +6,7 @@
 
 exports.help = {
   name: 'git',
-  description: 'Links to the bot\' Github repo',
+  description: 'Links to the bot\'s Github repo',
   usage: 'git',
 };
 
