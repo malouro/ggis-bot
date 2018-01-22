@@ -30,10 +30,15 @@ exports.run = (bot, message, args, perms) => {
   }
 
   /** Run test suites */
-  fs.readdir('./test/commands/Debug & Help', (err, files) => {
+
+  /**
+   * @todo Make more scalable / dynamic by reading command category names,
+   *       rather than going to a statically chosen directories
+   */
+  fs.readdir('./test/commands/Debug & Support', (err, files) => {
     if (err) throw err;
     files.forEach((f) => {
-      const cmd = require(`../../test/commands/Debug & Help/${f}`);
+      const cmd = require(`../../test/commands/Debug & Support/${f}`);
       cmd.test(bot, message, type);
     });
   });

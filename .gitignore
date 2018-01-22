@@ -21,6 +21,8 @@ node_modules
 /config/streamlink/users/*
 /config/streamlink/guilds/*
 !/config/streamlink/conf.json
+!/config/streamlink/users/dummy
+!/config/streamlink/guilds/dummy
 settings.json
 settings.backup.json
 

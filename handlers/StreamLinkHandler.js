@@ -53,6 +53,7 @@ exports.init = bot => new Promise((resolve, reject) => {
     console.log(chalk.bgMagenta.bold('StreamLink connections:'));
     fs.readdir(`${path}/users`, 'utf8', (err, files) => {
       files.forEach((f) => {
+        if (f === 'dummy') return;
         let conf = JSON.parse(fs.readFileSync(`${path}/users/${f}`, 'utf8'));
         users.set(conf.id, conf);
         topics.push({ topic: `video-playback.${conf.stream.toLowerCase()}` });
@@ -61,6 +62,7 @@ exports.init = bot => new Promise((resolve, reject) => {
       bot.streamLink.users = users;
       fs.readdir(`${path}/guilds`, 'utf8', (err, files) => {
         files.forEach((f) => {
+          if (f === 'dummy') return;
           let conf = JSON.parse(fs.readFileSync(`${path}/guilds/${f}`, 'utf8'));
           guilds.set(conf.id, conf);
           console.log(chalk.bgMagenta.black(`Guild: ${conf.id} => Enabled?: ${conf.enabled}, Users: ${conf.usersEnabled}`));
