@@ -55,7 +55,7 @@ const roll = (noOfDice, noOfSides, defaulted) => {
     }
   }
 
-  return `${defaultedString}You rolled ${(rolls.length > 1) ? `**${rolls.join(', ')}** for an average of **${getAverage(rolls)}**!` : `a **${rolls[0]}**!`}`;
+  return `${defaultedString}🎲 You rolled ${(rolls.length > 1) ? `**${rolls.join(', ')}** for an average of **${getAverage(rolls)}**!` : `**${rolls[0]}**! 🎲`}`;
 };
 
 exports.run = (bot, message, args) => {
