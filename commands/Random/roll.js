@@ -6,7 +6,7 @@
 
 const settings = require('../../settings');
 
-const defaultDie = 100;
+const defaultDie = 20;
 
 exports.help = {
   name: 'roll',
@@ -36,14 +36,26 @@ const getAverage = (rolls) => {
   return ac / rolls.length;
 };
 
-const roll = (noOfDice, noOfSides) => {
+const roll = (noOfDice, noOfSides, defaulted) => {
   const rolls = [];
+  let defaultedString = '';
 
   for (let i = 0; i < noOfDice; i++) {
     rolls.push(Math.ceil(Math.random() * noOfSides));
   }
 
-  return `You rolled ${(rolls.length > 1) ? `**${rolls.join(', ')}** for an average of **${getAverage(rolls)}**!` : `a **${rolls[0]}**!`}`;
+  if (defaulted) {
+    defaultedString = 'There was a mistake in your command use. Defaulting to a roll of ';
+    if (defaulted[0] && defaulted[1]) {
+      defaultedString += `\`1d${this.conf.defaultDie}\`\n`;
+    } else if (defaulted[0]) {
+      defaultedString += `\`1d${noOfSides}\`\n`;
+    } else {
+      defaultedString += `\`${noOfDice}d${this.conf.defaultDie}\`\n`;
+    }
+  }
+
+  return `${defaultedString}You rolled ${(rolls.length > 1) ? `**${rolls.join(', ')}** for an average of **${getAverage(rolls)}**!` : `a **${rolls[0]}**!`}`;
 };
 
 exports.run = (bot, message, args) => {
@@ -55,15 +67,17 @@ exports.run = (bot, message, args) => {
 
     if (rollArgs.includes('d')) {
       rollArgs = rollArgs.split('d', 2);
-      rollArgs.forEach((arg, index) => {
-        rollArgs[index] = Number(arg);
-      });
-      if (typeof rollArgs[0] !== 'number' && typeof rollArgs[1] !== 'number') {
-        message.reply(roll(1, this.conf.defaultDie));
-      } else if (typeof rollArgs[0] !== 'number') {
-        message.reply(roll(1, rollArgs[1]));
-      } else if (typeof rollArgs[1] !== 'number') {
-        message.reply(roll(rollArgs[0], this.conf.defaultDie));
+
+      rollArgs[0] = Number(rollArgs[0]);
+      rollArgs[1] = Number(rollArgs[1]);
+
+      /* eslint-disable */
+      if (isNaN(rollArgs[0]) && isNaN(rollArgs[1])) {
+        message.reply(roll(1, this.conf.defaultDie, [true, true]));
+      } else if (isNaN(rollArgs[0])) {
+        message.reply(roll(1, rollArgs[1], [true, false]));
+      } else if (isNaN(rollArgs[1])) {
+        message.reply(roll(rollArgs[0], this.conf.defaultDie, [false, true]));
       } else {
         message.reply(roll(rollArgs[0], rollArgs[1]));
       }
