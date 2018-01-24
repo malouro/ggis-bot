@@ -116,7 +116,7 @@ exports.streamUp = (bot, data) => {
         if (guild.usersEnabled.includes(user.id) && bot.guilds.get(guild.id).members.has(user.id) && guild.enabled) {
           if (difference >= guild.timer * 60) {
             const embed = new Discord.RichEmbed()
-              .setTitle('StreamLink Update <:streamLink:376115635702202370>')
+              .setTitle('StreamLink Update')
               .setDescription(`${u} has gone live on Twitch!`)
               .setColor(0x5a4194);
             if (guild.style !== 'minimal') embed.setThumbnail(u.avatarURL);
