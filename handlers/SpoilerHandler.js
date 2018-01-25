@@ -1,7 +1,7 @@
 /**
-* All credit goes to Timur Kuzhagaliyev for his Discord-Spoiler-Bot module
+* All credit goes to Timur Kuzhagaliyev for his discord-spoiler-bot module
 * While I do not use his module directly, I *did* use his GifGenerator
-* method, which may be only slightly modified for my purposes!
+* method, which I only slightly modified for my purposes.
 *
 * Thanks Tim! :)
 */
