@@ -1,21 +1,22 @@
 # Handlers
 
-This directory contains core modules that get accessed across several commands, events, etc.
+This directory contains core modules that get accessed across several commands, events, etc. They handle events and occurrences for many of Ggis's core features, including StreamLink, LFG, to any of the standard [Discord.js Client](https://discord.js.org/#/docs/main/stable/class/Client) event emissions.
 
 ## Table of Contents
 
 | File                  | Description                                     |
 |:----------------------|-------------------------------------------------|
-| Setup                 | Start up file that sets up everything           |
-| EventLoader           | Ties JavaScript to eventListeners<br>(ie: message, guildCreate, channelDelete, etc)|
-| LFGHandler            | For use with LFG commands/events                |
+| [Setup](#setup)       | Start up file that serves as the first point of contact |
+| [EventLoader](#eldr)  | Ties JavaScript to eventListeners<br>(ie: message, guildCreate, channelDelete, etc)|
+| [LFGHandler](#lfg)    | For use with LFG commands/events                |
 | PollHandler           | For use with creating polls/petitions           |
 | SpoilerHandler        | For use with the spoiler command                |
 | StreamLinkHandler     | For use with StreamLink commands/events         |
-| ReloadCommands        | Reloads required files for all commands         |
-| ReloadLFG             | reloads the LFG game library                    |
+| [ReloadCommands](#rlc)| Reloads required files for all commands         |
+| [ReloadLFG](#rlfg)    | reloads the LFG game library                    |
 
-## Setup
+
+## <a name="setup">Setup</a>
 
 As implied by the name, this code is executed at start up from the main `app.js` file and serves as the main entry point for the bot.
 
@@ -26,11 +27,12 @@ Below is a list of things that get executed at this stage:
 - Embedded functions within the Client are initialized at this point.<br>Includes: `getPerms`, `reloadCommands`, `reloadLFG`, `reloadHandlers`, and `lfgUpdate`
   > Note: Eventually, a `reloadEvents` function will also be instantiated here, but for now this is a work in progress while I figure some stuff out
 
-## EventLoader
 
-Here, any events that the Client (our bot) needs to listen to are defined. By tying these event emitters to functions within our `~/events/` directory, we can control how the bot will handle incoming messages, emoji reactions, creation or deletion of channels & guilds, etc, etc.
+## <a name="eldr">EventLoader</a>
 
-Table of events the Client listens to:
+Here, any events that the Client (our bot) needs to listen to are defined. By tying these event emitters to functions within our `~/events/` directory, we can control how the bot will handle incoming messages, emoji reactions, creation or deletion of channels & guilds, and so on.
+
+**Table of events the Client listens to:**
 
 |Event|Description & info|
 |:----|------------------|
@@ -48,15 +50,15 @@ Table of events the Client listens to:
 
 **References:**
 
-- Check out the Discord.js docs [here](https://discord.js.org/#/docs/main/stable/class/Client) for more info on Events.
+> Check out the Discord.js docs [here](https://discord.js.org/#/docs/main/stable/class/Client) for more info on Events.
 
-## LFGHandler
+## <a name="lfg">LFGHandler</a>
 
 All `!lfg` related events are handled in here.
 
 **Definitions & general format:**
 
-`bot.games` is the collection of LFG games the bot has (taken directly from the collection of .json files in ~/config/lfg/), and they each follow the format below:
+`bot.games` is the collection of LFG games the bot keeps record of (taken directly from the collection of .json files in `~/config/lfg/`), and they each follow the format below:
 
 ```json
 // LFG Game format
@@ -73,16 +75,21 @@ All `!lfg` related events are handled in here.
 // Keep in mind:
 // 1. Don't include spaces in any of the above, except 'name' & 'modes_proper'
 // 2. 'default_party_size', 'modes', and 'modes_proper' are arrays that *must* be of the same length
-// 3. 'default_game_mode' *must* correspond to any item from 'modes'
+// 3. 'default_game_mode' *must* exactly correspond to an item from 'modes'
 // 4. 'thumbnail' is always a URL
+// 5. Don't include these comments :)
 ```
 
-`bot.gameAliases` contains mapping information for every alias defined within these LFG .json configs that specifies what game each is connected to.
+After adding or editing a config file for a game within `~/config/lfg/`, either restart the app OR (preferably) run the command `!reloadlfg` to run an update on your bot's game library and to have it included within the `bot.games` Collection. If the command returns an error, it's likely there was a syntax error with your JSON file, or that it breaks one of the "Keep in mind" rules listed above.
 
-Each LFG request that gets passed from the main `!lfg` command file to the LFGHandler, follows this format:
+`bot.gameAliases` contains mapping information for every alias defined within these LFG .json configs that specifies what game each is connected to. This collection will be auto updated whenever you run `!reloadlfg`
+
+Each LFG request that gets passed from the main `!lfg` command file to the LFGHandler, follows the specific format shown below
+
+> Generally speaking, this LFG request format is of no importance to an average user. However, if you wish to have some insight on the working parts of LFG, and perhaps want to improve or build upon the feature, feel free to have a look at the formatting below.
 
 ```js
-/** Taken directly from /commands/Useful/lfg.js */
+/** Taken from /commands/Useful/lfg.js */
 
 let lfgObject = {
   id: '', // the message ID of the LFG party request that goes out
@@ -99,6 +106,8 @@ let lfgObject = {
   channel: message.channel.id, // channel message was sent in
   warning: false, // has a warning on the expiration time been sent yet?
 };
+
+/** This object gets passed into LFGHandler's `addLFG` function */
 ```
 
 **Functions:**
@@ -108,15 +117,15 @@ let lfgObject = {
 |`addLFG`| `Discord.Client` bot<br>`object` obj (follows format above) | Creates a new LFG party |
 |`addToParty`| `Discord.Client` bot<br>`Snowflake` id<br>`Snowflake` userid | 
 
-> todo: Need to add the rest of the LFG functions here
+> TODO: Need to add the rest of the LFG functions here
 
-## ReloadCommands
+## <a name="rlc">ReloadCommands</a>
 
-This script is ran to update any command(s) in real time. If changes need to be made to a command, it is not necessary to restart the whole app--just run `!reload [command]`
+This script is ran to update any command(s) in real time. If changes need to be made to a command, it is not necessary to restart the whole app; just run `!reload [command]`
 
 If a `[command]` argument is not provided, *all* the bot's commands will be reloaded.
 
-## ReloadLFG
+## <a name="rlfg">ReloadLFG</a>
 
 This script is will reload any updates made to the LFG library--that is, any of the .json config files within the `~/config/lfg/` directory.
 
@@ -124,4 +133,4 @@ Executed from `!reloadlfg [game]`
 
 If a `[game]` argument is not provided, *all* of the games in the LFG library will be reloaded.
 
-> todo: Document the other handlers
+> TODO: Document the other handlers: (Poll, Spoiler, StreamLink)
