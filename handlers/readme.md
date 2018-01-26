@@ -13,7 +13,7 @@ This directory contains core modules that get accessed across several commands, 
 | SpoilerHandler        | For use with the spoiler command                |
 | StreamLinkHandler     | For use with StreamLink commands/events         |
 | [ReloadCommands](#rlc)| Reloads required files for all commands         |
-| [ReloadLFG](#rlfg)    | reloads the LFG game library                    |
+| [ReloadLFG](#rlfg)    | Reloads the LFG game library                    |
 
 
 ## <a name="setup">Setup</a>
@@ -115,7 +115,10 @@ let lfgObject = {
 |Func|Parameters|Description|
 |:---|----------|-----------|
 |`addLFG`| `Discord.Client` bot<br>`object` obj (follows format above) | Creates a new LFG party |
-|`addToParty`| `Discord.Client` bot<br>`Snowflake` id<br>`Snowflake` userid | 
+|`addToParty`| `Discord.Client` bot<br>`Snowflake` id<br>`Snowflake` userid | Adds a user (of ID 'userid') into the LFG party (of ID 'id') and updates the message. | 
+|`removeFromParty` | `Discord.Client` bot<br>`Snowflake` id<br>`Snowflake` userid | Removes a user (of ID 'userid') from the LFG party (of ID 'id') and updates the message. | 
+|`timeout` | `Discord.Client` bot<br>`Snowflake` id | Function that runs when an LFG party times out. Edits the message to show the timeout. |
+|`warning` | `Discord.Client` bot<br>
 
 > TODO: Need to add the rest of the LFG functions here
 
