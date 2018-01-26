@@ -29,14 +29,6 @@ let INTERVAL = settings.lfg.update_interval;
 
 module.exports = {
   /**
-   * Initial setup
-   * @func init
-   */
-  init: (conf) => {
-    INTERVAL = conf.lfg.update_interval;
-  },
-
-  /**
    * @func addLFG
    * Adds new LFG party to the LFG stack
    *
