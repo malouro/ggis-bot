@@ -5,7 +5,7 @@ const Discord = require('discord.js');
 const moment = require('moment');
 const settings = require('../settings');
 
-let INTERVAL = settings.lfg.update_interval;
+const INTERVAL = settings.lfg.update_interval;
 
 /**
  * Format for all LFG requests, embedded in the Client (bot) object -->

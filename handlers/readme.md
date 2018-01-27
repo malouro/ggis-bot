@@ -82,7 +82,7 @@ All `!lfg` related events are handled in here.
 
 After adding or editing a config file for a game within `~/config/lfg/`, either restart the app OR (preferably) run the command `!reloadlfg` to run an update on your bot's game library and to have it included within the `bot.games` Collection. If the command returns an error, it's likely there was a syntax error with your JSON file, or that it breaks one of the "Keep in mind" rules listed above.
 
-`bot.gameAliases` contains mapping information for every alias defined within these LFG .json configs that specifies what game each is connected to. This collection will be auto updated whenever you run `!reloadlfg`
+`bot.gameAliases` contains mapping information for every alias defined within these LFG .json configs that specifies what game each is correspondent to. This collection will be auto-updated whenever you run `!reloadlfg`
 
 Each LFG request that gets passed from the main `!lfg` command file to the LFGHandler, follows the specific format shown below
 
@@ -112,16 +112,18 @@ let lfgObject = {
 
 **Functions:**
 
-|Func|Parameters|Description|
-|:---|----------|-----------|
-|addLFG| `Discord.Client` bot<br>`object` obj (follows format above) | Creates a new LFG party |
-|addToParty | `Discord.Client` bot<br>`Snowflake` id<br>`Snowflake` userid | Adds a user (of ID 'userid') into the LFG party (of ID 'id') and updates the message. | 
-|removeFromParty | `Discord.Client` bot<br>`Snowflake` id<br>`Snowflake` userid | Removes a user (of ID 'userid') from the LFG party (of ID 'id') and updates the message. | 
-|timeout | `Discord.Client` bot<br>`Snowflake` id | Function that runs when an LFG party times out. Edits the message to show the timeout. |
-|warning | `Discord.Client` bot<br>`Snowflake` id |
+|Func|Parameters        |Description|
+|:---|------------------|-----------|
+|addLFG| `Discord.Client` bot<br>`object` obj | Creates a new LFG party given an incoming LFG object. |
+|addToParty | `Discord.Client` bot<br>`Snowflake` id<br>`Snowflake` userid | Adds a user (of ID 'userid') into the LFG party. | 
+|removeFromParty | `Discord.Client` bot<br>`Snowflake` id<br>`Snowflake` userid | Removes a user (of ID 'userid') from the LFG party. |
+|timeout | `Discord.Client` bot<br>`Snowflake` id | Function that runs when an LFG party times out. Removes the party.
+|warning | `Discord.Client` bot<br>`Snowflake` id<br>`Number` timeLeft | Send out a warning that the LFG party is expiring soon. |
+|complete | `Discord.Client` bot<br>`Snowflake` id | Sends a completed party message to the channel. | 
+|cancel | `Discord.Client` bot<br>`Snowflake` id<br>`Boolean` removed | Cancels an LFG party (of id 'id'). |
+|update | `Discord.Client` bot | Checks for LFG parties that have timed out or will expire soon.  |
 
-
-> TODO: Need to add the rest of the LFG functions here
+*Note: more details on the functions are given within the JavaScript file itself*
 
 ## <a name="rlc">ReloadCommands</a>
 

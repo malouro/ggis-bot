@@ -1,15 +1,7 @@
 /**
- * Info needed:
- *
- * BotName : {default: ggis}
- * BotNameProper: { }
- * token:
- * command prefix:
- * masterID: Discord User ID
- * mainGuild:
- * testGuild:
- * everything else default?
- *
+ * Setup Script
+ *  - Creates setting.json file (given user input)
+ *  - Creates blank atreaction, and txtreaction.json files
  */
 
 const readline = require('readline');
