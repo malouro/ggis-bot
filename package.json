@@ -4,7 +4,8 @@
   "description": "A Discord chat bot for the Christian Mingle Discord server.",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "setup": "node ./config/generate.js"
   },
   "author": "Michael Louro",
   "license": "MIT",

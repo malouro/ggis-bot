@@ -1,7 +1,7 @@
 {
   "botName": "ggis",
   "botNameProper": "Ggis",
-  "token": "",
+  "token": "Discord OAuth token for the bot goes here",
   "prefix": "!",
   "commandGroups": [
     {
@@ -26,10 +26,10 @@
     }
   ],
   "guilds": [],
-  "masterID": "",
-  "mainGuild": "",
-  "mainChannel": "",
-  "testGuild": "",
+  "masterID": "123456789",
+  "mainGuild": "123456789",
+  "mainChannel": "123456789",
+  "testGuild": "123456789",
   "timeFormat": "hh:mm:ssA MM/DD/YY",
   "rules": {
     "enable": true,
@@ -53,7 +53,7 @@
     "split_value": 20
   },
   "fortune": {
-    "token": "",
+    "token": "IMGUR API Client Token",
     "album": "d5drq",
     "amount": 0
   },
