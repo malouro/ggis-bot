@@ -12,6 +12,7 @@ const slFuncGC = require('../../events/guildCreate');
 const slFuncGD = require('../../events/guildDelete');
 const slFuncGMR = require('../../events/guildMemberRemove');
 const slFuncCD = require('../../events/channelDelete');
+const slFuncRdy = require('../../events/ready');
 
 exports.help = {
   name: 'streamlink',
@@ -202,7 +203,9 @@ exports.reloadHandler = () =>
         .then(slFuncGD.reloadHandler()
           .then(slFuncGMR.reloadHandler()
             .then(slFuncCD.reloadHandler()
-              .then(resolve())
+              .then(slFuncRdy.reloadHandler()
+                .then(resolve())
+                .catch(console.error))
               .catch(console.error))
             .catch(console.error))
           .catch(console.error))

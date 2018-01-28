@@ -8,7 +8,8 @@
         "guildDelete",
         "guildMemberRemove",
         "channelDelete",
-        "channelDelete"
+        "channelDelete",
+        "ready"
     ],
     "handlers": [
         "StreamLinkHandler",
