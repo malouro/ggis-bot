@@ -4,10 +4,17 @@ const chalk = require('chalk');
 const fs = require('fs');
 const moment = require('moment');
 
-const streamlink = require('../handlers/StreamLinkHandler');
+let streamlink = require('../handlers/StreamLinkHandler');
 
 const checkForCurrentGuilds = (bot) => {
+  const settings = JSON.parse(fs.readFileSync('./settings.json', 'utf8'));
+  let missingGuild = false;
+
   bot.guilds.forEach((guild) => {
+    if (settings.guilds.indexOf(guild) === -1) {
+      settings.guilds.push(guild);
+      missingGuild = true;
+    }
     fs.readFile(`./config/streamlink/guilds/${guild}.json`, (err) => {
       if (err) {
         if (err.code === 'ENOENT') {
@@ -18,6 +25,12 @@ const checkForCurrentGuilds = (bot) => {
       }
     });
   });
+
+  if (missingGuild) {
+    fs.writeFile('./settings.json', JSON.stringify(settings), (err) => {
+      if (err) console.error(`[${moment().format(settings.timeFormat)}] ${err}`);
+    });
+  }
 };
 
 module.exports = (bot, settings) => {

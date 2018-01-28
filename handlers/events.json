@@ -14,14 +14,12 @@
     "handlers": [
         "StreamLinkHandler",
         "LFGHandler",
-        "PollHandler",
-        "SpoilerHandler"
+        "PollHandler"
     ],
     "functionsToReload": [
         "streamlink",
         "lfg",
-        "poll",
-        "spoiler"
+        "poll"
     ],
     "reloaders": [
         "ReloadCommands",

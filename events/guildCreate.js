@@ -9,18 +9,7 @@ let streamlink = require('../handlers/StreamLinkHandler');
 
 module.exports = (guild) => {
   try {
-    const settings = JSON.parse(fs.readFileSync('./settings.json'), 'utf8');
-    const index = settings.guilds.indexOf(guild.id);
-
     streamlink.addGuild(guild.client, guild);
-
-    if (index === -1) {
-      settings.guilds.push(guild.id);
-      fs.writeFile('./settings.json', JSON.stringify(settings), (err) => {
-        if (err) console.error(`[${moment().format(conf.timeFormat)}] ${err}`);
-        else console.log(chalk.bgCyan.black(`[${moment().format(conf.timeFormat)}] Wrote to settings.json OK! Joined Guild "${guild.name}" (ID ${guild.id})`));
-      });
-    }
   } catch (err) {
     console.log(chalk.bgRed.bold(`[${moment().format(conf.timeFormat)}] ${err}`));
   }
