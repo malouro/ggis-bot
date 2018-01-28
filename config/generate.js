@@ -17,28 +17,27 @@ const rl = readline.createInterface({
 
 const getCode = (name) => {
   name.replace(/\s/, '');
-  name.toLowerCase();
-  return name;
+  return name.toLowerCase();
 };
 
 console.log('Generating a settings.json file for you! Just need some info first...\n\nA (*) means that the setting is required. Otherwise, you can leave the setting blank.\n[Refer to the README for more information on this setup script.]\n');
 
 rl.question('* Token: (Discord app token, keep this private!) ', (token) => {
   json.token = token;
-  rl.question(`* Bot name: (${json.botNameProper}) `, (botName) => {
-    if (botName !== '') json.botNameProper = botName;
+  rl.question(`* Bot user name (spaces will be trimmed): (${json.botNameProper}) `, (name) => {
+    if (name !== '') json.botNameProper = name;
     json.botName = getCode(json.botNameProper);
     rl.question(`* Command prefix: (${json.prefix}) `, (prefix) => {
       if (prefix !== '') json.prefix = prefix;
-      rl.question('* Discord User ID: (right click, Copy ID) ', (masterID) => {
+      rl.question('* Your Discord User ID: (right click, Copy ID) ', (masterID) => {
         json.masterID = masterID;
-        rl.question('* Discord Server ID: (right click, Copy ID) ', (mainGuild) => {
+        rl.question('* Your Discord Server ID: (right click, Copy ID) ', (mainGuild) => {
           json.mainGuild = mainGuild;
           rl.question('  Test Guild Server ID: (optional) ', (testGuild) => {
             json.testGuild = testGuild;
             rl.question('  Imgur API Token: (optional) ', (imgurToken) => {
               json.fortune.token = imgurToken;
-              console.log('\n\nWriting settings.json...');
+              console.log('\nWriting settings.json...');
               fs.writeFile('settings.json', JSON.stringify(json), (err) => {
                 if (err) throw err;
                 fs.writeFile('settings.backup.json', JSON.stringify(json), (errOnBackup) => { console.log(errOnBackup); });

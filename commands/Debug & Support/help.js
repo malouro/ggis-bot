@@ -25,7 +25,7 @@ exports.conf = {
 };
 
 const checkIfCommandAvailable = (command, guildId, perms, conf) => {
-  const notGuild = (guildId !== conf.mainguild && guildId !== conf.testguild);
+  const notGuild = (guildId !== conf.mainGuild && guildId !== conf.testGuild);
   if (command.conf.guildOnly && notGuild) return false;
   if (perms < command.conf.permLevel) return false;
   return true;
