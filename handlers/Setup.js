@@ -54,9 +54,7 @@ module.exports = (bot, settings) => {
   bot.lfgStack = new Discord.Collection(); // ongoing LFG parties are kept in here
 
   /* Start message */
-  console.log(chalk.bgBlue.bold(`STARTING UP ${settings.botName.toUpperCase()}-bot...`));
-  console.log(chalk.bgBlue(`${settings.botNameProper} is connected to ${settings.guilds.length} guilds currently.`));
-  console.log(chalk.bgBlue(`Guilds connected to: { ${settings.guilds} }`));
+  console.log(chalk.bgBlue.bold(`STARTING UP ${settings.botNameProper}-bot...`));
 
   /**
    * Load events into bot using eventLoader.js
