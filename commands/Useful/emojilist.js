@@ -27,6 +27,11 @@ exports.conf = {
 const buildEmojiList = (bot, message, pageGiven) => {
   let ac = 0;
   const g = bot.guilds.get(testGuild);
+  if (typeof g === 'undefined') {
+    return message.reply('No testGuild ID specified within settings.json! ExtendedEmoji won\'t function without this.').then((m) => {
+      m.delete(1500).then().catch(console.error());
+    }).catch(err => console.error(err));
+  }
   const { emojis } = g;
   const embeds = new Map();
   const splitValue = settings.rules.extendedEmoji.split_value;
@@ -43,7 +48,6 @@ const buildEmojiList = (bot, message, pageGiven) => {
           ` \`Showing emojis ${(currentPage * splitValue) + 1} ~ ${(emojis.size - 1 < (currentPage + 1) * splitValue) ? emojis.size : (currentPage + 1) * splitValue}\``);
       }
 
-      /* eslint-disable */
       if (pageGiven === -1 || (ac >= currentPage * splitValue && ac <= ((currentPage + 1) * splitValue) - 1)) {
         embeds.get(currentPage).addField(`:${emoji.name}:`, `<:${emoji.name}:${emoji.id}>`, true);
       }
@@ -52,10 +56,11 @@ const buildEmojiList = (bot, message, pageGiven) => {
         message.channel.send({ embed: embeds.get(currentPage) });
         currentPage++;
       }
-      /* eslint-enable */
       ac++;
     }
   });
+
+  return 0;
 };
 
 exports.run = (bot, message, args) => {
