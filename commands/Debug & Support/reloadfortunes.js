@@ -6,9 +6,10 @@
 
 const chalk = require('chalk');
 const fs = require('fs');
-const i2rss = require('imgur2rss');
+const i2rss = require('../../handlers/imgur2rss/bin/');
 const moment = require('moment');
-const conf = require('../../settings.json');
+
+const conf = JSON.parse(fs.readFileSync('./settings.json', 'utf8'));
 
 exports.help = {
   name: 'reloadfortunes',

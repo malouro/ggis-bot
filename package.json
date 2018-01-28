@@ -1,7 +1,7 @@
 {
   "name": "ggis-bot",
   "version": "1.3.1",
-  "description": "A Discord chat bot for the Christian Mingle Discord server.",
+  "description": "A Discord chat bot that does things.",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
@@ -15,7 +15,6 @@
     "feed-read-parser": "0.0.6",
     "gifencoder": "^1.1.0",
     "iconv-lite": "^0.4.19",
-    "imgur2rss": "^1.0.4",
     "lyrics-fetcher": "^1.0.2",
     "mkdirp": "^0.5.1",
     "moment": "^2.19.1",

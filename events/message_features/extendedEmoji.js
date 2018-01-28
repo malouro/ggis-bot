@@ -27,6 +27,7 @@ module.exports = (message, settings) =>
   new Promise((resolve, reject) => {
     try {
       const g = message.client.guilds.get(settings.testGuild);
+      if (typeof g === 'undefined') resolve(message);
       const emojiData = g.emojis;
       const emojiCodes = [];
       const emojis = new Map();
