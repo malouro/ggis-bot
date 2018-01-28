@@ -11,17 +11,17 @@
   "author": "Michael Louro",
   "license": "MIT",
   "dependencies": {
-    "chalk": "^2.2.0",
+    "chalk": "2.2.0",
     "discord.js": "^11.2.1",
     "feed-read-parser": "0.0.6",
-    "gifencoder": "^1.1.0",
-    "iconv-lite": "^0.4.19",
-    "lyrics-fetcher": "^1.0.2",
-    "mkdirp": "^0.5.1",
-    "moment": "^2.19.1",
-    "node-schedule": "^1.2.5",
-    "rmdir": "^1.2.0",
-    "twitchps": "^0.5.5"
+    "gifencoder": "1.1.0",
+    "iconv-lite": "0.4.19",
+    "lyrics-fetcher": "1.0.2",
+    "mkdirp": "0.5.1",
+    "moment": "2.19.1",
+    "node-schedule": "1.2.5",
+    "rmdir": "1.2.0",
+    "twitchps": "0.5.5"
   },
   "repository": {
     "type": "git",
