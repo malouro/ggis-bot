@@ -28,9 +28,9 @@ const buildEmojiList = (bot, message, pageGiven) => {
   let ac = 0;
   const g = bot.guilds.get(testGuild);
   if (typeof g === 'undefined') {
-    return message.reply('No testGuild ID specified within settings.json! ExtendedEmoji won\'t function without this.').then((m) => {
-      m.delete(1500).then().catch(console.error());
-    }).catch(err => console.error(err));
+    return message.reply('No testGuild ID specified within settings.json! ExtendedEmoji won\'t function without this.')
+      .then()
+      .catch(err => console.error(err));
   }
   const { emojis } = g;
   const embeds = new Map();

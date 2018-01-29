@@ -12,7 +12,9 @@
   "license": "MIT",
   "dependencies": {
     "chalk": "2.2.0",
+    "coffee-script": "^1.12.7",
     "discord.js": "^11.2.1",
+    "escape-html": "^1.0.3",
     "feed-read-parser": "0.0.6",
     "gifencoder": "1.1.0",
     "iconv-lite": "0.4.19",
@@ -20,7 +22,9 @@
     "mkdirp": "0.5.1",
     "moment": "2.19.1",
     "node-schedule": "1.2.5",
+    "request": "^2.83.0",
     "rmdir": "1.2.0",
+    "rss": "^1.2.2",
     "twitchps": "0.5.5"
   },
   "repository": {
