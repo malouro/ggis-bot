@@ -1,6 +1,6 @@
 # Handlers
 
-This directory contains core modules that get accessed across several commands, events, etc. They handle events and occurrences for many of Ggis's core features, including StreamLink, LFG, to any of the standard [Discord.js Client](https://discord.js.org/#/docs/main/stable/class/Client) event emissions.
+This directory contains core modules that get accessed across several commands, events, etc. They handle events and occurrences for many of Ggis's core features, including StreamLink, LFG, to any of the standard [Discord.js Client](https://discord.js.org/#/docs/main/stable/class/Client?scrollTo=e-channelCreate) event emissions.
 
 ## Table of Contents
 
@@ -10,7 +10,6 @@ This directory contains core modules that get accessed across several commands, 
 | [EventLoader](#eldr)  | Ties JavaScript to eventListeners<br>(ie: message, guildCreate, channelDelete, etc)|
 | [LFGHandler](#lfg)    | For use with LFG commands/events                |
 | PollHandler           | For use with creating polls/petitions           |
-| SpoilerHandler        | For use with the spoiler command                |
 | StreamLinkHandler     | For use with StreamLink commands/events         |
 | [ReloadCommands](#rlc)| Reloads required files for all commands         |
 | [ReloadLFG](#rlfg)    | Reloads the LFG game library                    |
@@ -139,4 +138,4 @@ Executed from `!reloadlfg [game]`
 
 If a `[game]` argument is not provided, *all* of the games in the LFG library will be reloaded.
 
-> TODO: Document the other handlers: (Poll, Spoiler, StreamLink)
+> TODO: Document the other handlers: (Poll, ~~Spoiler~~, StreamLink)
