@@ -1,3 +1,5 @@
 This module is an edited version of https://www.npmjs.com/package/imgur2rss (also located at https://github.com/statico/imgur2rss) by user statico
 
 His module limited the callback to only include the first 10 images of an Imgur album. It was edited to include ALL images from an Imgur album and externalized here so that `npm install` would not revert to older versions of the module.
+
+Now, the !reloadfortunes command will actually retrieve ALL of the fortune images off of Imgur. :) Cheers to that
