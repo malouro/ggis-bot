@@ -25,10 +25,12 @@ exports.conf = {
 };
 
 exports.run = (bot, message) => {
-  message.channel.send(`If you wish to invite <@${bot.user.id}> to your Discord server, use the link below and choose a server from the dropdown list.` +
-  'You must have the **Manage Server** permission on the server in order for it to show up on the list, and for the invite to work.\n\n' +
-  'You may add or remove permissions as you please, but keep in mind that it might break current or future features.\n\n' +
-  `${bot.generateInvite(523762774)}`);
+  bot.generateInvite(523762774).then((invite) => {
+    message.channel.send(`If you wish to invite <@${bot.user.id}> to your Discord server, use the link below and choose a server from the dropdown list.` +
+    'You must have the **Manage Server** permission on the server in order for it to show up on the list, and for the invite to work.\n\n' +
+    'You may add or remove permissions as you please, but keep in mind that it might break current or future features.\n\n' +
+    `${invite}`);
+  }).catch(err => console.error(err));
 
   console.log(`[${moment().format(settings.timeFormat)}] User ${message.author.username} asked for an invite link`);
 };
