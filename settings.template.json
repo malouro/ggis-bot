@@ -58,6 +58,7 @@
     "amount": 0
   },
   "streamlink": {
+    "max_connections": 30,
     "default_setting": true,
     "enable": true,
     "timer": 60,
