@@ -18,6 +18,7 @@
     "feed-read-parser": "0.0.6",
     "gifencoder": "1.1.0",
     "iconv-lite": "0.4.19",
+    "imgur2rss": "malouro/imgur2rss#patch-1",
     "lyrics-fetcher": "1.0.2",
     "mkdirp": "0.5.1",
     "moment": "2.19.1",

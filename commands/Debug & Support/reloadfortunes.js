@@ -6,7 +6,7 @@
 
 const chalk = require('chalk');
 const fs = require('fs');
-const i2rss = require('../../handlers/imgur2rss/bin/');
+const i2rss = require('imgur2rss');
 const moment = require('moment');
 
 const conf = JSON.parse(fs.readFileSync('./settings.json', 'utf8'));
