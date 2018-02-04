@@ -57,7 +57,7 @@ module.exports = (message, settings) =>
       // If method (1) was used...
       if (edit) {
         message.delete().then((msg) => {
-          if (settings.rules.extended_emoji.embed) {
+          if (settings.rules.extendedEmoji.embed) {
             const embed = new Discord.RichEmbed()
               .setTitle('says:')
               .setDescription(str)
