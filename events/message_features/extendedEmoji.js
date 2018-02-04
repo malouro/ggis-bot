@@ -29,7 +29,7 @@ module.exports = (message, settings) =>
       const g = message.client.guilds.get(settings.testGuild);
       if (typeof g === 'undefined') resolve(message);
       const emojiData = g.emojis;
-      const emojiCodes = [];
+      let emojiCodes = [];
       const emojis = new Map();
       let edit = false;
       let str = message.content.toString();
