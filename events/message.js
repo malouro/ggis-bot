@@ -27,7 +27,7 @@ module.exports = (message) => {
           if (message.content.toString().match(RegExExtendedEmojis) && extEmojiOn) {
             extEmoji(message, settings).then().catch(console.error);
           }
-          if (updatedSettings.rules.autoReact && autoReactOn) {
+          if (autoReactOn) {
             autoReact(message, settings).then().catch(console.error);
           }
         }

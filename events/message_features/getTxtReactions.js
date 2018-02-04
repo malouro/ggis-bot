@@ -10,7 +10,8 @@ module.exports = (TxtReactions) => {
     const reactions = JSON.parse(fs.readFileSync('./config/txtreactions.json', 'utf8'));
 
     reactions.reactions.forEach((r) => {
-      TxtReactions.set(r.regex, r);
+      const regexp = new RegExp(r.regex, (r.flags) ? r.flags : '');
+      TxtReactions.set(regexp, r);
     });
 
     return TxtReactions;

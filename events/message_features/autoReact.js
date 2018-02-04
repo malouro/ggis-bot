@@ -57,7 +57,7 @@ module.exports = (message, settings) =>
       if (settings.rules.autoReact.txtMentions) {
         TxtReactions = getTxtReactions(TxtReactions);
         TxtReactions.forEach((t, regex) => {
-          if (message.content.toLowerCase().match(regex)) {
+          if (message.content.match(regex)) {
             switch (t.type) {
               case 'react':
                 if (t.reaction.length > 0) {

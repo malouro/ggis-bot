@@ -43,7 +43,7 @@ module.exports = (message, settings) =>
         let emoji = emojiCodes[0].toString().slice(1, emojiCodes[0].length - 1);
         if (emojis.has(emoji)) {
           let e = emojis.get(emoji);
-          if (settings.rules.extended_emoji.edit) {
+          if (settings.rules.extendedEmoji.edit) {
             edit = true;
             str = str.replace(`:${e.name}:`, `<:${e.name}:${e.id}>`);
           } else {
