@@ -181,7 +181,7 @@ exports.run = (bot, message, args, perms) => {
         `\`${settings.prefix}streamlink enable\`\n` +
         `\`${settings.prefix}streamlink disable\`\n` +
         `\`${settings.prefix}streamlink status\`\n` +
-        `\`${settings.prefix}streamlink help\`);
+        `\`${settings.prefix}streamlink help\``);
       break;
     default:
       message.reply(`\`${message.content}\` is an incorrect command usage! Check \`${settings.prefix}streamlink help\` for more information.`);
