@@ -35,7 +35,11 @@ module.exports = (message, settings) =>
       let str = message.content.toString();
 
       emojiData.forEach((emoji) => {
-        emojis.set(emoji.name, { id: emoji.id, name: emoji.name });
+        emojis.set(emoji.name, {
+          id: emoji.id,
+          name: emoji.name,
+          format: (emoji.animated) ? `<a:${emoji.name}:${emoji.id}>` : `<:${emoji.name}:${emoji.id}>`
+        });
       });
 
       /* eslint-disable */
@@ -45,7 +49,7 @@ module.exports = (message, settings) =>
           let e = emojis.get(emoji);
           if (settings.rules.extendedEmoji.edit) {
             edit = true;
-            str = str.replace(`:${e.name}:`, `<:${e.name}:${e.id}>`);
+            str = str.replace(`:${e.name}:`, e.format);
           } else {
             message.react(e.id).then().catch(err => console.log(err));
             resolve(message);
