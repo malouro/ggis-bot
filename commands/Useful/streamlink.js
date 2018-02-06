@@ -47,7 +47,7 @@ exports.run = (bot, message, args, perms) => {
           `\`${settings.prefix}streamlink enable self\`\nEnables your own StreamLink connection, allowing ${settings.botNameProper} to notify the server when you go live. (This can be written as either "${settings.prefix}streamlink enable self" or "${settings.prefix}streamlink enable", with no extra argument)\n\n` +
           `\`${settings.prefix}streamlink enable @user\`\nEnables another user's StreamLink connection. __Admin-only.__\n(Though nothing will stop an admin from enabling/disabling someone's StreamLink, it should not be abused! Don't be a jerk.)\n\n` +
           `\`${settings.prefix}streamlink enable server\`\nEnables StreamLink notifications for your Discord server. StreamLink notifications will now be pushed onto the server. __Admin-only.__\n\n` +
-          `\`${settings.prefix}streamlink enable help\`\nShows the menu you're looking at right now. ;)`;
+          `\`${settings.prefix}streamlink enable help\`\nShows the menu you're looking at right now. ;)`);
       } else if (message.mentions.users.size > 0) {
         if (perms < 2) {
           message.reply(`Sorry, but enabling another user's StreamLink is **admin exclusive**.\n\nIf you are attempting to enable your own StreamLink, you can simply use \`${settings.prefix}streamlink enable self\` or just \`${settings.prefix}streamlink enable\``);
