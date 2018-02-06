@@ -49,7 +49,7 @@ const buildEmojiList = (bot, message, pageGiven) => {
       }
 
       if (pageGiven === -1 || (ac >= currentPage * splitValue && ac <= ((currentPage + 1) * splitValue) - 1)) {
-        embeds.get(currentPage).addField(`:${emoji.name}:`, `<:${emoji.name}:${emoji.id}>`, true);
+        embeds.get(currentPage).addField(`:${emoji.name}:`, `${(emoji.animated) ? `<a:${emoji.name}:${emoji.id}>` : `<:${emoji.name}:${emoji.id}>`}`, true);
       }
 
       if (ac === ((currentPage + 1) * splitValue) - 1 || ac === emojis.size - 1) {
