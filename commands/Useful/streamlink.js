@@ -75,7 +75,7 @@ exports.run = (bot, message, args, perms) => {
           `${settings.prefix}streamlink disable self\`\nDisables your own StreamLink connection. ${settings.botNameProper} will no longer notify the server when you go live. (This can be written as either "${settings.prefix}streamlink disable self" or "${settings.prefix}streamlink disable", with no extra arguments)\n\n\`` +
           `${settings.prefix}streamlink disable @user\`\nDisables another user's StreamLink connection. __Admin-only.__\n(Though nothing will stop an admin from enabling/disabling someone's StreamLink, it should not be abused! Don't be a jerk.)\n\n\`` +
           `${settings.prefix}streamlink disable server\`\nDisables StreamLink notifications for your Discord server. StreamLink notifications will no longer be pushed onto the server. __Admin-only.__\n\n\`` +
-          `${settings.prefix}streamlink disable help\`\nShows the menu you're looking at right now. ;)`;
+          `${settings.prefix}streamlink disable help\`\nShows the menu you're looking at right now. ;)`);
       } else if (message.mentions.users.size > 0) {
         if (perms < 2) {
           message.reply(`Sorry, but enabling another user's StreamLink is **admin exclusive**.\n\nIf you are attempting to enable your own StreamLink, you can simply use \`${settings.prefix}streamlink enable self\` or \`${settings.prefix}streamlink enable\``);
@@ -106,7 +106,7 @@ exports.run = (bot, message, args, perms) => {
             '**(@user)**\nOptional, __admin-only__ option. Specifies Discord user to make StreamLink connection to. If this option isn\'t present, StreamLink will assume the User ID of the user that used the command. ' +
             'Basically, non-admins cannot alter StreamLink settings for users other than themselves.\n\n`' +
             `${settings.prefix}streamlink add channel\`\nThis command will add the current text-channel into the list of channels to notify for StreamLink updates. __Admin-only.__\n\n\`` +
-            `${settings.prefix}streamlink add help\`\nShows the menu you're looking at right now. ;)`;
+            `${settings.prefix}streamlink add help\`\nShows the menu you're looking at right now. ;)`);
         } else if (typeof args[3] === 'undefined') {
           streamlink.addUser(message, bot, args[2]);
         } else if (perms >= 2) {
@@ -139,7 +139,7 @@ exports.run = (bot, message, args, perms) => {
             '**(@user)**\nOptional, __admin-only__ option. Discord user to remove the StreamLink connection from. If this option isn\'t present, StreamLink will assume the User ID of the user that issued the command. ' +
             'Basically, non-admins cannot alter StreamLink settings for users other than themselves.\n\n`' +
             `${settings.prefix}streamlink remove channel\`\nThis command will remove the current text-channel from the list of channels to notify for StreamLink updates. __Admin-only.__\n\n\`` +
-            `${settings.prefix}streamlink remove help\`\nShows the menu you're looking at right now. ;)`;
+            `${settings.prefix}streamlink remove help\`\nShows the menu you're looking at right now. ;)`);
         } else if (perms >= 2) {
           if (message.mentions.users.size > 0) {
             streamlink.removeUser(message, bot, message.mentions.users.first());
@@ -181,7 +181,7 @@ exports.run = (bot, message, args, perms) => {
         `\`${settings.prefix}streamlink enable\`\n` +
         `\`${settings.prefix}streamlink disable\`\n` +
         `\`${settings.prefix}streamlink status\`\n` +
-        `\`${settings.prefix}streamlink help\`;
+        `\`${settings.prefix}streamlink help\`);
       break;
     default:
       message.reply(`\`${message.content}\` is an incorrect command usage! Check \`${settings.prefix}streamlink help\` for more information.`);
