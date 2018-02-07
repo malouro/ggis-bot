@@ -7,7 +7,7 @@
 
 exports.help = {
   name: 'reload',
-  description: 'Reloads the command file, if it\'s been updated or modified.',
+  description: 'Reloads a command file or files, if it\'s been updated or modified.',
   usage: 'reload [command]',
 };
 

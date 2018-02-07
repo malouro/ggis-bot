@@ -11,12 +11,11 @@
   "author": "Michael Louro",
   "license": "MIT",
   "dependencies": {
-    "chalk": "2.2.0",
+    "chalk": "^2.2.0",
     "coffee-script": "1.12.7",
-    "discord.js": "11.2.1",
+    "discord.js": "^11.3.0",
     "escape-html": "1.0.3",
     "feed-read-parser": "0.0.6",
-    "gifencoder": "1.1.0",
     "iconv-lite": "0.4.19",
     "imgur2rss": "malouro/imgur2rss#patch-1",
     "lyrics-fetcher": "1.0.2",
@@ -34,10 +33,10 @@
   },
   "false": {},
   "devDependencies": {
-    "chai": "4.1.2",
-    "eslint": "4.12.1",
-    "eslint-config-airbnb-base": "12.1.0",
-    "eslint-plugin-import": "2.8.0",
-    "mocha": "4.1.0"
+    "chai": "^4.1.2",
+    "eslint": "^4.12.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "mocha": "^4.1.0"
   }
 }

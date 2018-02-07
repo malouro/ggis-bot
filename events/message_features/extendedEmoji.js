@@ -28,17 +28,16 @@ module.exports = (message, settings) =>
     try {
       const g = message.client.guilds.get(settings.testGuild);
       if (typeof g === 'undefined') resolve(message);
-      const emojiData = g.emojis;
       let emojiCodes = [];
       const emojis = new Map();
       let edit = false;
       let str = message.content.toString();
 
-      emojiData.forEach((emoji) => {
+      g.emojis.forEach((emoji) => {
         emojis.set(emoji.name, {
           id: emoji.id,
           name: emoji.name,
-          format: (emoji.animated) ? `<a:${emoji.name}:${emoji.id}>` : `<:${emoji.name}:${emoji.id}>`
+          format: `${(emoji.animated) ? `<a:${emoji.name}:${emoji.id}>` : `<:${emoji.name}:${emoji.id}>`}`,
         });
       });
 
@@ -49,7 +48,7 @@ module.exports = (message, settings) =>
           let e = emojis.get(emoji);
           if (settings.rules.extendedEmoji.edit) {
             edit = true;
-            str = str.replace(`:${e.name}:`, e.format);
+            str = str.replace(`:${e.name}:`, `${e.format}`);
           } else {
             message.react(e.id).then().catch(err => console.log(err));
             resolve(message);

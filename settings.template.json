@@ -5,8 +5,8 @@
   "prefix": "!",
   "commandGroups": [
     {
-      "code": ["debug","help"],
-      "name": "Debug & Help",
+      "code": ["debug","support"],
+      "name": "Debug & Support",
       "description": "Help menus & debug"
     },
     {
