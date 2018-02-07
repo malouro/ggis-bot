@@ -323,6 +323,10 @@ exports.addUser = (message, bot, stream, user) => {
   let object; let userToAdd; let existed; let oldStream;
   if (!stream) return message.reply(`Oops! Something went wrong.\n\nIt appears that no stream name was given with the command usage! Proper format is \`${settings.prefix}streamlink add twitchName\` where \`twitchName\` is your Twitch.tv user name (ie: the end of the URL for your stream <https://www.twitch.tv/THIS_PART_HERE>)`);
   if (!stream.match(RegExChannelName)) return message.reply('The given Twitch.tv channel name doesn\'t comply with the Twitch.tv username requirements! (must be between 4-25 characters, alphanumeric or underscores ONLY [a-zA-Z0-9_])');
+  
+  let noOfConfigs = fs.readdirSync('./config/streamlink/users');
+  let settings = JSON.parse(fs.readFileSync('./settings.json', 'utf8'));
+  if (noOfConfigs.length > settings.streamlink.max_connections) return message.reply(`The max number of StreamLink connections (${settings.streamlink.max_connections}) has been reached! Due to API constraints, no more users can be added for StreamLink. 😦 Sorry!`);
 
   stream = stream.toLowerCase();
 
