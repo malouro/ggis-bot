@@ -1,14 +1,14 @@
 > To document:
-  - Introduction / overview
-  - Commands & features
-  - Setup guide (Windows, Linux, Mac etc)
-  - How to contribute
+- Introduction / overview
+- Commands & features
+- Setup guide (Windows, Linux, Mac etc)
+- How to contribute
 
 # Intro
 
 Ggis-bot is a small, personal summer project that escalated into something a little bigger. Originally designed to be used for a private Discord server with some friends, Ggis sports some pretty useful (as well as some pretty *useless*) features that helps keep us entertained to this day.
 
-## The $%&# is a "Ggis"?
+### The $%&# is a "Ggis"?
 
 My Discord username is Sigg.
 
@@ -16,7 +16,7 @@ Ggis is Sigg backwards.
 
 Yep, there you go.
 
-## Features
+### Features
 
 - **StreamLink** : Pushes notifications when linked users go live on Twitch.tv
 - **LFG** : "Looking for group" helps you find people to play a game with you
@@ -34,12 +34,12 @@ Yep, there you go.
 
 > Still trying to streamline the installation process to make things easier for beginner users
 
-## Requirements
+### Requirements
 
 - Node.js
 
 > todo: Finish requirements section
 
-## Getting set up
+### Getting set up
 
 > todo: Finish set up section
