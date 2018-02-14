@@ -6,7 +6,7 @@
 
 # Intro
 
-Ggis-bot is a small, personal summer project that escalated into something a little bigger. Originally designed to be used for a private Discord server with some friends, Ggis sports some pretty useful (as well as some pretty *useless*) features that helps keep us entertained to this day.
+Ggis-bot was a small, personal summer project that escalated into something a little bigger. Originally designed to be used for a private Discord server among friends, Ggis sports some pretty useful (as well as some pretty *useless*) features that help keep us entertained to this day.
 
 ### The $%&# is a "Ggis"?
 
@@ -16,7 +16,7 @@ Ggis is Sigg backwards.
 
 Yep, there you go.
 
-### Features
+### Features & Commands
 
 - **StreamLink** : Pushes notifications when linked users go live on Twitch.tv
 - **LFG** : "Looking for group" helps you find people to play a game with you
@@ -26,13 +26,18 @@ Yep, there you go.
 - Open up fortune cookies, Random Jaden Smith Tweets, Key & Peele videos, and other useless & silly commands
 - ... and more
 
-(use the `help` command to find out more about what Ggis can do)
+(use the `help` command to get a list of commands)
 
 > todo: command list documentation
 
 # Insallation & Setup
 
 > Still trying to streamline the installation process to make things easier for beginner users
+
+```bash
+npm run setup
+npm start
+```
 
 ### Requirements
 
