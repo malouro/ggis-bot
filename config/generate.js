@@ -22,6 +22,9 @@ const getCode = (name) => {
 
 console.log('Generating a settings.json file for you! Just need some info first...\n\nA (*) means that the setting is required. Otherwise, you can leave the setting blank.\n[Refer to the README for more information on this setup script.]\n');
 
+/* Incoming death pyramid, watch your step... */
+/** @todo There's definitely a better way to do this lol */
+
 rl.question('* Token: (Discord app token, keep this private!) ', (token) => {
   json.token = token;
   rl.question(`* Bot user name (spaces will be trimmed): (${json.botNameProper}) `, (name) => {
