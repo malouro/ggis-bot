@@ -1,9 +1,3 @@
-> To document:
-- Introduction / overview
-- Commands & features
-- Setup guide (Windows, Linux, Mac etc)
-- How to contribute
-
 # Intro
 
 Ggis-bot was a small, personal summer project that escalated into something a little bigger. Originally designed to be used for a private Discord server among friends, Ggis sports some pretty useful (as well as some pretty *useless*) features that help keep us entertained to this day.
@@ -24,11 +18,8 @@ Yep, there you go.
 - Programmable **chat filters**
 - Fetch random posts from any of Reddit's subreddits
 - Open up fortune cookies, Random Jaden Smith Tweets, Key & Peele videos, and other useless & silly commands
-- ... and more
 
-(use the `help` command to get a list of commands)
-
-> todo: command list documentation
+Use the `!help` command to get a full list of commands.
 
 # Insallation & Setup
 
