@@ -12,19 +12,13 @@
   "license": "MIT",
   "dependencies": {
     "chalk": "^2.2.0",
-    "coffee-script": "1.12.7",
     "discord.js": "^11.3.0",
-    "escape-html": "1.0.3",
     "feed-read-parser": "0.0.6",
-    "iconv-lite": "0.4.19",
     "imgur2rss": "malouro/imgur2rss#patch-1",
     "lyrics-fetcher": "1.0.2",
     "mkdirp": "0.5.1",
     "moment": "2.19.1",
-    "node-schedule": "1.2.5",
-    "request": "2.83.0",
     "rmdir": "1.2.0",
-    "rss": "1.2.2",
     "twitchps": "0.5.5"
   },
   "repository": {

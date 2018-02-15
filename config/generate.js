@@ -25,20 +25,20 @@ console.log('Generating a settings.json file for you! Just need some info first.
 /* Incoming death pyramid, watch your step... */
 /** @todo There's definitely a better way to do this lol */
 
-rl.question('* Token: (Discord app token, keep this private!) ', (token) => {
+rl.question('* Token: [Discord app token, keep this private!] ', (token) => {
   json.token = token;
-  rl.question(`* Bot user name (spaces will be trimmed): (${json.botNameProper}) `, (name) => {
+  rl.question(`* Bot user name [spaces will be trimmed]: (${json.botNameProper}) `, (name) => {
     if (name !== '') json.botNameProper = name;
     json.botName = getCode(json.botNameProper);
     rl.question(`* Command prefix: (${json.prefix}) `, (prefix) => {
       if (prefix !== '') json.prefix = prefix;
-      rl.question('* Your Discord User ID: (right click, Copy ID) ', (masterID) => {
+      rl.question('* Your Discord User ID: ( ) [right click, Copy ID] ', (masterID) => {
         json.masterID = masterID;
-        rl.question('* Your Discord Server ID: (right click, Copy ID) ', (mainGuild) => {
+        rl.question('* Your Discord Server ID: ( ) [right click, Copy ID] ', (mainGuild) => {
           json.mainGuild = mainGuild;
-          rl.question('  Test Guild Server ID: (optional) ', (testGuild) => {
+          rl.question('  Test Guild Server ID: ( ) [needed only for ExtendedEmoji] ', (testGuild) => {
             json.testGuild = testGuild;
-            rl.question('  Imgur API Token: (optional) ', (imgurToken) => {
+            rl.question('  Imgur API Token: ( ) [needed only for !reloadfortunes] ', (imgurToken) => {
               json.fortune.token = imgurToken;
               console.log('\nWriting settings.json...');
               fs.writeFile('settings.json', JSON.stringify(json), (err) => {
