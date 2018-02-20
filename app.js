@@ -8,9 +8,7 @@
  *
  * @name Ggis-bot
  * @author Michael Louro
- * @version 1.3.1
  * @license MIT
- *
  */
 
 const Discord = require('discord.js');
