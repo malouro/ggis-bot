@@ -33,7 +33,7 @@ Firstly, you need a Discord development app and its corresponding OAuth token re
 
 - Navigate to [https://discordapp.com/developers/docs/intro](https://discordapp.com/developers/docs/intro), log in with your Discord account and access the **My Apps** page
 - Under the **Bot** section, hit **Create a Bot User**
-- Click **click to reveal** for the bot's token and save this token for later use
+- Click **click to reveal** for the bot's token and *save this token for later use!*
 - Feel free to edit any preferences for your bot while you're here on this page
 - Click **Save Changes** and be on your way
 
