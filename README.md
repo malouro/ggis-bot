@@ -23,19 +23,27 @@ Use the `!help` command to get a full list of commands.
 
 # Insallation & Setup
 
-> Still trying to streamline the installation process to make things easier for beginner users
+### Requirements
+
+- Node.js
+
+### Getting set up
+
+Firstly, you need a Discord development app and its corresponding OAuth token ready.
+
+- Navigate to [https://discordapp.com/developers/docs/intro](https://discordapp.com/developers/docs/intro), log in with your Discord account and access the **My Apps** page
+- Under the **Bot** section, hit **Create a Bot User**
+- Click **click to reveal** for the bot's token and save this token for later use
+- Feel free to edit any preferences for your bot while you're here on this page
+- Click **Save Changes** and be on your way
+
+Run the following commands, in order:
 
 ```bash
 npm run setup
 npm start
 ```
 
-### Requirements
+After `npm run setup`, you will be asked a series of configuration questions. Make sure you have your Discord OAuth token ready for this part, as you will be prompted for it.
 
-- Node.js
-
-> todo: Finish requirements section
-
-### Getting set up
-
-> todo: Finish set up section
+> todo: Finish up this section
