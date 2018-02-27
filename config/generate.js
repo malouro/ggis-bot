@@ -15,10 +15,7 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-const getCode = (name) => {
-  name.replace(/\s/, '');
-  return name.toLowerCase();
-};
+const getCode = (name) => name.replace(/\s/, '').toLowerCase();
 
 console.log('Generating a settings.json file for you! Just need some info first...\n\nA (*) means that the setting is required. Otherwise, you can leave the setting blank.\n[Refer to the README for more information on this setup script.]\n');
 
