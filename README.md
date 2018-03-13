@@ -25,7 +25,7 @@ Use the `!help` command to get a full list of commands.
 
 ### Requirements
 
-- Node.js
+- [Latest Node.js](https://nodejs.org/en/)
 
 ### Getting set up
 
