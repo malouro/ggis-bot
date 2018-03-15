@@ -18,7 +18,7 @@ module.exports = (message, settings) => {
    *  (this is just an example of an arbitrary use for this feature)
    */
 
-  if (message.channel.name.toLowerCase() === 'nosailormoon' && settings.rules.sailorMoon) {
+  if (message.channel.name.toLowerCase() === 'nosailormoon' && settings.rules.filters.sailorMoon) {
     if (message.toString().toLowerCase().match(RegExSailorMoon)) {
       message.delete().then(() => {
         /**

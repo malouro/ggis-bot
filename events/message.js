@@ -17,7 +17,14 @@ module.exports = (message) => {
 
   if (message.channel.type === 'text') {
     if (message.guild.id === settings.mainGuild || message.guild.id === settings.testGuild) {
-      const deleted = msgFilter(message, settings);
+      let deleted;
+
+      if (settings.rules.filters) {
+        deleted = msgFilter(message, settings);
+      } else {
+        deleted = false;
+      }
+
       if (!deleted) {
         // If message *is not* filtered from above, check through autoReact and extEmoji functions
         const extEmojiOn = updatedSettings.rules.extendedEmoji.enable;
