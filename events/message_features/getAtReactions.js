@@ -7,7 +7,7 @@ module.exports = (AtReactions) => {
   try {
     AtReactions.clear();
 
-    const reactions = JSON.parse(fs.readFileSync('./config/atreactions.json', 'utf8'));
+    const reactions = JSON.parse(fs.readFileSync('./config/atReactions.json', 'utf8'));
 
     reactions.reactions.forEach((r) => {
       AtReactions.set(r.id, r);

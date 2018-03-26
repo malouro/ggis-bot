@@ -1,27 +1,5 @@
-/**
- * Initializes everything
- *
- * @param {Discord.Client} bot - Discord.Client object
- * @param {JSON} settings - settings JSON file
- *
- * Sets up the following:
- *
- * (locally, in this file):
- * @var {Array[require()]} handlers - Functions that run outside of the command files themselves.
- * @var {Array[require()]} functionsToReload - Command functions that need to be warned
- *                                             when handlers are being reloaded.
- * @var {null/func} lfgUpdateContainer - Contains the interval function for the LFG updater.
- *
- * (embedded in Discord Client 'bot'):
- * @var {Discord.Collection} bot.commandGroups
- * @var {Discord.Collection} bot.commandGroupCategories
- * @var {Discord.Collection} bot.commands
- * @var {Discord.Collection} bot.aliases
- * @var {Discord.Collection} bot.streamLink.(conf,users,guilds)
- * @var {Discord.Collection} bot.games
- * @var {Discord.Collection} bot.gameAliases
- */
-
+/** Initialization & start up script */
+/** @todo Migrate out these comment blocks into documentation */
 const chalk = require('chalk');
 const Discord = require('discord.js');
 const events = require('./events.json');
@@ -229,11 +207,15 @@ module.exports = (bot, settings) => {
    *                        (corresponds with an element from modes, not modes_proper)
    *  }
    */
-  fs.readdir('./config/lfg', (err, files) => {
+  /**
+   * @todo Per-server LFG game lists
+   * Need to consider how this will be implemented!
+   */
+  fs.readdir('./config/lfg/default', (err, files) => {
     if (err) console.error(err);
     console.log(chalk.bgYellow.black(`Loading a total of ${files.length} games into Games Collection.`));
     files.forEach((f) => {
-      const contents = JSON.parse(fs.readFileSync(`./config/lfg/${f}`, 'utf8'));
+      const contents = JSON.parse(fs.readFileSync(`./config/lfg/default/${f}`, 'utf8'));
       console.log(chalk.bgYellow.gray(`Loading game ... ${contents.name}`));
       bot.games.set(contents.code, contents);
       contents.aliases.forEach((alias) => {

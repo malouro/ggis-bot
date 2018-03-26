@@ -15,8 +15,8 @@ node_modules
 /img/memes/bitchholdon.jpg
 
 # Privacy & security
-/config/atreactions.json
-/config/txtreactions.json
+/config/atReactions.json
+/config/txtReactions.json
 /config/streamlink/users/*
 /config/streamlink/guilds/*
 !/config/streamlink/conf.json

@@ -2,8 +2,6 @@
  * @func !invite
  *
  * @desc Get invite link for the bot
- *
- * @todo More dynamic invite links, autogen a link rather than send a static one
  */
 
 const moment = require('moment');
