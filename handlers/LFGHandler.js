@@ -47,7 +47,7 @@ module.exports = {
         .setDescription(`**Game mode:** ${g.modes_proper[index]}\n**Party size:** ${object.max_party_size}`)
         .setColor(0x009395)
         .setThumbnail(g.thumbnail)
-        .setFooter('Expires at: ')
+        .setFooter('Expires')
         .setTimestamp(object.expire_date)
         .addField('Want to join?', `Click the 👍 below to reserve a spot!\n${object.party_leader_name}: click the 🚫 below to cancel the party.\n\n**Party:** <@${object.party_leader_id}> (1/${object.max_party_size})`);
       bot.channels.get(object.channel).send({ embed }).then((message) => {
@@ -85,7 +85,7 @@ module.exports = {
         .setDescription(`**Game mode:** ${game.modes_proper[mode]}\n**Party size:** ${stack.max_party_size}`)
         .setColor(0x009395)
         .setThumbnail(game.thumbnail)
-        .setFooter('Expires at ')
+        .setFooter('Expires')
         .setTimestamp(stack.expire_date)
         .addField('Want to join?', `Click the 👍 below to reserve a spot!\n${stack.party_leader_name}: click the 🚫 below to cancel the party.\n\n**Party:** ${stack.party.map(m => `<@${m}>`).join(' ')} (${stack.party.length}/${stack.max_party_size})`);
       const ch = bot.channels.get(stack.channel);
@@ -132,7 +132,7 @@ module.exports = {
           .setDescription(`**Game mode:** ${game.modes_proper[mode]}\n**Party size:** ${stack.max_party_size}`)
           .setColor(0x009395)
           .setThumbnail(game.thumbnail)
-          .setFooter('Expires at ')
+          .setFooter('Expires')
           .setTimestamp(stack.expire_date)
           .addField('Want to join?', `Click the 👍 below to reserve a spot!\n${stack.party_leader_name}: click the 🚫 below to cancel the party.\n\n**Party:** ${stack.party.map(m => `<@${m}>`).join(' ')} (${stack.party.length}/${stack.max_party_size})`);
         const ch = bot.channels.get(stack.channel);
@@ -162,7 +162,7 @@ module.exports = {
         .setDescription(`**Game mode:** ${game.modes_proper[mode]}\n**Party size:** ${stack.max_party_size}`)
         .setColor(0x009395)
         .setThumbnail(game.thumbnail)
-        .setFooter('Timed out at ')
+        .setFooter('Timed out')
         .setTimestamp()
         .addField('⏰ **This LFG request has timed out.** ⏰', `**Party:** ${stack.party.map(m => `<@${m}>`).join(' ')} (${stack.party.length}/${stack.max_party_size})`);
       const ch = bot.channels.get(stack.channel);
@@ -249,7 +249,7 @@ module.exports = {
         .setTitle(`${stack.party_leader_name}'s party has been cancelled`)
         .setDescription(`**Game:** ${stack.game}\n**Game mode:** ${game.modes_proper[mode]}\n**Party:** ${stack.party.map(m => `<@${m}>`).join(' ')} (${stack.party.length}/${stack.max_party_size})`)
         .setColor(0x009395)
-        .setFooter('Cancelled at ')
+        .setFooter('Cancelled')
         .setTimestamp()
         .setThumbnail('https://i.imgur.com/jSYuGrc.png');
       if (removed) {
