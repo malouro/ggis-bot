@@ -29,24 +29,23 @@ Use the `!help` command to get a full list of commands.
 
 ### Getting set up
 
-> Todo: Do a trial run of a user's first time setup
+Firstly, you need a Discord development app and its corresponding OAuth token ready. Here's how to do this:
 
-Firstly, you need a Discord development app and its corresponding OAuth token ready.
+1. Navigate to [https://discordapp.com/developers/docs/intro](https://discordapp.com/developers/docs/intro), log in with your Discord account and access the **My Apps** page
+2. Under the **Bot** section, hit **Create a Bot User**
+3. Click **click to reveal** for the bot's token and *save this token for later use!*
+4. At the top of the page, under **App details** there should be a **Client ID**. We'll need this soon!
+5. (Feel free to edit any other preferences for your bot while you're here on this page, because we're about to navigate away from it.)
+6. Click **Save Changes** to save your bot's information.
+7. Paste the following URL into your browser, but replace **INSERT_CLIENT_ID_HERE** with your Client ID from step 4: `https://discordapp.com/oauth2/authorize?client_id=INSERT_CLIENT_ID_HERE&scope=bot&permissions=523762774`<br>This will invite your bot into a server of your choice! (Note: You need to have the 'Manage server' permission on the server you wish to invite the bot into.)
 
-- Navigate to [https://discordapp.com/developers/docs/intro](https://discordapp.com/developers/docs/intro), log in with your Discord account and access the **My Apps** page
-- Under the **Bot** section, hit **Create a Bot User**
-- Click **click to reveal** for the bot's token and *save this token for later use!*
-- (Feel free to edit any preferences for your bot while you're here on this page)
-> Todo: add how to invite bot into your server here
-- Click **Save Changes** and be on your way
-
-Then, run the following command within the project directory:
+Run the following command in a command prompt within the project directory:
 
 ```bash
 npm run setup
 ```
 
-After `npm run setup`, you will be asked a series of configuration questions. Make sure you have your OAuth token ready for this part, as you will be prompted for it.
+During this setup script, you will be asked a series of configuration questions. Make sure you have your OAuth token ready for this part, as you will be prompted for it.
 
 ### Start the bot
 
