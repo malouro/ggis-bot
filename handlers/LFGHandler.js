@@ -239,7 +239,6 @@ module.exports = {
    * @param id - LFG id
    * @param removed - Whether the LFG party message was removed or not
    */
-  /* eslint-disable */
   cancel(bot, id, removed) {
     try {
       const stack = bot.lfgStack.get(id);
@@ -252,21 +251,24 @@ module.exports = {
         .setFooter('Cancelled')
         .setTimestamp()
         .setThumbnail('https://i.imgur.com/jSYuGrc.png');
+
       if (removed) {
         bot.lfgStack.delete(id);
         if (bot.lfgStack.size === 0) bot.lfgUpdate(false);
         return console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG party for ${stack.game} has been deleted.`));
       }
-      const ch = bot.channels.get(stack.channel);
-      ch.fetchMessage(stack.id).then((message) => {
+
+      bot.channels.get(stack.channel).fetchMessage(stack.id).then((message) => {
         message.edit({ embed }).then(() => {
           bot.lfgStack.delete(id);
           if (bot.lfgStack.size === 0) bot.lfgUpdate(false);
-          console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG party for ${stack.game} has been cancelled.`));
+          return console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG party for ${stack.game} has been cancelled.`));
         }).catch(err => console.log(err));
       }).catch(err => console.log(err));
+
+      return 0;
     } catch (err) {
-      console.log(err);
+      return console.log(err);
     }
   },
 
@@ -279,9 +281,16 @@ module.exports = {
   update(bot) {
     try {
       const d = new Date();
+
       bot.lfgStack.forEach((l) => {
+        /** Booleans to check */
         const timedOut = (d.getTime() >= l.time + (l.ttl * 60000));
-        let sendWarning = ((l.ttl >= settings.lfg.ttl_threshold) && !l.warning && settings.lfg.ttl_warning && (l.time + ((l.ttl * 60000) - d.getTime()) <= Math.round((l.ttl * 60000) / 4)));
+        const ttlExceedsThreshold = l.ttl >= settings.lfg.ttl_threshold;
+        const alreadySentWarning = l.warning;
+        const shouldSendWarning = settings.lfg.ttl_warning;
+        const warningTimeMet = (l.time + ((l.ttl * 60000) - d.getTime())) <= (Math.round((l.ttl * 60000) / 4));
+        const sendWarning = (ttlExceedsThreshold && !alreadySentWarning && shouldSendWarning && warningTimeMet);
+
         if (timedOut) {
           this.timeout(bot, l.id);
         } else if (sendWarning) {
