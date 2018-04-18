@@ -11,11 +11,11 @@
  * @license MIT
  */
 
-const Discord = require('discord.js');
-const settings = require('./settings.json');
+const Discord = require('discord.js'); /* discord.js */
+const settings = require('./settings.json'); /* get bot config */
 
-const bot = new Discord.Client();
+const bot = new Discord.Client(); /* make bot client */
 
-require('./handlers/Setup')(bot, settings);
+require('./handlers/Setup')(bot, settings); /* setup */
 
-bot.login(settings.token);
+bot.login(settings.token); /* login */
