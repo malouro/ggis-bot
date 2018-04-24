@@ -1,0 +1,10 @@
+{
+    "code": "barotrauma",
+    "name": "Barotrauma",
+    "aliases": [],
+    "thumbnail": "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/e9/e965b7964b4195bd1427fcb67ae1b175931a09d9_full.jpg",
+    "default_party_size": [16],
+    "modes": ["any"],
+    "modes_proper": ["Any"],
+    "default_game_mode": "any"
+}
