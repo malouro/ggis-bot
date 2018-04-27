@@ -67,8 +67,9 @@
   "lfg": {
     "ttl_default": 15,
     "ttl_warning": true,
-    "ttl_max": 180,
+    "ttl_max": 1440,
     "ttl_threshold": 30,
+    "min_party_size": 2,
     "max_party_size": 32,
     "split_value": 25
   },

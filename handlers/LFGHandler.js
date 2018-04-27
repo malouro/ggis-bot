@@ -50,6 +50,7 @@ module.exports = {
         .setFooter('Expires')
         .setTimestamp(object.expire_date)
         .addField('Want to join?', `Click the 👍 below to reserve a spot!\n${object.party_leader_name}: click the 🚫 below to cancel the party.\n\n**Party:** <@${object.party_leader_id}> (1/${object.max_party_size})`);
+
       bot.channels.get(object.channel).send({ embed }).then((message) => {
         object.id = message.id;
         bot.lfgStack.set(object.id, object);
@@ -59,9 +60,9 @@ module.exports = {
             console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${object.party_leader_name} made an LFG for ${object.game} | ${object.mode} | party of ${object.max_party_size} | ${object.ttl} minutes`));
           }).catch(err => console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] ${err}`)));
         }).catch(err => console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] ${err}`)));
-      }).catch(err => console.log(err));
+      }).catch(err => console.error(err));
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   },
 
@@ -90,23 +91,25 @@ module.exports = {
         .addField('Want to join?', `Click the 👍 below to reserve a spot!\n${stack.party_leader_name}: click the 🚫 below to cancel the party.\n\n**Party:** ${stack.party.map(m => `<@${m}>`).join(' ')} (${stack.party.length}/${stack.max_party_size})`);
       const ch = bot.channels.get(stack.channel);
       const g = ch.guild;
+
       ch.fetchMessage(stack.id).then((message) => {
         message.edit({ embed }).then(() => {
-        }).catch(err => console.log(err));
-      }).catch(err => console.log(err));
+        }).catch(err => console.error(err));
+      }).catch(err => console.error(err));
+
       bot.lfgStack.set(id, stack);
 
       // Attempt to move user into party leader's channel
       const memberToMoveTo = g.members.get(bot.lfgStack.get(id).party_leader_id);
       const memberToMove = g.members.get(userid);
       if (typeof memberToMoveTo.voiceChannel !== 'undefined') {
-        memberToMove.edit({ channel: memberToMoveTo.voiceChannelID }, `Moved by @${settings.botNameProper} for LFG`).then().catch(err => console.log(err));
+        memberToMove.edit({ channel: memberToMoveTo.voiceChannelID }, `Moved by @${settings.botNameProper} for LFG`).then().catch(err => console.error(err));
       }
 
       // Check if the party is full
       if (stack.party.length === stack.max_party_size) this.complete(bot, id);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   },
 
@@ -138,10 +141,10 @@ module.exports = {
         const ch = bot.channels.get(stack.channel);
         ch.fetchMessage(stack.id).then((message) => {
           message.edit({ embed }).then(() => {
-          }).catch(err => console.log(err));
-        }).catch(err => console.log(err));
+          }).catch(err => console.error(err));
+        }).catch(err => console.error(err));
       } else return;
-    } catch (err) { console.log(err); }
+    } catch (err) { console.error(err); }
   },
 
   /**
@@ -171,10 +174,10 @@ module.exports = {
         if (bot.lfgStack.size === 0) bot.lfgUpdate(false);
         message.edit({ embed }).then(() => {
           console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG for ${stack.game} has timed out.`));
-        }).catch(err => console.log(err));
-      }).catch(err => console.log(err));
+        }).catch(err => console.error(err));
+      }).catch(err => console.error(err));
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   },
 
@@ -200,7 +203,7 @@ module.exports = {
       ch.send({ embed });
       console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG is running out of time.`));
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   },
 
@@ -221,13 +224,17 @@ module.exports = {
         .setDescription(`**Game:** ${stack.game}\n**Game mode:** ${game.modes_proper[mode]}\n**Party:** ${stack.party.map(m => `<@${m}>`).join(' ')}`)
         .setColor(0x009395)
         .setThumbnail('https://i.imgur.com/RsRmWcm.png');
+
       const ch = bot.channels.get(stack.channel);
       ch.send({ embed });
+
+      // Remove from LFG stack
       bot.lfgStack.delete(id);
       if (bot.lfgStack.size === 0) bot.lfgUpdate(false);
+
       console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG party for ${stack.game} is full.`));
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   },
 
@@ -252,23 +259,26 @@ module.exports = {
         .setTimestamp()
         .setThumbnail('https://i.imgur.com/jSYuGrc.png');
 
+      // If the message was deleted, do this stuff:
       if (removed) {
         bot.lfgStack.delete(id);
         if (bot.lfgStack.size === 0) bot.lfgUpdate(false);
         return console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG party for ${stack.game} has been deleted.`));
       }
 
+      // Attempt to fetch message
       bot.channels.get(stack.channel).fetchMessage(stack.id).then((message) => {
         message.edit({ embed }).then(() => {
+          // Remove from LFG stack and edit message
           bot.lfgStack.delete(id);
           if (bot.lfgStack.size === 0) bot.lfgUpdate(false);
           return console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG party for ${stack.game} has been cancelled.`));
-        }).catch(err => console.log(err));
-      }).catch(err => console.log(err));
+        }).catch(err => console.error(err));
+      }).catch(err => console.error(err));
 
       return 0;
     } catch (err) {
-      return console.log(err);
+      return console.error(err);
     }
   },
 
@@ -299,7 +309,7 @@ module.exports = {
         }
       });
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   },
 };

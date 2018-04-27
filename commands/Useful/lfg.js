@@ -11,6 +11,52 @@ const lfgFuncMRR = require('../../events/messageReactionRemove');
 const lfgFuncMD = require('../../events/messageDelete');
 const settings = require('../../settings');
 
+// eslint-disable-next-line no-restricted-globals
+// const isNumeric = n => !isNaN(parseFloat(n)) && isFinite(n);
+
+const countRegexMatches = (str, regex) => {
+  const re = RegExp(regex, 'g');
+  return ((str || '').match(re) || []).length;
+};
+
+const parseRestArgs = (args) => {
+  let hours = 0;
+  let mins = -1;
+  let partySize = 0;
+  const timeRegexHoursMins = /[0-9]+h[0-9]+m/;
+  const timeRegexMinsHours = /[0-9]+m[0-9]+h/;
+  const timeRegexHours = /[0-9]+h/;
+  const timeRegexMins = /[0-9]+m/;
+  const regexJustNumber = /[0-9]+(?!\D)/;
+
+  args.forEach((arg) => {
+    if (arg.match(timeRegexHoursMins)) {
+      const argArray = arg.split('h');
+      hours = parseInt(argArray[0], 10);
+      mins = parseInt(argArray[1], 10);
+    } else if (arg.match(timeRegexMinsHours)) {
+      const argArray = arg.split('m');
+      mins = parseInt(argArray[0], 10);
+      hours = parseInt(argArray[1], 10);
+    } else if (arg.match(timeRegexHours)) {
+      hours = parseInt(arg.split('h')[0], 10);
+    } else if (arg.match(timeRegexMins)) {
+      mins = parseInt(arg.split('m')[0], 10);
+    } else if (arg.match(regexJustNumber)) {
+      const countMatches = countRegexMatches(arg, /\d/);
+
+      if (countMatches === arg.length) {
+        partySize = parseInt(arg, 10);
+      }
+    }
+  });
+
+  return [hours, mins, partySize];
+};
+
+/**
+ * @todo FIX HELP MENU FOR NEW TTL AND PARTY SIZE METHODS
+ */
 exports.help = {
   name: 'lfg',
   description: 'Look for players to join you in a game',
@@ -214,10 +260,43 @@ exports.run = (bot, message, args, perms) => {
       j = game.modes.indexOf(game.default_game_mode);
     }
 
-    /** Get the party size: */
-    if (args[3] && typeof args[3] !== 'number') {
-      partySize = (args[3] === 'default') ? game.default_party_size[j] : parseInt(args[3], 10);
-      if (partySize < 2) {
+    if (args[3]) {
+      // parse arguments for Party Size and TTL
+      const parsedArgs = parseRestArgs(args.slice(3));
+
+      ttl = parsedArgs[1] === -1 && parsedArgs[0] !== 0 ?
+        (parsedArgs[0] * 60) :
+        (parsedArgs[0] * 60) + parsedArgs[1];
+      // eslint-disable-next-line prefer-destructuring
+      partySize = parsedArgs[2];
+
+      if (partySize === 0) {
+        // set to default party size if parsing returned nothing
+        partySize = game.default_party_size[j];
+      } else if (partySize < settings.lfg.min_party_size) {
+        // if the party size is too small, send an error message to user
+        return message.reply('Party size must be more than 1!');
+      } else if (partySize > settings.lfg.max_party_size) {
+        // if the party size is too big, send an error message to user
+        return message.reply(`That party size is a little too big for LFG... Tone it down a bit alright? (the max is ${settings.lfg.max_party_size})`);
+      }
+
+      if (ttl === -1) {
+        // set to default ttl if parsing returned nothing
+        ttl = settings.lfg.ttl_default;
+      } else if (ttl < 1) {
+        // if ttl given is too small, send an error message to user
+        return message.reply('The LFG timer must be at least 1 minute!');
+      } else if (ttl > settings.lfg.ttl_max) {
+        // if ttl given is too big, send an error message to user
+        return message.reply(`That LFG timer is a little too long... Bring it down a notch. (the max is ${settings.lfg.ttl_max / 60} hours)`);
+      }
+    }
+
+    /*
+    if (args[3] && isNumeric(args[3])) {
+      partySize = parseInt(args[3], 10);
+      if (partySize < settings.lfg.min_party_size) {
         // if the party size is too small, send an error message to user
         return message.reply('Party size must be more than 1!');
       } else if (partySize > settings.lfg.max_party_size) {
@@ -225,11 +304,8 @@ exports.run = (bot, message, args, perms) => {
         return message.reply(`That party size is a little too big for LFG... Tone it down a bit alright? (the max is ${settings.lfg.max_party_size})`);
       }
     } else {
-      // if nothing is given, or what is given is NOT a number, set to default value
       partySize = game.default_party_size[j];
     }
-
-    // Get the TTL:
     if (args[4] && typeof args[4] !== 'number') {
       ttl = (args[4] === 'default') ? ttl = settings.lfg.ttl_default : parseInt(args[4], 10);
       if (ttl < 1) {
@@ -243,6 +319,7 @@ exports.run = (bot, message, args, perms) => {
       // if nothings is given, or what is given is NOT a number, set to default value
       ttl = settings.lfg.ttl_default;
     }
+    */
 
     /**
      * Now that all the info has been acquired from the command arguments sent...
