@@ -291,35 +291,10 @@ exports.run = (bot, message, args, perms) => {
         // if ttl given is too big, send an error message to user
         return message.reply(`That LFG timer is a little too long... Bring it down a notch. (the max is ${settings.lfg.ttl_max / 60} hours)`);
       }
-    }
-
-    /*
-    if (args[3] && isNumeric(args[3])) {
-      partySize = parseInt(args[3], 10);
-      if (partySize < settings.lfg.min_party_size) {
-        // if the party size is too small, send an error message to user
-        return message.reply('Party size must be more than 1!');
-      } else if (partySize > settings.lfg.max_party_size) {
-        // if the party size is too big, send an error message to user
-        return message.reply(`That party size is a little too big for LFG... Tone it down a bit alright? (the max is ${settings.lfg.max_party_size})`);
-      }
     } else {
       partySize = game.default_party_size[j];
-    }
-    if (args[4] && typeof args[4] !== 'number') {
-      ttl = (args[4] === 'default') ? ttl = settings.lfg.ttl_default : parseInt(args[4], 10);
-      if (ttl < 1) {
-        // if ttl given is too small, send an error message to user
-        return message.reply('The LFG timer must be at least 1 minute!');
-      } else if (ttl > settings.lfg.ttl_max) {
-        // if ttl given is too big, send an error message to user
-        return message.reply(`That LFG timer is a little too long... Bring it down a notch. (the max is ${settings.lfg.ttl_max} minutes)`);
-      }
-    } else {
-      // if nothings is given, or what is given is NOT a number, set to default value
       ttl = settings.lfg.ttl_default;
     }
-    */
 
     /**
      * Now that all the info has been acquired from the command arguments sent...
