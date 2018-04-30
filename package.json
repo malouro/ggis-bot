@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "setup": "npm install && node ./scripts/generate.js",
+    "setup": "npm install && node ./scripts/setup.js",
     "generate": "node ./scripts/generate.js"
   },
   "author": "Michael Louro",
