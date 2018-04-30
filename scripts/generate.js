@@ -124,7 +124,7 @@ const askForMasterID = () =>
     }
   });
 
-const askForMasterGuild = () =>
+const askForMainGuild = () =>
   new Promise((resolve, reject) => {
     try {
       rl.question('* Your Discord Server ID: ( ) [right click, Copy ID] ', (mainGuild) => {
@@ -178,9 +178,9 @@ const askForImgurToken = () =>
       json.masterID = masterID;
     }
 
-    const masterGuild = await askForMasterGuild();
-    if (masterGuild !== '') {
-      json.masterGuild = masterGuild;
+    const mainGuild = await askForMainGuild();
+    if (mainGuild !== '') {
+      json.mainGuild = mainGuild;
     }
 
     const testGuild = await askForTestGuild();
