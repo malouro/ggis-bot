@@ -1,0 +1,10 @@
+{
+    "code": "stardew",
+    "name": "Stardew Valley",
+    "aliases": [],
+    "thumbnail": "http://www.stickpng.com/assets/images/58f367aca4fa116215a923ef.png",
+    "default_party_size": [4, 4, 4],
+    "modes": ["any", "online", "coop"],
+    "modes_proper": ["Any", "Online Co-Op", "Online Co-Op"],
+    "default_game_mode": "any"
+}
