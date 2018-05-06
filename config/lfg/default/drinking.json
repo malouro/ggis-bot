@@ -1,7 +1,7 @@
 {
     "code": "drinking",
     "name": "🍺",
-    "aliases": ["drinkinggames", "gettingdrunk", "gettingcrunk", "gettinglit", "cincodemayo"],
+    "aliases": ["drinkinggames", "gettingdrunk", "gettingcrunk", "gettinglit"],
     "thumbnail": "http://icons.iconarchive.com/icons/flat-icons.com/flat/256/Beer-icon.png",
     "default_party_size": [64],
     "modes": ["any"],

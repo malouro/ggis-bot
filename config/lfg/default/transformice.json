@@ -1,0 +1,10 @@
+{
+    "code": "transformice",
+    "name": "Transformice",
+    "aliases": [],
+    "thumbnail": "https://vignette.wikia.nocookie.net/transformice/images/c/c2/Transformice_Logo.png",
+    "default_party_size": [12],
+    "modes": ["any"],
+    "modes_proper": ["Any"],
+    "default_game_mode": "any"
+}
