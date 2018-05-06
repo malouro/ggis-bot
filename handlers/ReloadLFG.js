@@ -27,7 +27,7 @@ module.exports = (bot, game) => {
   return new Promise((resolve, reject) => {
     try {
       if (game === 0) { // If no game specified, reset all LFG games
-        fs.readdir('./config/lfg', (err, files) => {
+        fs.readdir('./config/lfg/default', (err, files) => {
           if (err) reject(err);
           bot.games.clear();
           console.log(chalk.bgHex('#ffcc00').white('RELOADING LFG GAMES:'));
@@ -42,7 +42,7 @@ module.exports = (bot, game) => {
           });
         });
       } else { // otherwise, reload the given game
-        fs.readFile(`./config/lfg/${game}.json`, (err, file) => {
+        fs.readFile(`./config/lfg/default/${game}.json`, (err, file) => {
           if (err && err.code === 'ENOENT') {
             console.log(`Couldn't find file for ${game} in /lfg/`);
             reject(new Error(`Couldn't find file for ${game} in /lfg/`));
