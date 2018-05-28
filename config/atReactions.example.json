@@ -1,0 +1,20 @@
+{
+  "reactions": [
+    {
+      "id": "A Discord User ID",
+      "name": "Describes who this AutoReaction applies to. Purely for descriptive purposes",
+      "emoji": [
+        "🤔",
+        "🙃",
+        ":CustomEmoji:1234567890"
+      ]
+    },
+    {
+      "id": "Another Discord User ID",
+      "name": "Names don't really matter, they can be whatever.",
+      "emoji": [
+        "Type the emoji with a backslash appended to get the proper formatted emoji to put in this"
+      ]
+    }
+  ]
+}
