@@ -1,6 +1,8 @@
 /**
- * Attaches JavaScript to each of the bot's needed event listeners
- * @param {String} event
+ * Attaches a function to each of the bot's needed event listeners
+ *
+ * @param {Discord.Client} bot
+ * @param {JSON} settings
  */
 
 const reqEvent = event => require(`../events/${event}`);
