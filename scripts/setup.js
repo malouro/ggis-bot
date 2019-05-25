@@ -1,3 +1,1 @@
-const generateScripts = require('./generate');
-
-generateScripts();
+require('./generate');

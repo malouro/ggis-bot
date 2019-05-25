@@ -6,20 +6,23 @@
   "scripts": {
     "start": "node app.js",
     "setup": "npm install && node ./scripts/setup.js",
-    "generate": "node ./scripts/generate.js"
+    "generate": "node ./scripts/generate.js",
+    "clean": "rimraf node_modules",
+    "clean:install": "npm run clean && npm install",
+    "lint": "eslint ."
   },
   "author": "Michael Louro",
   "license": "MIT",
   "dependencies": {
-    "chalk": "^2.2.0",
-    "discord.js": "^11.3.0",
+    "chalk": "^2.4.2",
+    "discord.js": "^11.4.2",
     "feed-read-parser": "0.0.6",
-    "imgur2rss": "malouro/imgur2rss#patch-1",
+    "imgur2rss": "github:malouro/imgur2rss#patch-1",
     "lyrics-fetcher": "1.0.2",
     "mkdirp": "0.5.1",
     "moment": "2.21.0",
-    "rmdir": "1.2.0",
-    "twitchps": "0.5.5"
+    "rimraf": "^2.6.3",
+    "twitchps": "^1.1.0"
   },
   "repository": {
     "type": "git",
@@ -27,10 +30,10 @@
   },
   "false": {},
   "devDependencies": {
-    "chai": "^4.1.2",
-    "eslint": "^4.12.1",
+    "chai": "^4.2.0",
+    "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-import": "^2.16.0",
     "mocha": "^4.1.0"
   }
 }

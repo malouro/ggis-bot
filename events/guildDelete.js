@@ -4,7 +4,7 @@
 const chalk = require('chalk');
 const fs = require('fs');
 const moment = require('moment');
-const rmdir = require('rmdir');
+const rmdir = require('rimraf');
 const conf = require('../settings');
 
 let streamlink = require('../handlers/StreamLinkHandler');
