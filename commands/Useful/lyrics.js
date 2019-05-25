@@ -51,7 +51,7 @@ exports.run = (bot, message, args) => {
       message.reply('*Woops!* Something went wrong...\n\nCouldn\'t find the artist/song 😦 (possibly due to the request having unsearchable symbols or characters)');
       console.log(err);
     } else {
-      message.channel.send((lyrics.length + str.length > 1996) ? `${str + lyrics.substr(0, 1996 - str.length)}\n\`\`\`` : `${str + lyrics  }\n\`\`\``);
+      message.channel.send((lyrics.length + str.length > 1996) ? `${str + lyrics.substr(0, 1996 - str.length)}\n\`\`\`` : `${str + lyrics}\n\`\`\``);
       console.log(`[${moment().format(settings.timeFormat)}] ${message.author.username} requested lyrics for ${artist} - ${song}`);
     }
   });

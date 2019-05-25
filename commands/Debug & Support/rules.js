@@ -21,14 +21,15 @@ exports.help = {
 };
 
 exports.conf = {
-  enabled: true,
-  visible: true,
+  enabled: false,
+  visible: false,
   guildOnly: true,
   textChannelOnly: true,
   aliases: [`${settings.botname}rules`],
   permLevel: 3,
 };
 
+/* eslint-disable */
 exports.run = (bot, message, args) => {
   /** STARTING OVER */
 };

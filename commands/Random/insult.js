@@ -21,6 +21,7 @@ exports.conf = {
   permLevel: 4,
 };
 
+/* eslint-disable */
 exports.run = (bot, message, args) => {
   /** WIP */
 };

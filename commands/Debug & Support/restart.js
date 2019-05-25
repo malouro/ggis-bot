@@ -2,7 +2,7 @@
  * @func !restart
  *
  * @desc Restarts the app through Node.js 'process.exit()'.
- *       pm2 (if set up) will auto-restart node apps when they crash or shut down, 
+ *       pm2 (if set up) will auto-restart node apps when they crash or shut down,
  *       so process.exit() will 'restart' the bot
  *
  *  - Should ONLY be used by the bot owner(s) for debug purposes or when things go awry.

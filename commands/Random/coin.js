@@ -36,7 +36,12 @@ const getStats = (flips) => {
   });
 
   // Returns [ # of heads, # of tails, % heads, % tails ]
-  return [heads, tails, toFixedDown((heads / (heads + tails)) * 100, 4), toFixedDown((tails / (heads + tails)) * 100, 4)];
+  return [
+    heads,
+    tails,
+    toFixedDown((heads / (heads + tails)) * 100, 4),
+    toFixedDown((tails / (heads + tails)) * 100, 4),
+  ];
 };
 
 const flip = (noOfCoins) => {
