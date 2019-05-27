@@ -11,23 +11,21 @@ const lfgFuncMRR = require('../../events/messageReactionRemove');
 const lfgFuncMD = require('../../events/messageDelete');
 const settings = require('../../settings');
 
-// eslint-disable-next-line no-restricted-globals
-// const isNumeric = n => !isNaN(parseFloat(n)) && isFinite(n);
+const countRegexMatches = (str, regex) => (str.match(new RegExp(regex, 'g')) || []).length;
 
-const countRegexMatches = (str, regex) => {
-  const re = RegExp(regex, 'g');
-  return ((str || '').match(re) || []).length;
-};
-
-const parseRestArgs = (args) => {
+const parseRestArgs = (args, bot, game) => {
   let hours = 0;
   let mins = -1;
   let partySize = 0;
-  const timeRegexHoursMins = /[0-9]+h[0-9]+m/;
-  const timeRegexMinsHours = /[0-9]+m[0-9]+h/;
-  const timeRegexHours = /[0-9]+h/;
-  const timeRegexMins = /[0-9]+m/;
-  const regexJustNumber = /[0-9]+(?!\D)/;
+  let platform = null;
+  let rank = null;
+
+  const timeRegexHoursMins = /$[0-9]+h[0-9]+m/;
+  const timeRegexMinsHours = /$[0-9]+m[0-9]+h/;
+  const timeRegexHours = /$[0-9]+h/;
+  const timeRegexMins = /$[0-9]+m/;
+  const regexJustNumber = /$[0-9]+(?!\D)/;
+  const isAWord = /[a-z0-9]+/;
 
   args.forEach((arg) => {
     if (arg.match(timeRegexHoursMins)) {
@@ -48,10 +46,22 @@ const parseRestArgs = (args) => {
       if (countMatches === arg.length) {
         partySize = parseInt(arg, 10);
       }
+    } else if (arg.match(isAWord)) {
+      // Argument is a word... is it a platform?
+      if (bot.platforms.has(arg) || bot.platformAliases.has(arg)) {
+        const platformToCheck = bot.platforms.get(arg) || bot.platforms.get(bot.platformAliases.get(arg));
+
+        // Only add platform if it's a platform listed under the game
+        if (game.platforms.includes(platformToCheck.code)) {
+          platform = platformToCheck;
+        }
+      } else if (game.ranks.has(arg)) {
+        rank = game.ranks_proper[game.ranks.indexOf(arg)];
+      }
     }
   });
 
-  return [hours, mins, partySize];
+  return [hours, mins, partySize, platform, rank];
 };
 
 /**
@@ -60,20 +70,21 @@ const parseRestArgs = (args) => {
 exports.help = {
   name: 'lfg',
   description: 'Look for players to join you in a game',
-  usage: 'lfg <game> [mode] [partySize] [expirationTime(in minutes)]\n\n<game> is *mandatory*, and doesn\'t include spaces\n[mode], [partSize], [expirationTime] are all optional' +
-    '\n\n- These three options, if used, must be given *consecutivtely and in order*.' +
-    '\n- That is, in order to give the party size, you must have a mode chosen, and in order to specify the time left to expire, you must have a party size set.' +
-    '\n\n- Default gamemode & party size lety dependening on the game/gamemode respectively\n- \'Any\' & \'default\' are valid gamemodes for every game!' +
-    `\n- Default time is set to ${settings.lfg.ttl_default} minutes.\n- Party size & time must be given as positive integers.` +
-    `\n\nMore LFG Commands ::\nUse "${settings.prefix}lfg list" to see what games you can use!` +
-    `\nUse "${settings.prefix}lfg list <game>" to see more info on a specific game` +
-    `\nUse "${settings.prefix}lfg help" as an alternative way to access this help menu` +
-    `\n\nExamples ::\n${settings.prefix}lfg lol aram 4 20  ║ League of Legends - ARAM - Party of 4 - 20 minute timer\n` +
-    `${settings.prefix}lfg pubg default 2 ║ PUBG - Any gamemode - Party of 2 - Default timer\n` +
-    `${settings.prefix}lfg ow any         ║ Overwatch - Default gamemode - Default party size - Default timer\n` +
-    '\nWarnings :: (these won\'t work the way you probably intended them to)\n' +
-    `${settings.prefix}lfg dota2 4 20     ║ Doesn't give gamemode before party size or timer\n` +
-    `${settings.prefix}lfg rl hoops any   ║ 'Any' is not a valid party size, should be a number! (or 'default')`,
+  usage: 'lfg <game> [mode] [platform] [ranking] [partySize] [expirationTime(*h*m format))]' +
+         '\n\n<game> is *mandatory*, and doesn\'t include spaces\n[mode], [partySize], [expirationTime] are all optional' +
+         '\n\n- These three options, if used, must be given *consecutively and in order*.' +
+         '\n- That is, in order to give the party size, you must have a mode chosen, and in order to specify the time left to expire, you must have a party size set.' +
+         '\n\n- Default gamemode & party size depend on the game and gamemode respectively\n- \'Any\' & \'default\' are valid gamemodes for every game!' +
+         `\n- Default time is set to ${settings.lfg.ttl_default} minutes.\n- Party size & time must be given as positive integers.` +
+         `\n\nMore LFG Commands ::\nUse "${settings.prefix}lfg list" to see what games you can use!` +
+         `\nUse "${settings.prefix}lfg list <game>" to see more info on a specific game` +
+         `\nUse "${settings.prefix}lfg help" as an alternative way to access this help menu` +
+         `\n\nExamples ::\n${settings.prefix}lfg lol aram 4 20  ║ League of Legends - ARAM - Party of 4 - 20 minute timer\n` +
+         `${settings.prefix}lfg pubg default 2 ║ PUBG - Default gamemode - Party of 2 - Default timer\n` +
+         `${settings.prefix}lfg ow any         ║ Overwatch - Any gamemode - Default party size - Default timer\n` +
+         '\nWarnings :: (these won\'t work the way you probably intended them to)\n' +
+         `${settings.prefix}lfg dota2 4 20     ║ Doesn't give gamemode before party size or timer\n` +
+         `${settings.prefix}lfg rl hoops any   ║ 'Any' is not a valid party size, should be a number! (or 'default')`,
 };
 
 exports.conf = {
@@ -99,10 +110,12 @@ exports.run = (bot, message, args, perms) => {
   let j;
   let ttl;
   let partySize;
+  let platform = null;
+  let rank = null;
 
   // Convert everything to lower case before doing anything
   args.forEach((a, i) => {
-    args[i] = a.toLowerCase();
+    args[i] = a.toLocaleLowerCase();
   });
 
   if (args[1] === 'add') {
@@ -261,14 +274,14 @@ exports.run = (bot, message, args, perms) => {
     }
 
     if (args[3]) {
-      // parse arguments for Party Size and TTL
-      const parsedArgs = parseRestArgs(args.slice(3));
+      // parse arguments for Party Size, TTL, Platform and Rank
+      const parsedArgs = parseRestArgs(args.slice(3), bot, game);
 
       ttl = parsedArgs[1] === -1 && parsedArgs[0] !== 0 ?
         (parsedArgs[0] * 60) :
         (parsedArgs[0] * 60) + parsedArgs[1];
-      // eslint-disable-next-line prefer-destructuring
-      partySize = parsedArgs[2];
+
+      [partySize, platform, rank] = parsedArgs.slice(2);
 
       if (partySize === 0) {
         // set to default party size if parsing returned nothing
@@ -330,6 +343,8 @@ exports.run = (bot, message, args, perms) => {
       code: game.code,
       game: game.name,
       mode: game.modes[j],
+      platform,
+      rank,
       time,
       expire_date: expireDate,
       ttl,

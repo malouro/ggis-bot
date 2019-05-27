@@ -45,12 +45,17 @@ const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
   const color = DEFAULT_EMBED_COLOR;
   let title = `${lfgObj.party_leader_name} is looking for a ${lfgObj.game} group!`;
   let { thumbnail } = game;
-  let description = `**Game mode:** ${game.modes_proper[indexOfGame]}\n**Party size:** ${lfgObj.max_party_size}`;
+  let description =
+    `${lfgObj.platform ? `**Platform:** ${lfgObj.platform.properName}\n` : ''}` +
+    `**Game mode:** ${game.modes_proper[indexOfGame]}\n` +
+    `${lfgObj.rank ? `**Rank:** ${lfgObj.rank}\n` : ''}` +
+    `**Party size:** ${lfgObj.max_party_size}\n`;
   let fields = [[
     'Want to join?',
-    `Click the 👍 below to reserve a spot!\n${lfgObj.party_leader_name}: click the 🚫 below to cancel the party.\n\n**Party:** <@${lfgObj.party_leader_id}> (1/${lfgObj.max_party_size})`,
+    `Click the 👍 below to reserve a spot!\n<@${lfgObj.party_leader_id}>, click the 🚫 below to cancel the party.\n\n**Party:** <@${lfgObj.party_leader_id}> (1/${lfgObj.max_party_size})`,
   ]];
   let footer = 'Expires';
+  const footerThumbnail = lfgObj.platform ? lfgObj.platform.thumbnail : null;
   let timestamp = lfgObj.expire_date;
 
   switch (type) {
@@ -68,7 +73,11 @@ const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
     case 'cancelled':
       title = `${lfgObj.party_leader_name}'s party has been cancelled`;
       thumbnail = 'https://i.imgur.com/jSYuGrc.png';
-      description = `**Game:** ${lfgObj.game}\n**Game mode:** ${game.modes_proper[mode]}\n**Party:** ${lfgObj.party.map(m => `<@${m}>`).join(' ')} (${lfgObj.party.length}/${lfgObj.max_party_size})`;
+      description =
+        `**Game:** ${lfgObj.game}\n` +
+        `${lfgObj.platform !== null ? `**Platform:** ${lfgObj.platform.properName}\n` : ''}` +
+        `**Game mode:** ${game.modes_proper[mode]}\n` +
+        `**Party:** ${lfgObj.party.map(m => `<@${m}>`).join(' ')} (${lfgObj.party.length}/${lfgObj.max_party_size})`;
       fields = [];
       timestamp = null;
       footer = 'Cancelled';
@@ -88,7 +97,7 @@ const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
   embed.setDescription(description);
   fields.forEach(([fieldName, value]) => embed.addField(fieldName, value));
   /* Footer */
-  embed.setFooter(footer);
+  embed.setFooter(footer, footerThumbnail);
   embed.setTimestamp(timestamp);
 
   return embed;
@@ -115,7 +124,7 @@ const addLFG = (bot, object) => {
       if (isFirstEntry) bot.lfgUpdate(true, INTERVAL);
       message.react('👍').then(() => {
         message.react('🚫').then(() => {
-          console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${object.party_leader_name} made an LFG for ${object.game} | ${object.mode} | party of ${object.max_party_size} | ${object.ttl} minutes`));
+          console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${object.party_leader_name} made an LFG for ${object.game} | ${object.mode} | ${object.platform ? `platform: ${object.platform.properName}} |` : ''} party of ${object.max_party_size} | ${object.ttl} minutes`));
         }).catch(err => console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] ${err}`)));
       }).catch(err => console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] ${err}`)));
     }).catch(err => console.error(err));

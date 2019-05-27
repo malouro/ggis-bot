@@ -1,0 +1,38 @@
+{
+  "platforms": [
+    {
+      "code": "pc",
+      "properName": "PC",
+      "thumbnail": "",
+      "aliases": [
+        "computer",
+        "windows"
+      ]
+    },
+    {
+      "code": "ps4",
+      "properName": "PlayStation 4",
+      "thumbnail": "https://i.imgur.com/wfCZuQn.png",
+      "aliases": [
+        "playstation4"
+      ]
+    },
+    {
+      "code": "xbox",
+      "properName": "Xbox One",
+      "thumbnail": "",
+      "aliases": [
+        "xbone",
+        "xboxone"
+      ]
+    },
+    {
+      "code": "switch",
+      "properName": "Nintendo Switch",
+      "thumbnail": "",
+      "aliases": [
+        "nintendoswitch"
+      ]
+    }
+  ]
+}
