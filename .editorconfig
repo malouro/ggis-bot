@@ -1,3 +1,5 @@
+root = true
+
 [*.js]
 eol = lf
 insert_final_newline = true
