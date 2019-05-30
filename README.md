@@ -17,7 +17,7 @@ Yep, there you go.
 - **AutoReact** : Automatic emoji reactions or message replies when specified users get @mentioned or when specific phrases are said
 - Programmable **chat filters**
 - Fetch random posts from any of Reddit's subreddits
-- Open up fortune cookies, Random Jaden Smith Tweets, Key & Peele videos, and other useless & silly commands
+- Open up fortune cookies, random Key & Peele videos, and other useless & silly commands
 
 Use the `!help` command to get a full list of commands.
 

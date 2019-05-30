@@ -52,10 +52,10 @@ const parseRestArgs = (args, bot, game) => {
         const platformToCheck = bot.platforms.get(arg) || bot.platforms.get(bot.platformAliases.get(arg));
 
         // Only add platform if it's a platform listed under the game
-        if (game.platforms.includes(platformToCheck.code)) {
+        if (game.platforms && game.platforms.includes(platformToCheck.code)) {
           platform = platformToCheck;
         }
-      } else if (game.ranks.has(arg)) {
+      } else if (game.ranks && game.ranks.includes(arg)) {
         rank = game.ranks_proper[game.ranks.indexOf(arg)];
       }
     }
@@ -64,27 +64,31 @@ const parseRestArgs = (args, bot, game) => {
   return [hours, mins, partySize, platform, rank];
 };
 
-/**
- * @todo FIX HELP MENU FOR NEW TTL AND PARTY SIZE METHODS
- */
 exports.help = {
   name: 'lfg',
   description: 'Look for players to join you in a game',
-  usage: 'lfg <game> [mode] [platform] [ranking] [partySize] [expirationTime(*h*m format))]' +
-         '\n\n<game> is *mandatory*, and doesn\'t include spaces\n[mode], [partySize], [expirationTime] are all optional' +
-         '\n\n- These three options, if used, must be given *consecutively and in order*.' +
-         '\n- That is, in order to give the party size, you must have a mode chosen, and in order to specify the time left to expire, you must have a party size set.' +
-         '\n\n- Default gamemode & party size depend on the game and gamemode respectively\n- \'Any\' & \'default\' are valid gamemodes for every game!' +
-         `\n- Default time is set to ${settings.lfg.ttl_default} minutes.\n- Party size & time must be given as positive integers.` +
-         `\n\nMore LFG Commands ::\nUse "${settings.prefix}lfg list" to see what games you can use!` +
+  usage: 'lfg <game> [mode] [platform] [ranking] [partySize] [expirationTime(*h*m format)]' +
+         '\n\n<game> is *mandatory*, and doesn\'t include spaces' +
+         '\n[mode], [platform], [ranking], [partySize], [expirationTime] are all optional -- but if used, a [mode] *must be provided and before the other options*' +
+
+         '\n- That is, in order to give a [partySize], [platform], [ranking] or [expirationTime], you must have a mode chosen and it must be specified right after the [game]\n' +
+         '\n- Default gamemode & party size are dependent on the game and gamemode respectively' +
+         '\n- \'any\' & \'default\' are valid gamemodes for every game!' +
+         `\n- Default time is set to ${settings.lfg.ttl_default} minutes.' +
+         '\n- Party size & time must be given as positive integers.` +
+
+         '\n\nMore LFG Commands ::' +
+         `\nUse "${settings.prefix}lfg list" to see what games you can use!` +
          `\nUse "${settings.prefix}lfg list <game>" to see more info on a specific game` +
          `\nUse "${settings.prefix}lfg help" as an alternative way to access this help menu` +
-         `\n\nExamples ::\n${settings.prefix}lfg lol aram 4 20  ║ League of Legends - ARAM - Party of 4 - 20 minute timer\n` +
-         `${settings.prefix}lfg pubg default 2 ║ PUBG - Default gamemode - Party of 2 - Default timer\n` +
-         `${settings.prefix}lfg ow any         ║ Overwatch - Any gamemode - Default party size - Default timer\n` +
+
+         '\n\nExamples ::\n' +
+         `${settings.prefix}lfg lol aram 5 2h30m  ║ League of Legends - ARAM - Party of 4 - 2 hour 30 min timer\n` +
+         `${settings.prefix}lfg rl default 2 ps4  ║ PUBG - Default gamemode - Party of 2 - For PS4 platform - Default timer\n` +
+         `${settings.prefix}lfg ow any            ║ Overwatch - Any gamemode - Default party size - Default timer\n` +
          '\nWarnings :: (these won\'t work the way you probably intended them to)\n' +
-         `${settings.prefix}lfg dota2 4 20     ║ Doesn't give gamemode before party size or timer\n` +
-         `${settings.prefix}lfg rl hoops any   ║ 'Any' is not a valid party size, should be a number! (or 'default')`,
+         `${settings.prefix}lfg dota2 4 20        ║ Doesn't give gamemode before party size or timer\n` +
+         `${settings.prefix}lfg rl hoops any      ║ 'Any' is not a valid party size, should be a number! (or 'default')`,
 };
 
 exports.conf = {
@@ -174,7 +178,7 @@ exports.run = (bot, message, args, perms) => {
       }
       message.author.send(str, {
         code: 'asciidoc',
-      }); // ... and send it!
+      });
       page++;
     }
     message.reply(`The entire list of LFG games was just sent via DM. It's getting rather long (at **${bot.games.size} games** and counting), so it's seperated in parts and sent privately.`);
@@ -183,7 +187,7 @@ exports.run = (bot, message, args, perms) => {
      * !lfg list [game]
      *    - Lists all game modes & information on a specific game from the LFG library
      */
-    let str;
+    let str = '';
     let longestMode = 0;
     let longestModeProper = 0;
 
@@ -213,20 +217,28 @@ exports.run = (bot, message, args, perms) => {
     if (longestMode < 6) longestMode = 6;
     if (longestModeProper < 8) longestModeProper = 8;
 
-    // Create game info header
-    str = `= ${game.name} LFG Info =\n\nNames & Aliases ::\n${game.code}`;
-    if (game.aliases.length > 0) str += `, ${game.aliases.join(', ')}`;
-
     // Build game info
     const width = (Math.round(longestMode / 2) * 2) + (Math.round(longestModeProper / 2) * 2);
-    str += `\n\nThumbnail :: ${game.thumbnail}\n\n= Game Mode List =\n`;
-    str += `╔${'═'.repeat(Math.round(longestMode / 2) - 2)}Code${'═'.repeat(Math.round(longestMode / 2) + (Math.round(longestModeProper / 2) - 4))}GameMode${'═'.repeat(Math.round(longestModeProper / 2) - 2)}Size══╗\n`;
+
+    /* eslint-disable */
+    str +=
+      `= ${game.name} LFG Info =` +
+      `\nAliases   :: ${game.code}${(game.aliases.length > 0) ? str += `, ${game.aliases.join(', ')}` : ''}` +
+      `\nThumbnail :: ${game.thumbnail}` + ((game.platforms) ?
+      `\nPlatforms :: ${game.platforms.join(', ')}` : '') + ((game.ranks) ?
+      `\nRankings  :: ${game.ranks.join(', ')}` : '');
+    /* eslint-enable */
+
+    str +=
+        '\n\n= Game Mode List =\n' +
+        `╔${'═'.repeat(Math.round(longestMode / 2) - 2)}Code${'═'.repeat(Math.round(longestMode / 2) + (Math.round(longestModeProper / 2) - 4))}GameMode${'═'.repeat(Math.round(longestModeProper / 2) - 2)}Size══╗\n`;
     game.modes.forEach((m, index) => {
       str += (index !== game.modes.length - 1) ?
         `║${m}${' '.repeat(longestMode - m.length)} :: ${game.modes_proper[index]}${' '.repeat(width - longestMode - (game.modes_proper[index].length - 2))}${(game.default_party_size[index] / 10 >= 1) ? `${game.default_party_size[index]}` : ` ${game.default_party_size[index]}`}  ║\n` :
         `║${m}${' '.repeat(longestMode - m.length)} :: ${game.modes_proper[index]}${' '.repeat(width - longestMode - (game.modes_proper[index].length - 2))}${(game.default_party_size[index] / 10 >= 1) ? `${game.default_party_size[index]}` : ` ${game.default_party_size[index]}`}  ║\n` +
         `╚${'═'.repeat((2 * Math.round(longestMode / 2)) + (2 * Math.round(longestModeProper / 2)) + 10)}╝`;
     });
+
     message.channel.send(str, {
       code: 'asciidoc',
     });
@@ -236,10 +248,10 @@ exports.run = (bot, message, args, perms) => {
      *
      *  The lfg help menu --> really just the standard help menu, but with 'lfg' passed as the arg
      */
-    bot.commands.get(`${settings.botname}`).run(bot, message, ['help', 'lfg'], perms); // runs `!help lfg` command
+    bot.commands.get('help').run(bot, message, ['help', 'lfg'], perms); // runs `!help lfg` command
   } else {
     /**
-     * !lfg [game] [gameMode] [partySize] [time]
+     * !lfg [game] [gameMode] [...options]
      */
 
     /** No [game] was given */

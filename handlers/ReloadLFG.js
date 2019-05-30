@@ -33,7 +33,7 @@ module.exports = (bot, game) => {
           console.log(chalk.bgHex('#ffcc00').white('RELOADING LFG GAMES:'));
           console.log(chalk.bgYellow.black(`Loading a total of ${files.length} games into Games Collection.`));
           files.forEach((f) => {
-            const contents = JSON.parse(fs.readFileSync(`./config/lfg/${f}`, 'utf8'));
+            const contents = JSON.parse(fs.readFileSync(`./config/lfg/default/${f}`, 'utf8'));
             console.log(chalk.bgYellow.gray(`Loading game ... ${contents.name}`));
             bot.games.set(contents.code, contents);
             contents.aliases.forEach((alias) => {

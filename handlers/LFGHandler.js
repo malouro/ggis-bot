@@ -43,7 +43,8 @@ const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
 
   /* Configure options for Rich Embed */
   const color = DEFAULT_EMBED_COLOR;
-  let title = `${lfgObj.party_leader_name} is looking for a ${lfgObj.game} group!`;
+  let titleText = `${lfgObj.party_leader_name} is looking for a ${lfgObj.game} group!`;
+  const titleThumbnail = lfgObj.platform ? lfgObj.platform.thumbnail : null;
   let { thumbnail } = game;
   let description =
     `${lfgObj.platform ? `**Platform:** ${lfgObj.platform.properName}\n` : ''}` +
@@ -55,7 +56,6 @@ const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
     `Click the 👍 below to reserve a spot!\n<@${lfgObj.party_leader_id}>, click the 🚫 below to cancel the party.\n\n**Party:** <@${lfgObj.party_leader_id}> (1/${lfgObj.max_party_size})`,
   ]];
   let footer = 'Expires';
-  const footerThumbnail = lfgObj.platform ? lfgObj.platform.thumbnail : null;
   let timestamp = lfgObj.expire_date;
 
   switch (type) {
@@ -63,7 +63,7 @@ const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
       fields = [
         [
           '⏰ **This LFG request has timed out.** ⏰',
-          `**Party:** ${lfgObj.party.map(m => `<@${m}>`).join(' ')} (${lfgObj.party.length}/${lfgObj.max_party_size})`,
+          `**Party:** ${lfgObj.party.map(id => `<@${id}>`).join(' ')} (${lfgObj.party.length}/${lfgObj.max_party_size})`,
         ],
       ];
       footer = 'Timed out';
@@ -71,13 +71,13 @@ const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
       break;
 
     case 'cancelled':
-      title = `${lfgObj.party_leader_name}'s party has been cancelled`;
+      titleText = `${lfgObj.party_leader_name}'s party has been cancelled`;
       thumbnail = 'https://i.imgur.com/jSYuGrc.png';
       description =
         `**Game:** ${lfgObj.game}\n` +
         `${lfgObj.platform !== null ? `**Platform:** ${lfgObj.platform.properName}\n` : ''}` +
         `**Game mode:** ${game.modes_proper[mode]}\n` +
-        `**Party:** ${lfgObj.party.map(m => `<@${m}>`).join(' ')} (${lfgObj.party.length}/${lfgObj.max_party_size})`;
+        `**Party:** ${lfgObj.party.map(id => `<@${id}>`).join(' ')} (${lfgObj.party.length}/${lfgObj.max_party_size})`;
       fields = [];
       timestamp = null;
       footer = 'Cancelled';
@@ -91,13 +91,13 @@ const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
   /* Set up the Discord Rich Embed message */
   embed.setColor(color);
   /* Header */
-  embed.setTitle(title);
+  embed.setAuthor(titleText, titleThumbnail);
   embed.setThumbnail(thumbnail);
   /* Body */
   embed.setDescription(description);
   fields.forEach(([fieldName, value]) => embed.addField(fieldName, value));
   /* Footer */
-  embed.setFooter(footer, footerThumbnail);
+  embed.setFooter(footer);
   embed.setTimestamp(timestamp);
 
   return embed;

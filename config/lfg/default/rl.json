@@ -11,10 +11,33 @@
         "switch"
     ],
     "ranks": [
-
+        "unranked",
+        "bronze",
+        "silver",
+        "gold",
+        "plat",
+        "platinum",
+        "diamond",
+        "champ",
+        "champion",
+        "gm",
+        "grandchamp",
     ],
     "ranks_proper": [
-
+        "Unranked",
+        "Bronze",
+        "Silver",
+        "Gold",
+        "Platinum",
+        "Platinum",
+        "Diamond",
+        "Champion",
+        "Champion",
+        "Grand Champion",
+        "Grand Champion"
+    ],
+    "rank_thumbnails": [
+        ""
     ],
     "thumbnail": "http://i.imgur.com/QLWMkBQ.png",
     "default_party_size": [
