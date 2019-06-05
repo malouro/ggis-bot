@@ -45,8 +45,8 @@ const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
   const title = ''; // not currently being used, but you can enable this for your own use case
   let titleText = `${lfgObj.party_leader_name} is looking for a ${lfgObj.game} group!`;
   const titleThumbnail = lfgObj.platform ? lfgObj.platform.thumbnail : null;
-  let { thumbnail } = game;
-  let description =
+  let gameThumbnail = game.thumbnail;
+  let lfgDescription =
     `${lfgObj.platform ? `**Platform:** ${lfgObj.platform.properName}\n` : ''}` +
     `**Game mode:** ${game.modes_proper[indexOfGame]}\n` +
     `${lfgObj.rank ? `**Rank:** ${game.ranks_proper[game.ranks.indexOf(lfgObj.rank)]}\n` : ''}` +
@@ -55,10 +55,10 @@ const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
     'Want to join?',
     `Click the 👍 below to reserve a spot!\n<@${lfgObj.party_leader_id}>, click the 🚫 below to cancel the party.\n\n**Party:** <@${lfgObj.party_leader_id}> (1/${lfgObj.max_party_size})`,
   ]];
-  let footer = 'Expires';
+  let expirationLabel = 'Expires';
   const footerThumbnail = null; // not currently being used, but you can enable this for your own use case
   let timestamp = lfgObj.expire_date;
-  let image = lfgObj.rank ? game.rank_thumbnails[game.ranks.indexOf(lfgObj.rank)] : null;
+  let rankImage = lfgObj.rank ? game.rank_thumbnails[game.ranks.indexOf(lfgObj.rank)] : null;
 
   switch (type) {
     case 'timeout':
@@ -68,22 +68,22 @@ const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
           `**Party:** ${lfgObj.party.map(id => `<@${id}>`).join(' ')} (${lfgObj.party.length}/${lfgObj.max_party_size})`,
         ],
       ];
-      footer = 'Timed out';
+      expirationLabel = 'Timed out';
       timestamp = null;
-      image = null;
+      rankImage = null;
       break;
 
     case 'cancelled':
       titleText = `${lfgObj.party_leader_name}'s party has been cancelled`;
-      thumbnail = 'https://i.imgur.com/jSYuGrc.png';
-      description =
+      gameThumbnail = 'https://i.imgur.com/jSYuGrc.png';
+      lfgDescription =
         `**Game:** ${lfgObj.game}\n` +
         `${lfgObj.platform !== null ? `**Platform:** ${lfgObj.platform.properName}\n` : ''}` +
         `**Game mode:** ${game.modes_proper[mode]}\n` +
         `**Party:** ${lfgObj.party.map(id => `<@${id}>`).join(' ')} (${lfgObj.party.length}/${lfgObj.max_party_size})`;
       fields = [];
       timestamp = null;
-      footer = 'Cancelled';
+      expirationLabel = 'Cancelled';
       break;
 
     case 'default':
@@ -141,6 +141,9 @@ const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
     // "Timestamp" that displays to the right of the footerText
     footerTimeStamp: timestamp,
     ----------------------------------------- */
+
+    topRightImage: rankImage,
+    bodyImage: null,
   };
 
   const embedVars = Object.assign({}, {
@@ -149,11 +152,11 @@ const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
     topTitleText: titleText,
     topLeftImage: titleThumbnail,
     subtitle: title,
-    topRightImage: thumbnail,
-    bodyTitle: description,
+    topRightImage: gameThumbnail,
+    bodyTitle: lfgDescription,
     bodyContent: fields,
-    bodyImage: image,
-    footerText: footer,
+    bodyImage: rankImage,
+    footerText: expirationLabel,
     footerImage: footerThumbnail,
     footerTimeStamp: timestamp,
   }, lfgMessageOverrides);
