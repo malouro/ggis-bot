@@ -6,7 +6,6 @@ const moment = require('moment');
 const settings = require('../settings');
 
 const INTERVAL = settings.lfg.update_interval;
-
 const DEFAULT_EMBED_COLOR = 0x009395;
 
 /**
@@ -43,20 +42,23 @@ const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
 
   /* Configure options for Rich Embed */
   const color = DEFAULT_EMBED_COLOR;
+  const title = ''; // not currently being used, but you can enable this for your own use case
   let titleText = `${lfgObj.party_leader_name} is looking for a ${lfgObj.game} group!`;
   const titleThumbnail = lfgObj.platform ? lfgObj.platform.thumbnail : null;
   let { thumbnail } = game;
   let description =
     `${lfgObj.platform ? `**Platform:** ${lfgObj.platform.properName}\n` : ''}` +
     `**Game mode:** ${game.modes_proper[indexOfGame]}\n` +
-    `${lfgObj.rank ? `**Rank:** ${lfgObj.rank}\n` : ''}` +
+    `${lfgObj.rank ? `**Rank:** ${game.ranks_proper[game.ranks.indexOf(lfgObj.rank)]}\n` : ''}` +
     `**Party size:** ${lfgObj.max_party_size}\n`;
   let fields = [[
     'Want to join?',
     `Click the 👍 below to reserve a spot!\n<@${lfgObj.party_leader_id}>, click the 🚫 below to cancel the party.\n\n**Party:** <@${lfgObj.party_leader_id}> (1/${lfgObj.max_party_size})`,
   ]];
   let footer = 'Expires';
+  const footerThumbnail = null; // not currently being used, but you can enable this for your own use case
   let timestamp = lfgObj.expire_date;
+  let image = lfgObj.rank ? game.rank_thumbnails[game.ranks.indexOf(lfgObj.rank)] : null;
 
   switch (type) {
     case 'timeout':
@@ -68,6 +70,7 @@ const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
       ];
       footer = 'Timed out';
       timestamp = null;
+      image = null;
       break;
 
     case 'cancelled':
@@ -88,17 +91,83 @@ const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
       break;
   }
 
+  /**
+   * @description
+   * This is to override for your own implementation of the LFG message
+   */
+  const lfgMessageOverrides = {
+    /* *********************************** */
+    /* LFG Message Overrides go here       */
+    /* ***********************************
+
+    // Uncomment or add below to start customizing
+    -----------------------------------------
+    // Color of left message accent
+    color: '#fff', // White
+
+    // This text will go under the top most title
+    // (which is usually reserved for the 'author' of the message)',
+    topTitleText: 'custom title!',
+
+    // Image in top left, left of the title text labeled above
+    topLeftImage: 'url to some image',
+
+    // This text goes right underneath the top title and above the body
+    subtitle: 'subtitle text'
+
+    // Top-right image thumbnail
+    topRightImage: thumbnail,
+
+    // Description that labels the body content
+    bodyTitle: description,
+
+    // Array of arrays. "Fields" for the content of the body
+    // [
+    //   [ fieldName0, fieldValue0 ],
+    //   [ fieldName1, fieldValue1 ]
+    //   ... etc.
+    // ]
+    bodyContent: [ ['some field name', 'content of the field'] ],
+
+    // Image at the bottom of the body
+    bodyImage: image,
+
+    // Footer label
+    footerText: footer,
+
+    // Footer image thumbnail (bottom-left most image)
+    footerImage: footerThumbnail,
+
+    // "Timestamp" that displays to the right of the footerText
+    footerTimeStamp: timestamp,
+    ----------------------------------------- */
+  };
+
+  const embedVars = Object.assign({}, {
+    /* Default values */
+    color,
+    topTitleText: titleText,
+    topLeftImage: titleThumbnail,
+    subtitle: title,
+    topRightImage: thumbnail,
+    bodyTitle: description,
+    bodyContent: fields,
+    bodyImage: image,
+    footerText: footer,
+    footerImage: footerThumbnail,
+    footerTimeStamp: timestamp,
+  }, lfgMessageOverrides);
+
   /* Set up the Discord Rich Embed message */
-  embed.setColor(color);
-  /* Header */
-  embed.setAuthor(titleText, titleThumbnail);
-  embed.setThumbnail(thumbnail);
-  /* Body */
-  embed.setDescription(description);
-  fields.forEach(([fieldName, value]) => embed.addField(fieldName, value));
-  /* Footer */
-  embed.setFooter(footer);
-  embed.setTimestamp(timestamp);
+  embed.setColor(embedVars.color);
+  embed.setAuthor(embedVars.topTitleText, embedVars.topLeftImage);
+  embed.setTitle(embedVars.subtitle);
+  embed.setThumbnail(embedVars.topRightImage);
+  embed.setDescription(embedVars.bodyTitle);
+  embedVars.bodyContent.forEach(([fieldName, value]) => embed.addField(fieldName, value));
+  embed.setImage(embedVars.bodyImage);
+  embed.setFooter(embedVars.footerText, embedVars.footerImage);
+  embed.setTimestamp(embedVars.footerTimeStamp);
 
   return embed;
 };
@@ -154,6 +223,10 @@ const complete = (bot, id) => {
 
     const ch = bot.channels.get(stack.channel);
     ch.send({ embed });
+
+    if (settings.lfg.delete_on_complete) {
+      bot.channels.get(stack.channel).fetchMessage(id).then(messageToDelete => messageToDelete.delete());
+    }
 
     // Remove from LFG stack
     bot.lfgStack.delete(id);
@@ -240,17 +313,25 @@ const removeFromParty = (bot, id, userid) => {
  */
 const timeout = (bot, id) => {
   try {
-    // Edit LFG message
+    // Edit or delete LFG message when it times out
     const stack = bot.lfgStack.get(id);
-    const embed = buildMessage(bot, stack, { type: 'timeout' });
-
     const ch = bot.channels.get(stack.channel);
+
     ch.fetchMessage(stack.id).then((message) => {
+      const logTimeout = () => {
+        console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG for ${stack.game} has timed out.`));
+      };
+
       bot.lfgStack.delete(id);
       if (bot.lfgStack.size === 0) bot.lfgUpdate(false);
-      message.edit({ embed }).then(() => {
-        console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG for ${stack.game} has timed out.`));
-      }).catch(err => console.error(err));
+
+      if (settings.lfg.delete_on_timeout) {
+        message.delete().then(logTimeout).catch(err => console.error(err));
+      } else {
+        const embed = buildMessage(bot, stack, { type: 'timeout' });
+
+        message.edit({ embed }).then(logTimeout).catch(err => console.error(err));
+      }
     }).catch(err => console.error(err));
   } catch (err) {
     console.error(err);
@@ -296,7 +377,6 @@ const warning = (bot, id, timeLeft) => {
 const cancel = (bot, id, removed) => {
   try {
     const stack = bot.lfgStack.get(id);
-    const embed = buildMessage(bot, stack, { type: 'cancelled' });
 
     // If the message was deleted, do this stuff:
     if (removed) {
@@ -307,13 +387,19 @@ const cancel = (bot, id, removed) => {
 
     // Attempt to fetch message
     bot.channels.get(stack.channel).fetchMessage(stack.id).then((message) => {
-      message.edit({ embed }).then(() => {
-        // Remove from LFG stack and edit message
+      const afterCancel = () => {
         bot.lfgStack.delete(id);
         if (bot.lfgStack.size === 0) bot.lfgUpdate(false);
-        return console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG party for ${stack.game} has been cancelled.`));
-      }).catch(err => console.error(err));
-    }).catch(err => console.error(err));
+        console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG party for ${stack.game} has been cancelled.`));
+      };
+
+      if (settings.lfg.delete_on_cancel) {
+        message.delete().then(afterCancel).catch(err => console.error(err));
+      } else {
+        const embed = buildMessage(bot, stack, { type: 'cancelled' });
+        message.edit({ embed }).then(afterCancel).catch(err => console.error(err));
+      }
+    });
 
     return 0;
   } catch (err) {

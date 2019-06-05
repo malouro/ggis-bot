@@ -20,11 +20,12 @@ const parseRestArgs = (args, bot, game) => {
   let platform = null;
   let rank = null;
 
-  const timeRegexHoursMins = /$[0-9]+h[0-9]+m/;
-  const timeRegexMinsHours = /$[0-9]+m[0-9]+h/;
-  const timeRegexHours = /$[0-9]+h/;
-  const timeRegexMins = /$[0-9]+m/;
-  const regexJustNumber = /$[0-9]+(?!\D)/;
+  const timeRegexHoursMins = /[0-9]+h[0-9]+m/;
+  const timeRegexMinsHours = /[0-9]+m[0-9]+h/;
+  const timeRegexHours = /[0-9]+h/;
+  const timeRegexMins = /[0-9]+m/;
+  const isANumber = /[0-9]+/;
+  const isALetter = /[a-z]+/;
   const isAWord = /[a-z0-9]+/;
 
   args.forEach((arg) => {
@@ -40,10 +41,11 @@ const parseRestArgs = (args, bot, game) => {
       hours = parseInt(arg.split('h')[0], 10);
     } else if (arg.match(timeRegexMins)) {
       mins = parseInt(arg.split('m')[0], 10);
-    } else if (arg.match(regexJustNumber)) {
-      const countMatches = countRegexMatches(arg, /\d/);
+    } else if (arg.match(isANumber)) {
+      const countNumberMatches = countRegexMatches(arg, /\d/);
+      const countLetterMatches = countRegexMatches(arg, isALetter);
 
-      if (countMatches === arg.length) {
+      if (countNumberMatches === arg.length && countLetterMatches === 0) {
         partySize = parseInt(arg, 10);
       }
     } else if (arg.match(isAWord)) {
@@ -56,7 +58,7 @@ const parseRestArgs = (args, bot, game) => {
           platform = platformToCheck;
         }
       } else if (game.ranks && game.ranks.includes(arg)) {
-        rank = game.ranks_proper[game.ranks.indexOf(arg)];
+        rank = arg;
       }
     }
   });

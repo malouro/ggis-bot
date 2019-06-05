@@ -37,7 +37,17 @@
         "Grand Champion"
     ],
     "rank_thumbnails": [
-        ""
+        "insert unranked thumbnail here",
+        "insert bronze thumbnail here",
+        "insert silver thumbnail here",
+        "insert gold thumbnail here",
+        "insert plat thumbnail here",
+        "insert plat thumbnail here",
+        "https://i.imgur.com/A4zLasA.png",
+        "insert champ thumbnail here",
+        "insert champ thumbnail here",
+        "insert gm thumbnail here",
+        "insert gm thumbnail here"
     ],
     "thumbnail": "http://i.imgur.com/QLWMkBQ.png",
     "default_party_size": [

@@ -18,14 +18,14 @@ const rl = readline.createInterface({
 const writeFiles = (settingsObj, reactionsObj) => {
   console.log('\n');
   // Write `settings.json`
-  fs.writeFile('settings.json', JSON.stringify(settingsObj), (err) => {
+  fs.writeFile('settings.json', JSON.stringify(settingsObj, null, 2), (err) => {
     if (err) {
       console.log(chalk.bgRed.black('FAILED'), ' Writing settings.json', `\n${err}`);
     } else {
       // SUCCESS settings.json
       console.log(chalk.bgGreen.black('SUCCESS'), ' Writing settings.json');
       // create backup file
-      fs.writeFile('settings.backup.json', JSON.stringify(settingsObj), (errOnBackup) => {
+      fs.writeFile('settings.backup.json', JSON.stringify(settingsObj, null, 2), (errOnBackup) => {
         if (errOnBackup) {
           console.log(chalk.bgRed.black('FAILED'), ' Writing settings.backup.json', `\n${errOnBackup}`);
         } else {

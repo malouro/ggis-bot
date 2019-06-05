@@ -71,7 +71,10 @@
     "ttl_threshold": 30,
     "min_party_size": 2,
     "max_party_size": 32,
-    "split_value": 25
+    "split_value": 25,
+    "delete_on_timeout": false,
+    "delete_on_cancel": true,
+    "delete_on_complete": true
   },
   "echo": {
     "ms_per_char": 35
