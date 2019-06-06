@@ -70,14 +70,14 @@ exports.help = {
   name: 'lfg',
   description: 'Look for players to join you in a game',
   usage: 'lfg <game> [mode] [platform] [ranking] [partySize] [expirationTime(*h*m format)]' +
-         '\n\n<game> is *mandatory*, and doesn\'t include spaces' +
-         '\n[mode], [platform], [ranking], [partySize], [expirationTime] are all optional -- but if used, a [mode] *must be provided and before the other options*' +
+         '\n\n<game> is *mandatory*' +
+         '\n\n[mode] [platform] [ranking] [partySize] [expirationTime] are all optional -- but if used, a [gamemode] *must* be provided and *before* the other options. ' +
+         'In other words, in order to give a [partySize] [platform] [ranking] or [expirationTime], you must have a [gamemode] chosen, and it must be specified right after the [game]\n' +
 
-         '\n- That is, in order to give a [partySize], [platform], [ranking] or [expirationTime], you must have a mode chosen and it must be specified right after the [game]\n' +
          '\n- Default gamemode & party size are dependent on the game and gamemode respectively' +
          '\n- \'any\' & \'default\' are valid gamemodes for every game!' +
-         `\n- Default time is set to ${settings.lfg.ttl_default} minutes.' +
-         '\n- Party size & time must be given as positive integers.` +
+         `\n- Default time is set to ${settings.lfg.ttl_default} minutes.` +
+         '\n- Party size & time must be given as positive integers.' +
 
          '\n\nMore LFG Commands ::' +
          `\nUse "${settings.prefix}lfg list" to see what games you can use!` +
@@ -85,9 +85,9 @@ exports.help = {
          `\nUse "${settings.prefix}lfg help" as an alternative way to access this help menu` +
 
          '\n\nExamples ::\n' +
-         `${settings.prefix}lfg lol aram 5 2h30m  ║ League of Legends - ARAM - Party of 4 - 2 hour 30 min timer\n` +
-         `${settings.prefix}lfg rl default 2 ps4  ║ PUBG - Default gamemode - Party of 2 - For PS4 platform - Default timer\n` +
-         `${settings.prefix}lfg ow any            ║ Overwatch - Any gamemode - Default party size - Default timer\n` +
+         `${settings.prefix}lfg ow arcade 5 2h30m ║ Overwatch - Arcade - Party of 5 - 2 hour 30 min timer\n` +
+         `${settings.prefix}lfg rl default 2 ps4  ║ Rocket League - Default gamemode - Party of 2 - For PlayStation 4 - Default timer\n` +
+         `${settings.prefix}lfg lol duoq gold     ║ League of Legends - Ranked Duo Queue - Gold Rank - Default party size - Default timer\n` +
          '\nWarnings :: (these won\'t work the way you probably intended them to)\n' +
          `${settings.prefix}lfg dota2 4 20        ║ Doesn't give gamemode before party size or timer\n` +
          `${settings.prefix}lfg rl hoops any      ║ 'Any' is not a valid party size, should be a number! (or 'default')`,
