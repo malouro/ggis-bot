@@ -141,9 +141,6 @@ const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
     // "Timestamp" that displays to the right of the footerText
     footerTimeStamp: timestamp,
     ----------------------------------------- */
-
-    topRightImage: rankImage,
-    bodyImage: null,
   };
 
   const embedVars = Object.assign({}, {

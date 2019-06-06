@@ -41,7 +41,7 @@ const parseRestArgs = (args, bot, game) => {
       hours = parseInt(arg.split('h')[0], 10);
     } else if (arg.match(timeRegexMins)) {
       mins = parseInt(arg.split('m')[0], 10);
-    } else if (arg.match(isANumber)) {
+    } else if (arg.match(isANumber) && !arg.match(isALetter)) {
       const countNumberMatches = countRegexMatches(arg, /\d/);
       const countLetterMatches = countRegexMatches(arg, isALetter);
 
