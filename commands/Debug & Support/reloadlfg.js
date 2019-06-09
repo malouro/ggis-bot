@@ -33,6 +33,7 @@ exports.run = (bot, message, args) => {
   }
 
   if (!game && game !== 0) return message.channel.send(`Cannot find the game: ${args[1]}`);
+
   return message.channel.send((game === 0) ? 'Reloading LFG library!' : `Reloading: ${game}`)
     .then((m) => {
       bot.reloadLFG(bot, game)

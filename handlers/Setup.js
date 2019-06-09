@@ -3,6 +3,7 @@
 const chalk = require('chalk');
 const Discord = require('discord.js');
 const events = require('./events.json');
+const { platforms } = require('../config/lfg/platforms.json');
 const fs = require('fs');
 const TwitchPS = require('twitchps');
 
@@ -29,6 +30,8 @@ module.exports = (bot, settings) => {
   /* LFG */
   bot.games = new Discord.Collection(); // collection of LFG games
   bot.gameAliases = new Discord.Collection(); // aliases for LFG games
+  bot.platforms = new Discord.Collection(); // platforms/consoles for LFG games
+  bot.platformAliases = new Discord.Collection(); // aliases for LFG platforms
   bot.lfgStack = new Discord.Collection(); // ongoing LFG parties are kept in here
 
   /* Start message */
@@ -207,10 +210,13 @@ module.exports = (bot, settings) => {
    *                        (corresponds with an element from modes, not modes_proper)
    *  }
    */
+
   /**
    * @todo Per-server LFG game lists
    * Need to consider how this will be implemented!
    */
+
+  // Games
   fs.readdir('./config/lfg/default', (err, files) => {
     if (err) console.error(err);
     console.log(chalk.bgYellow.black(`Loading a total of ${files.length} games into Games Collection.`));
@@ -221,6 +227,16 @@ module.exports = (bot, settings) => {
       contents.aliases.forEach((alias) => {
         bot.gameAliases.set(alias, contents.code);
       });
+    });
+  });
+
+  // Platforms
+  console.log(chalk.bgYellow.black(`Loading ${platforms.length} platforms into Platforms Collection.`));
+  platforms.forEach((platform) => {
+    console.log(chalk.bgYellow.gray(`Loading platform ... ${platform.properName}`));
+    bot.platforms.set(platform.code, platform);
+    platform.aliases.forEach((alias) => {
+      bot.platformAliases.set(alias, platform.code);
     });
   });
 

@@ -6,6 +6,7 @@ const moment = require('moment');
 const settings = require('../settings');
 
 const INTERVAL = settings.lfg.update_interval;
+const DEFAULT_EMBED_COLOR = 0x009395;
 
 /**
  * Format for all LFG requests, embedded in the Client (bot) object -->
@@ -27,289 +28,424 @@ const INTERVAL = settings.lfg.update_interval;
  * }
  */
 
-module.exports = {
+/**
+ * @function buildMessage
+ * Builds a RichEmbed Discord message to send for the LFG
+ *
+ * @returns {Discord.RichEmbed}
+ */
+const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
+  const embed = new Discord.RichEmbed();
+  const game = bot.games.get(lfgObj.code);
+  const mode = game.modes.indexOf(lfgObj.mode);
+  const indexOfGame = game.modes.indexOf(lfgObj.mode);
+
+  /* Configure options for Rich Embed */
+  const color = DEFAULT_EMBED_COLOR;
+  const title = ''; // not currently being used, but you can enable this for your own use case
+  let titleText = `${lfgObj.party_leader_name} is looking for a ${lfgObj.game} group!`;
+  const titleThumbnail = lfgObj.platform ? lfgObj.platform.thumbnail : null;
+  let gameThumbnail = game.thumbnail;
+  let lfgDescription =
+    `${lfgObj.platform ? `**Platform:** ${lfgObj.platform.properName}\n` : ''}` +
+    `**Game mode:** ${game.modes_proper[indexOfGame]}\n` +
+    `${lfgObj.rank ? `**Rank:** ${game.ranks_proper[game.ranks.indexOf(lfgObj.rank)]}\n` : ''}` +
+    `**Party size:** ${lfgObj.max_party_size}\n`;
+  let fields = [[
+    'Want to join?',
+    `Click the 👍 below to reserve a spot!\n<@${lfgObj.party_leader_id}>, click the 🚫 below to cancel the party.\n\n**Party:** <@${lfgObj.party_leader_id}> (1/${lfgObj.max_party_size})`,
+  ]];
+  let expirationLabel = 'Expires';
+  const footerThumbnail = null; // not currently being used, but you can enable this for your own use case
+  let timestamp = lfgObj.expire_date;
+  let rankImage = lfgObj.rank ? game.rank_thumbnails[game.ranks.indexOf(lfgObj.rank)] : null;
+
+  switch (type) {
+    case 'timeout':
+      fields = [
+        [
+          '⏰ **This LFG request has timed out.** ⏰',
+          `**Party:** ${lfgObj.party.map(id => `<@${id}>`).join(' ')} (${lfgObj.party.length}/${lfgObj.max_party_size})`,
+        ],
+      ];
+      expirationLabel = 'Timed out';
+      timestamp = null;
+      rankImage = null;
+      break;
+
+    case 'cancelled':
+      titleText = `${lfgObj.party_leader_name}'s party has been cancelled`;
+      gameThumbnail = 'https://i.imgur.com/jSYuGrc.png';
+      lfgDescription =
+        `**Game:** ${lfgObj.game}\n` +
+        `${lfgObj.platform !== null ? `**Platform:** ${lfgObj.platform.properName}\n` : ''}` +
+        `**Game mode:** ${game.modes_proper[mode]}\n` +
+        `**Party:** ${lfgObj.party.map(id => `<@${id}>`).join(' ')} (${lfgObj.party.length}/${lfgObj.max_party_size})`;
+      fields = [];
+      timestamp = null;
+      expirationLabel = 'Cancelled';
+      break;
+
+    case 'default':
+    default:
+      break;
+  }
+
   /**
-   * @func addLFG
-   * Adds new LFG party to the LFG stack
-   *
-   * @param {Discord.Client} bot
-   * @param {object} obj -- lfg object which contains all information as shown above
+   * @description
+   * This is to override for your own implementation of the LFG message
    */
-  addLFG(bot, object) {
-    try {
-      let firstEntry;
-      if (bot.lfgStack.size === 0) firstEntry = true;
-      const g = bot.games.get(object.code);
-      const index = g.modes.indexOf(object.mode);
+  const lfgMessageOverrides = {
+    /* *********************************** */
+    /* LFG Message Overrides go here       */
+    /* ***********************************
 
-      const embed = new Discord.RichEmbed()
-        .setTitle(`${object.party_leader_name} is looking for a ${object.game} group!`)
-        .setDescription(`**Game mode:** ${g.modes_proper[index]}\n**Party size:** ${object.max_party_size}`)
-        .setColor(0x009395)
-        .setThumbnail(g.thumbnail)
-        .setFooter('Expires')
-        .setTimestamp(object.expire_date)
-        .addField('Want to join?', `Click the 👍 below to reserve a spot!\n${object.party_leader_name}: click the 🚫 below to cancel the party.\n\n**Party:** <@${object.party_leader_id}> (1/${object.max_party_size})`);
+    // Uncomment or add below to start customizing
+    -----------------------------------------
+    // Color of left message accent
+    color: '#fff', // White
 
-      bot.channels.get(object.channel).send({ embed }).then((message) => {
-        object.id = message.id;
-        bot.lfgStack.set(object.id, object);
-        if (firstEntry) bot.lfgUpdate(true, INTERVAL);
-        message.react('👍').then(() => {
-          message.react('🚫').then(() => {
-            console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${object.party_leader_name} made an LFG for ${object.game} | ${object.mode} | party of ${object.max_party_size} | ${object.ttl} minutes`));
-          }).catch(err => console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] ${err}`)));
+    // This text will go under the top most title
+    // (which is usually reserved for the 'author' of the message)',
+    topTitleText: 'custom title!',
+
+    // Image in top left, left of the title text labeled above
+    topLeftImage: 'url to some image',
+
+    // This text goes right underneath the top title and above the body
+    subtitle: 'subtitle text'
+
+    // Top-right image thumbnail
+    topRightImage: thumbnail,
+
+    // Description that labels the body content
+    bodyTitle: description,
+
+    // Array of arrays. "Fields" for the content of the body
+    // [
+    //   [ fieldName0, fieldValue0 ],
+    //   [ fieldName1, fieldValue1 ]
+    //   ... etc.
+    // ]
+    bodyContent: [ ['some field name', 'content of the field'] ],
+
+    // Image at the bottom of the body
+    bodyImage: image,
+
+    // Footer label
+    footerText: footer,
+
+    // Footer image thumbnail (bottom-left most image)
+    footerImage: footerThumbnail,
+
+    // "Timestamp" that displays to the right of the footerText
+    footerTimeStamp: timestamp,
+    ----------------------------------------- */
+  };
+
+  const embedVars = Object.assign({}, {
+    /* Default values */
+    color,
+    topTitleText: titleText,
+    topLeftImage: titleThumbnail,
+    subtitle: title,
+    topRightImage: gameThumbnail,
+    bodyTitle: lfgDescription,
+    bodyContent: fields,
+    bodyImage: rankImage,
+    footerText: expirationLabel,
+    footerImage: footerThumbnail,
+    footerTimeStamp: timestamp,
+  }, lfgMessageOverrides);
+
+  /* Set up the Discord Rich Embed message */
+  embed.setColor(embedVars.color);
+  embed.setAuthor(embedVars.topTitleText, embedVars.topLeftImage);
+  embed.setTitle(embedVars.subtitle);
+  embed.setThumbnail(embedVars.topRightImage);
+  embed.setDescription(embedVars.bodyTitle);
+  embedVars.bodyContent.forEach(([fieldName, value]) => embed.addField(fieldName, value));
+  embed.setImage(embedVars.bodyImage);
+  embed.setFooter(embedVars.footerText, embedVars.footerImage);
+  embed.setTimestamp(embedVars.footerTimeStamp);
+
+  return embed;
+};
+
+/**
+ * @function addLFG
+ * Adds new LFG party to the LFG stack
+ *
+ * @param {Discord.Client} bot
+ * @param {object} obj -- lfg object which contains all information as shown above
+ */
+const addLFG = (bot, object) => {
+  try {
+    let isFirstEntry;
+
+    if (bot.lfgStack.size === 0) isFirstEntry = true;
+
+    const embed = buildMessage(bot, object);
+
+    bot.channels.get(object.channel).send({ embed }).then((message) => {
+      object.id = message.id;
+      bot.lfgStack.set(object.id, object);
+      if (isFirstEntry) bot.lfgUpdate(true, INTERVAL);
+      message.react('👍').then(() => {
+        message.react('🚫').then(() => {
+          console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${object.party_leader_name} made an LFG for ${object.game} | ${object.mode} | ${object.platform ? `platform: ${object.platform.properName}} |` : ''} party of ${object.max_party_size} | ${object.ttl} minutes`));
         }).catch(err => console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] ${err}`)));
-      }).catch(err => console.error(err));
-    } catch (err) {
-      console.error(err);
+      }).catch(err => console.log(chalk.bgRed(`[${moment().format(settings.timeFormat)}] ${err}`)));
+    }).catch(err => console.error(err));
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
+/**
+ * @func complete
+ * Party is full; Complete the LFG party ✓
+ *
+ * @param {Discord.Client} bot
+ * @param {Snowflake} id - LFG id
+ */
+const complete = (bot, id) => {
+  try {
+    const stack = bot.lfgStack.get(id);
+    const game = bot.games.get(stack.code);
+    const mode = game.modes.indexOf(stack.mode);
+    const embed = new Discord.RichEmbed()
+      .setTitle(`${stack.party_leader_name}'s party is now full & ready to go!`)
+      .setDescription(`**Game:** ${stack.game}\n**Game mode:** ${game.modes_proper[mode]}\n**Party:** ${stack.party.map(m => `<@${m}>`).join(' ')}`)
+      .setColor(0x009395)
+      .setThumbnail('https://i.imgur.com/RsRmWcm.png');
+
+    const ch = bot.channels.get(stack.channel);
+    ch.send({ embed });
+
+    if (settings.lfg.delete_on_complete) {
+      bot.channels.get(stack.channel).fetchMessage(id).then(messageToDelete => messageToDelete.delete());
     }
-  },
 
-  /**
-   * @func addToParty
-   * Add a user into an LFG party
-   *
-   * @param {Discord.Client} bot
-   * @param {Snowflake} id - LFG id
-   * @param {Snowflake} userid - User id to add into LFG party
-   */
-  addToParty(bot, id, userid) {
-    try {
-      // Push user into party array
+    // Remove from LFG stack
+    bot.lfgStack.delete(id);
+    if (bot.lfgStack.size === 0) bot.lfgUpdate(false);
+
+    console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG party for ${stack.game} is full.`));
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+/**
+ * @function addToParty
+ * Add a user into an LFG party
+ *
+ * @param {Discord.Client} bot
+ * @param {Snowflake} id - LFG id
+ * @param {Snowflake} userid - User id to add into LFG party
+ */
+const addToParty = (bot, id, userid) => {
+  try {
+    // Push user into party array
+    const stack = bot.lfgStack.get(id);
+    stack.party.push(userid);
+
+    const embed = buildMessage(bot, stack);
+    const ch = bot.channels.get(stack.channel);
+    const { guild } = ch;
+
+    ch.fetchMessage(stack.id).then((message) => {
+      message.edit({ embed }).then(() => {
+      }).catch(err => console.error(err));
+    }).catch(err => console.error(err));
+
+    bot.lfgStack.set(id, stack);
+
+    // Attempt to move user into party leader's channel
+    const memberToMoveTo = guild.members.get(bot.lfgStack.get(id).party_leader_id);
+    const memberToMove = guild.members.get(userid);
+    if (typeof memberToMoveTo.voiceChannel !== 'undefined') {
+      memberToMove.edit({ channel: memberToMoveTo.voiceChannelID }, `Moved by @${settings.botNameProper} for LFG`).then().catch(err => console.error(err));
+    }
+
+    // Check if the party is full
+    if (stack.party.length === stack.max_party_size) {
+      complete(bot, id);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+/**
+ * @func removeFromParty
+ * Remove a user from an LFG party
+ *
+ * @param {Discord.Client} bot
+ * @param {Snowflake} id - LFG id
+ * @param {Snowflake} userid - User id to remove from LFG party
+ */
+const removeFromParty = (bot, id, userid) => {
+  try {
+    // Remove user from party array
+    const index = bot.lfgStack.get(id).party.indexOf(userid);
+    if (index > -1) {
+      bot.lfgStack.get(id).party.splice(index, 1);
       const stack = bot.lfgStack.get(id);
-      stack.party.push(userid);
-      const game = bot.games.get(stack.code);
-      const mode = game.modes.indexOf(stack.mode);
-      const embed = new Discord.RichEmbed()
-        .setTitle(`${stack.party_leader_name} is looking for a ${game.name} group!`)
-        .setDescription(`**Game mode:** ${game.modes_proper[mode]}\n**Party size:** ${stack.max_party_size}`)
-        .setColor(0x009395)
-        .setThumbnail(game.thumbnail)
-        .setFooter('Expires')
-        .setTimestamp(stack.expire_date)
-        .addField('Want to join?', `Click the 👍 below to reserve a spot!\n${stack.party_leader_name}: click the 🚫 below to cancel the party.\n\n**Party:** ${stack.party.map(m => `<@${m}>`).join(' ')} (${stack.party.length}/${stack.max_party_size})`);
+      const embed = buildMessage(bot, stack);
       const ch = bot.channels.get(stack.channel);
-      const g = ch.guild;
-
       ch.fetchMessage(stack.id).then((message) => {
         message.edit({ embed }).then(() => {
         }).catch(err => console.error(err));
       }).catch(err => console.error(err));
+    } else return;
+  } catch (err) { console.error(err); }
+};
 
-      bot.lfgStack.set(id, stack);
+/**
+ * @func timeout
+ * LFG party is timed out, remove from the LFG stack
+ *
+ * @param {Discord.Client} bot
+ * @param {Snowflake} id - LFG id
+ */
+const timeout = (bot, id) => {
+  try {
+    // Edit or delete LFG message when it times out
+    const stack = bot.lfgStack.get(id);
+    const ch = bot.channels.get(stack.channel);
 
-      // Attempt to move user into party leader's channel
-      const memberToMoveTo = g.members.get(bot.lfgStack.get(id).party_leader_id);
-      const memberToMove = g.members.get(userid);
-      if (typeof memberToMoveTo.voiceChannel !== 'undefined') {
-        memberToMove.edit({ channel: memberToMoveTo.voiceChannelID }, `Moved by @${settings.botNameProper} for LFG`).then().catch(err => console.error(err));
-      }
+    ch.fetchMessage(stack.id).then((message) => {
+      const logTimeout = () => {
+        console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG for ${stack.game} has timed out.`));
+      };
 
-      // Check if the party is full
-      if (stack.party.length === stack.max_party_size) this.complete(bot, id);
-    } catch (err) {
-      console.error(err);
-    }
-  },
-
-  /**
-   * @func removeFromParty
-   * Remove a user from an LFG party
-   *
-   * @param {Discord.Client} bot
-   * @param {Snowflake} id - LFG id
-   * @param {Snowflake} userid - User id to remove from LFG party
-   */
-  removeFromParty(bot, id, userid) {
-    try {
-      // Remove user from party array
-      const index = bot.lfgStack.get(id).party.indexOf(userid);
-      if (index > -1) {
-        bot.lfgStack.get(id).party.splice(index, 1);
-        const stack = bot.lfgStack.get(id);
-        const game = bot.games.get(stack.code);
-        const mode = game.modes.indexOf(stack.mode);
-        const embed = new Discord.RichEmbed()
-          .setTitle(`${stack.party_leader_name} is looking for a ${game.name} group!`)
-          .setDescription(`**Game mode:** ${game.modes_proper[mode]}\n**Party size:** ${stack.max_party_size}`)
-          .setColor(0x009395)
-          .setThumbnail(game.thumbnail)
-          .setFooter('Expires')
-          .setTimestamp(stack.expire_date)
-          .addField('Want to join?', `Click the 👍 below to reserve a spot!\n${stack.party_leader_name}: click the 🚫 below to cancel the party.\n\n**Party:** ${stack.party.map(m => `<@${m}>`).join(' ')} (${stack.party.length}/${stack.max_party_size})`);
-        const ch = bot.channels.get(stack.channel);
-        ch.fetchMessage(stack.id).then((message) => {
-          message.edit({ embed }).then(() => {
-          }).catch(err => console.error(err));
-        }).catch(err => console.error(err));
-      } else return;
-    } catch (err) { console.error(err); }
-  },
-
-  /**
-   * @func timeout
-   * LFG party is timed out, remove from the LFG stack
-   *
-   * @param {Discord.Client} bot
-   * @param {Snowflake} id - LFG id
-   */
-  timeout(bot, id) {
-    try {
-      // Edit LFG message
-      const stack = bot.lfgStack.get(id);
-      const game = bot.games.get(stack.code);
-      const mode = game.modes.indexOf(stack.mode);
-      const embed = new Discord.RichEmbed()
-        .setTitle(`${stack.party_leader_name} is looking for a ${game.name} group!`)
-        .setDescription(`**Game mode:** ${game.modes_proper[mode]}\n**Party size:** ${stack.max_party_size}`)
-        .setColor(0x009395)
-        .setThumbnail(game.thumbnail)
-        .setFooter('Timed out')
-        .setTimestamp()
-        .addField('⏰ **This LFG request has timed out.** ⏰', `**Party:** ${stack.party.map(m => `<@${m}>`).join(' ')} (${stack.party.length}/${stack.max_party_size})`);
-      const ch = bot.channels.get(stack.channel);
-      ch.fetchMessage(stack.id).then((message) => {
-        bot.lfgStack.delete(id);
-        if (bot.lfgStack.size === 0) bot.lfgUpdate(false);
-        message.edit({ embed }).then(() => {
-          console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG for ${stack.game} has timed out.`));
-        }).catch(err => console.error(err));
-      }).catch(err => console.error(err));
-    } catch (err) {
-      console.error(err);
-    }
-  },
-
-  /**
-   * @func warning
-   * Running out of time on LFG party; Issue warning message
-   *
-   * @param {Discord.Client} bot
-   * @param {Snowflake} id - LFG id
-   * @param {Number} timeLeft - Minutes remaining on LFG party
-   */
-  warning(bot, id, timeLeft) {
-    try {
-      const stack = bot.lfgStack.get(id);
-      const game = bot.games.get(stack.code);
-      const mode = game.modes.indexOf(stack.mode);
-      const embed = new Discord.RichEmbed()
-        .setTitle(`${stack.party_leader_name}'s party has ${timeLeft} minutes left before it times out!`)
-        .setDescription(`**Game:** ${stack.game}\n**Game mode:** ${game.modes_proper[mode]}\n**Party:** ${stack.party.map(m => `<@${m}>`).join(' ')} (${stack.party.length}/${stack.max_party_size})`)
-        .setColor(0x009395);
-      stack.warning = true;
-      const ch = bot.channels.get(stack.channel);
-      ch.send({ embed });
-      console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG is running out of time.`));
-    } catch (err) {
-      console.error(err);
-    }
-  },
-
-  /**
-   * @func complete
-   * Party is full; Complete the LFG party ✓
-   *
-   * @param {Discord.Client} bot
-   * @param {Snowflake} id - LFG id
-   */
-  complete(bot, id) {
-    try {
-      const stack = bot.lfgStack.get(id);
-      const game = bot.games.get(stack.code);
-      const mode = game.modes.indexOf(stack.mode);
-      const embed = new Discord.RichEmbed()
-        .setTitle(`${stack.party_leader_name}'s party is now full & ready to go!`)
-        .setDescription(`**Game:** ${stack.game}\n**Game mode:** ${game.modes_proper[mode]}\n**Party:** ${stack.party.map(m => `<@${m}>`).join(' ')}`)
-        .setColor(0x009395)
-        .setThumbnail('https://i.imgur.com/RsRmWcm.png');
-
-      const ch = bot.channels.get(stack.channel);
-      ch.send({ embed });
-
-      // Remove from LFG stack
       bot.lfgStack.delete(id);
       if (bot.lfgStack.size === 0) bot.lfgUpdate(false);
 
-      console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG party for ${stack.game} is full.`));
-    } catch (err) {
-      console.error(err);
+      if (settings.lfg.delete_on_timeout) {
+        message.delete().then(logTimeout).catch(err => console.error(err));
+      } else {
+        const embed = buildMessage(bot, stack, { type: 'timeout' });
+
+        message.edit({ embed }).then(logTimeout).catch(err => console.error(err));
+      }
+    }).catch(err => console.error(err));
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
+/**
+ * @func warning
+ * Running out of time on LFG party; Issue warning message
+ *
+ * @param {Discord.Client} bot
+ * @param {Snowflake} id - LFG id
+ * @param {Number} timeLeft - Minutes remaining on LFG party
+ */
+const warning = (bot, id, timeLeft) => {
+  try {
+    const stack = bot.lfgStack.get(id);
+    const game = bot.games.get(stack.code);
+    const mode = game.modes.indexOf(stack.mode);
+    const embed = new Discord.RichEmbed()
+      .setTitle(`${stack.party_leader_name}'s party has ${timeLeft} minutes left before it times out!`)
+      .setDescription(`**Game:** ${stack.game}\n**Game mode:** ${game.modes_proper[mode]}\n**Party:** ${stack.party.map(m => `<@${m}>`).join(' ')} (${stack.party.length}/${stack.max_party_size})`)
+      .setColor(0x009395);
+    stack.warning = true;
+    const ch = bot.channels.get(stack.channel);
+    ch.send({ embed });
+    console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG is running out of time.`));
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
+/**
+ * @func cancel
+ * Cancel the LFG party
+ *
+ * @param bot
+ * @param id - LFG id
+ * @param removed - Whether the LFG party message was removed or not
+ */
+const cancel = (bot, id, removed) => {
+  try {
+    const stack = bot.lfgStack.get(id);
+
+    // If the message was deleted, do this stuff:
+    if (removed) {
+      bot.lfgStack.delete(id);
+      if (bot.lfgStack.size === 0) bot.lfgUpdate(false);
+      return console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG party for ${stack.game} has been deleted.`));
     }
-  },
 
-  /**
-   * @func cancel
-   * Cancel the LFG party
-   *
-   * @param bot
-   * @param id - LFG id
-   * @param removed - Whether the LFG party message was removed or not
-   */
-  cancel(bot, id, removed) {
-    try {
-      const stack = bot.lfgStack.get(id);
-      const game = bot.games.get(stack.code);
-      const mode = game.modes.indexOf(stack.mode);
-      const embed = new Discord.RichEmbed()
-        .setTitle(`${stack.party_leader_name}'s party has been cancelled`)
-        .setDescription(`**Game:** ${stack.game}\n**Game mode:** ${game.modes_proper[mode]}\n**Party:** ${stack.party.map(m => `<@${m}>`).join(' ')} (${stack.party.length}/${stack.max_party_size})`)
-        .setColor(0x009395)
-        .setFooter('Cancelled')
-        .setTimestamp()
-        .setThumbnail('https://i.imgur.com/jSYuGrc.png');
-
-      // If the message was deleted, do this stuff:
-      if (removed) {
+    // Attempt to fetch message
+    bot.channels.get(stack.channel).fetchMessage(stack.id).then((message) => {
+      const afterCancel = () => {
         bot.lfgStack.delete(id);
         if (bot.lfgStack.size === 0) bot.lfgUpdate(false);
-        return console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG party for ${stack.game} has been deleted.`));
+        console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG party for ${stack.game} has been cancelled.`));
+      };
+
+      if (settings.lfg.delete_on_cancel) {
+        message.delete().then(afterCancel).catch(err => console.error(err));
+      } else {
+        const embed = buildMessage(bot, stack, { type: 'cancelled' });
+        message.edit({ embed }).then(afterCancel).catch(err => console.error(err));
       }
+    });
 
-      // Attempt to fetch message
-      bot.channels.get(stack.channel).fetchMessage(stack.id).then((message) => {
-        message.edit({ embed }).then(() => {
-          // Remove from LFG stack and edit message
-          bot.lfgStack.delete(id);
-          if (bot.lfgStack.size === 0) bot.lfgUpdate(false);
-          return console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG party for ${stack.game} has been cancelled.`));
-        }).catch(err => console.error(err));
-      }).catch(err => console.error(err));
+    return 0;
+  } catch (err) {
+    return console.error(err);
+  }
+};
 
-      return 0;
-    } catch (err) {
-      return console.error(err);
-    }
-  },
+/**
+ * @func update
+ * LFG update interval function
+ *
+ * @param bot
+ */
+const update = (bot) => {
+  try {
+    const d = new Date();
 
-  /**
-   * @func update
-   * LFG update interval function
-   *
-   * @param bot
-   */
-  update(bot) {
-    try {
-      const d = new Date();
+    bot.lfgStack.forEach((l) => {
+      /** Booleans to check */
+      const timedOut = (d.getTime() >= l.time + (l.ttl * 60000));
+      const ttlExceedsThreshold = l.ttl >= settings.lfg.ttl_threshold;
+      const alreadySentWarning = l.warning;
+      const shouldSendWarning = settings.lfg.ttl_warning;
+      const warningTimeMet = (l.time + ((l.ttl * 60000) - d.getTime())) <= (Math.round((l.ttl * 60000) / 4));
+      const sendWarning = (ttlExceedsThreshold && !alreadySentWarning && shouldSendWarning && warningTimeMet);
 
-      bot.lfgStack.forEach((l) => {
-        /** Booleans to check */
-        const timedOut = (d.getTime() >= l.time + (l.ttl * 60000));
-        const ttlExceedsThreshold = l.ttl >= settings.lfg.ttl_threshold;
-        const alreadySentWarning = l.warning;
-        const shouldSendWarning = settings.lfg.ttl_warning;
-        const warningTimeMet = (l.time + ((l.ttl * 60000) - d.getTime())) <= (Math.round((l.ttl * 60000) / 4));
-        const sendWarning = (ttlExceedsThreshold && !alreadySentWarning && shouldSendWarning && warningTimeMet);
+      if (timedOut) {
+        timeout(bot, l.id);
+      } else if (sendWarning) {
+        const timeLeft = Math.round(Math.round((60000 * l.ttl) / 4) / 60000);
+        warning(bot, l.id, timeLeft);
+      }
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
 
-        if (timedOut) {
-          this.timeout(bot, l.id);
-        } else if (sendWarning) {
-          const timeLeft = Math.round(Math.round((60000 * l.ttl) / 4) / 60000);
-          this.warning(bot, l.id, timeLeft);
-        }
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  },
+module.exports = {
+  buildMessage,
+  addLFG,
+  addToParty,
+  removeFromParty,
+  timeout,
+  warning,
+  complete,
+  cancel,
+  update,
 };

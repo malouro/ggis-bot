@@ -97,6 +97,8 @@ let lfgObject = {
   code: game.code, // code to identify the game within bot.games
   game: game.name, // name of the game
   mode: game.modes[j], // code of the game mode
+  platform, // game console / platform for the game
+  rank, // ranking for the requesting player in said game (ie: Challenger, Gold II in LoL, etc.)
   time, // current time
   expire_date: expireDate, // time of expiration
   ttl, // time to live
@@ -113,6 +115,7 @@ let lfgObject = {
 
 |Func|Parameters        |Description|
 |:---|------------------|-----------|
+|buildMessage| `Discord.Client` bot<br>`object` lfgObj<br>`string` type: ['timeout', 'cancelled', 'default'] | Creates a Discord Rich Embed message for the LFG request given a specified 'type'
 |addLFG| `Discord.Client` bot<br>`object` obj | Creates a new LFG party given an incoming LFG object. |
 |addToParty | `Discord.Client` bot<br>`Snowflake` id<br>`Snowflake` userid | Adds a user (of ID 'userid') into the LFG party. | 
 |removeFromParty | `Discord.Client` bot<br>`Snowflake` id<br>`Snowflake` userid | Removes a user (of ID 'userid') from the LFG party. |
@@ -138,4 +141,7 @@ Executed from `!reloadlfg [game]`
 
 If a `[game]` argument is not provided, *all* of the games in the LFG library will be reloaded.
 
-> TODO: Document the other handlers: (Poll, ~~Spoiler~~, StreamLink)
+> TODO: Document the other handlers?
+
+* Poll
+* StreamLink

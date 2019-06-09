@@ -50,7 +50,7 @@ exports.init = bot => new Promise((resolve, reject) => {
     const topics = [];
     bot.streamLink.conf = JSON.parse(fs.readFileSync(`${path}/conf.json`, 'utf8'));
 
-    console.log(chalk.bgMagenta.bold('StreamLink connections:'));
+    console.log(chalk.bgMagenta.bold('StreamLink:'));
     fs.readdir(`${path}/users`, 'utf8', (err, files) => {
       files.forEach((f) => {
         if (f === 'dummy') return;
@@ -65,7 +65,7 @@ exports.init = bot => new Promise((resolve, reject) => {
           if (f === 'dummy') return;
           let conf = JSON.parse(fs.readFileSync(`${path}/guilds/${f}`, 'utf8'));
           guilds.set(conf.id, conf);
-          console.log(chalk.bgMagenta.black(`Guild: ${conf.id} => Enabled?: ${conf.enabled}, Users: ${conf.usersEnabled}`));
+          console.log(chalk.bgMagenta.black(`Guild: ${conf.id} => StreamLink Enabled?: ${conf.enabled}, Users: ${conf.usersEnabled}`));
         });
         bot.streamLink.guilds = guilds;
         resolve({ topics: topics, client: bot });
