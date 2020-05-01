@@ -19,7 +19,7 @@
     "feed-read-parser": "1.0.5",
     "imgur2rss": "github:malouro/imgur2rss#patch-1",
     "lyrics-fetcher": "1.0.2",
-    "mkdirp": "0.5.1",
+    "mkdirp": "1.0.4",
     "moment": "2.21.0",
     "rimraf": "^3.0.2",
     "twitchps": "^1.5.0"
