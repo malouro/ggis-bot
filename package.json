@@ -16,7 +16,7 @@
   "dependencies": {
     "chalk": "^2.4.2",
     "discord.js": "^11.4.2",
-    "feed-read-parser": "0.0.6",
+    "feed-read-parser": "1.0.5",
     "imgur2rss": "github:malouro/imgur2rss#patch-1",
     "lyrics-fetcher": "1.0.2",
     "mkdirp": "0.5.1",
