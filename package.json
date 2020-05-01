@@ -7,7 +7,7 @@
     "start": "node app.js",
     "setup": "npm install && node ./scripts/setup.js",
     "generate": "node ./scripts/generate.js",
-    "clean": "rimraf node_modules",
+    "clean": "rimraf ./node_modules",
     "clean:install": "npm run clean && npm install",
     "lint": "eslint ."
   },
