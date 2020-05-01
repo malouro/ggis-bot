@@ -57,8 +57,8 @@ const flip = (noOfCoins) => {
   }
 
   return (
-    `You flipped ${noOfCoins === 1 ? 'a coin!' : `**${noOfCoins}** coins! Your results:`}\n\n` +
-    `${(noOfCoins > 1) ? `${flips.map(f => (f ? 'heads' : 'tails')).join(', ')}\n\n**${stats[0]}** heads (${stats[2]}%), **${stats[1]}** tails (${stats[3]}%)` : `${(flips[0]) ? '**Heads**' : '**Tails**'}`}`
+    `You flipped ${noOfCoins === 1 ? 'a coin!' : `**${noOfCoins}** coins! Your results:`}\n\n`
+    + `${(noOfCoins > 1) ? `${flips.map(f => (f ? 'heads' : 'tails')).join(', ')}\n\n**${stats[0]}** heads (${stats[2]}%), **${stats[1]}** tails (${stats[3]}%)` : `${(flips[0]) ? '**Heads**' : '**Tails**'}`}`
   );
 };
 

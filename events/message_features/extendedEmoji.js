@@ -23,25 +23,24 @@ const Discord = require('discord.js');
 
 const RegExExtendedEmojis = /:\w+:(?!\d+>)/g;
 
-module.exports = (message, settings) =>
-  new Promise((resolve, reject) => {
-    try {
-      const g = message.client.guilds.get(settings.testGuild);
-      if (typeof g === 'undefined') resolve(message);
-      let emojiCodes = [];
-      const emojis = new Map();
-      let edit = false;
-      let str = message.content.toString();
+module.exports = (message, settings) => new Promise((resolve, reject) => {
+  try {
+    const g = message.client.guilds.get(settings.testGuild);
+    if (typeof g === 'undefined') resolve(message);
+    let emojiCodes = [];
+    const emojis = new Map();
+    let edit = false;
+    let str = message.content.toString();
 
-      g.emojis.forEach((emoji) => {
-        emojis.set(emoji.name, {
-          id: emoji.id,
-          name: emoji.name,
-          format: `${(emoji.animated) ? `<a:${emoji.name}:${emoji.id}>` : `<:${emoji.name}:${emoji.id}>`}`,
-        });
+    g.emojis.forEach((emoji) => {
+      emojis.set(emoji.name, {
+        id: emoji.id,
+        name: emoji.name,
+        format: `${(emoji.animated) ? `<a:${emoji.name}:${emoji.id}>` : `<:${emoji.name}:${emoji.id}>`}`,
       });
+    });
 
-      /* eslint-disable */
+    /* eslint-disable */
       while ((emojiCodes = RegExExtendedEmojis.exec(str)) !== null) {
         let emoji = emojiCodes[0].toString().slice(1, emojiCodes[0].length - 1);
         if (emojis.has(emoji)) {
@@ -57,26 +56,26 @@ module.exports = (message, settings) =>
       }
       /* eslint-enable */
 
-      // If method (1) was used...
-      if (edit) {
-        message.delete().then((msg) => {
-          if (settings.rules.extendedEmoji.embed) {
-            const embed = new Discord.RichEmbed()
-              .setTitle('says:')
-              .setDescription(str)
-              .setAuthor(msg.author.username, msg.author.displayAvatarURL)
-              .setThumbnail(msg.author.displayAvatarURL);
-            msg.channel.send({ embed }).then((m) => {
-              resolve(m);
-            }).catch(err => console.log(err));
-          } else {
-            msg.channel.send(`\`${msg.author.username}:\`\n${str}`).then((m) => {
-              resolve(m);
-            }).catch(err => console.log(err));
-          }
-        }).catch(err => console.log(err));
-      }
-    } catch (err) {
-      reject(err);
+    // If method (1) was used...
+    if (edit) {
+      message.delete().then((msg) => {
+        if (settings.rules.extendedEmoji.embed) {
+          const embed = new Discord.RichEmbed()
+            .setTitle('says:')
+            .setDescription(str)
+            .setAuthor(msg.author.username, msg.author.displayAvatarURL)
+            .setThumbnail(msg.author.displayAvatarURL);
+          msg.channel.send({ embed }).then((m) => {
+            resolve(m);
+          }).catch(err => console.log(err));
+        } else {
+          msg.channel.send(`\`${msg.author.username}:\`\n${str}`).then((m) => {
+            resolve(m);
+          }).catch(err => console.log(err));
+        }
+      }).catch(err => console.log(err));
     }
-  });
+  } catch (err) {
+    reject(err);
+  }
+});

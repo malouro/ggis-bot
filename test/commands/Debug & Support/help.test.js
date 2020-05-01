@@ -8,7 +8,7 @@
 const chalk = require('chalk');
 const settings = require('../../../settings');
 
-const { testGuild, mainGuild, masterID } = settings; // eslint-disable-line
+const { testGuild } = settings;
 
 const t = 'help';
 const defaultProps = {

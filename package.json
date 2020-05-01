@@ -9,7 +9,8 @@
     "generate": "node ./scripts/generate.js",
     "clean": "rimraf ./node_modules",
     "clean:install": "npm run clean && npm install",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "mocha ./test/unit/*.test.js"
   },
   "author": "Michael Louro",
   "license": "MIT",
@@ -34,6 +35,7 @@
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^13.2.0",
     "eslint-plugin-import": "^2.20.2",
-    "mocha": "^7.1.2"
+    "mocha": "^7.1.2",
+    "sinon": "^9.0.2"
   }
 }

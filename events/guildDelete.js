@@ -62,13 +62,12 @@ module.exports = (guild) => {
 };
 
 // Reload StreamLink handler
-module.exports.reloadHandler = () =>
-  new Promise((resolve, reject) => {
-    try {
-      delete require.cache[require.resolve('../handlers/StreamLinkHandler')];
-      streamlink = require('../handlers/StreamLinkHandler');
-      resolve();
-    } catch (err) {
-      reject(err);
-    }
-  });
+module.exports.reloadHandler = () => new Promise((resolve, reject) => {
+  try {
+    delete require.cache[require.resolve('../handlers/StreamLinkHandler')];
+    streamlink = require('../handlers/StreamLinkHandler');
+    resolve();
+  } catch (err) {
+    reject(err);
+  }
+});

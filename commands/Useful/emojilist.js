@@ -44,8 +44,8 @@ const buildEmojiList = (bot, message, pageGiven) => {
       if (ac === currentPage * splitValue) {
         const embed = new Discord.RichEmbed();
         embeds.set(currentPage, embed);
-        embeds.get(currentPage).setTitle('Extended Emoji List').setDescription(`\`page ${currentPage + 1}/${Math.ceil(emojis.size / splitValue)}\`` +
-          ` \`Showing emojis ${(currentPage * splitValue) + 1} ~ ${(emojis.size - 1 < (currentPage + 1) * splitValue) ? emojis.size : (currentPage + 1) * splitValue}\``);
+        embeds.get(currentPage).setTitle('Extended Emoji List').setDescription(`\`page ${currentPage + 1}/${Math.ceil(emojis.size / splitValue)}\``
+          + ` \`Showing emojis ${(currentPage * splitValue) + 1} ~ ${(emojis.size - 1 < (currentPage + 1) * splitValue) ? emojis.size : (currentPage + 1) * splitValue}\``);
       }
 
       if (pageGiven === -1 || (ac >= currentPage * splitValue && ac <= ((currentPage + 1) * splitValue) - 1)) {
@@ -68,9 +68,9 @@ exports.run = (bot, message, args) => {
     switch (args[1]) {
       case 'help':
       case 'howto': {
-        const str = `Normally, a server can only have 50 custom emojis. Here in ${message.guild.name}, through the power of ${bot.user}, you can access even more emojis!` +
-          ` Just type the appropriate code for the emoji you want and ${bot.user} will replace your message with the emoji editted in.\n\n` +
-          `*Use \`${settings.prefix}emojilist\` or \`${settings.prefix}emojilist (page#)\` to see the list of extra emoji you can use!*`;
+        const str = `Normally, a server can only have 50 custom emojis. Here in ${message.guild.name}, through the power of ${bot.user}, you can access even more emojis!`
+          + ` Just type the appropriate code for the emoji you want and ${bot.user} will replace your message with the emoji editted in.\n\n`
+          + `*Use \`${settings.prefix}emojilist\` or \`${settings.prefix}emojilist (page#)\` to see the list of extra emoji you can use!*`;
         const embed = new Discord.RichEmbed().setTitle('Extended Emoji List').setDescription(str);
         /** Send the long message embed from above */
         message.channel.send({ embed });

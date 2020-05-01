@@ -51,58 +51,57 @@ const replyReaction = (message, reply) => {
   else message.reply(reply.message);
 };
 
-module.exports = (message, settings) =>
-  new Promise((resolve, reject) => {
-    try {
-      if (settings.rules.autoReact.txtMentions) {
-        TxtReactions = getTxtReactions(TxtReactions);
-        TxtReactions.forEach((t, regex) => {
-          if (message.content.match(regex)) {
-            switch (t.type) {
-              case 'react':
-                if (t.reaction.length > 0) {
-                  reactInOrder(message, t.reaction, 0);
-                } else {
-                  console.log(`No reactions in reaction array for "${t.description}" AutoReaction for a 'react' type AutoReact`);
-                }
-                break;
-              case 'reply':
-                if (t.reply.message !== '') {
-                  replyReaction(message, t.reply);
-                } else {
-                  console.log(`No reply message for "${t.description}" AutoReaction for a 'reply' type AutoReact`);
-                }
-                break;
-              case 'react-reply':
-              case 'reply-react':
-                if (t.reaction.length > 0 && t.reply.message !== '') {
-                  replyReaction(message, t.reply);
-                  reactInOrder(message, t.reaction, 0);
-                } else {
-                  if (t.reply.message === '') console.log(`No reply message for "${t.description}" AutoReaction for a 'reply' type AutoReact`);
-                  if (t.reaction.length <= 0) console.log(`No reactions in reaction array for "${t.description}" for a 'react' type AutoReact`);
-                }
-                break;
-              default:
-                console.log('Unexpected TxtReaction type in autoReact.js');
-                break;
-            }
+module.exports = (message, settings) => new Promise((resolve, reject) => {
+  try {
+    if (settings.rules.autoReact.txtMentions) {
+      TxtReactions = getTxtReactions(TxtReactions);
+      TxtReactions.forEach((t, regex) => {
+        if (message.content.match(regex)) {
+          switch (t.type) {
+            case 'react':
+              if (t.reaction.length > 0) {
+                reactInOrder(message, t.reaction, 0);
+              } else {
+                console.log(`No reactions in reaction array for "${t.description}" AutoReaction for a 'react' type AutoReact`);
+              }
+              break;
+            case 'reply':
+              if (t.reply.message !== '') {
+                replyReaction(message, t.reply);
+              } else {
+                console.log(`No reply message for "${t.description}" AutoReaction for a 'reply' type AutoReact`);
+              }
+              break;
+            case 'react-reply':
+            case 'reply-react':
+              if (t.reaction.length > 0 && t.reply.message !== '') {
+                replyReaction(message, t.reply);
+                reactInOrder(message, t.reaction, 0);
+              } else {
+                if (t.reply.message === '') console.log(`No reply message for "${t.description}" AutoReaction for a 'reply' type AutoReact`);
+                if (t.reaction.length <= 0) console.log(`No reactions in reaction array for "${t.description}" for a 'react' type AutoReact`);
+              }
+              break;
+            default:
+              console.log('Unexpected TxtReaction type in autoReact.js');
+              break;
           }
-        });
-      }
-      if (settings.rules.autoReact.atMentions && message.mentions.users.array().length > 0) {
-        AtReactions = getAtReactions(AtReactions);
-        message.mentions.users.forEach((u) => {
-          if (AtReactions.has(u.id)) {
-            const reaction = AtReactions.get(u.id);
-            message.react(reaction.emoji[Math.floor(Math.random() * reaction.emoji.length)])
-              .then()
-              .catch(e => console.error(e));
-          }
-        });
-      }
-      resolve();
-    } catch (err) {
-      reject(err);
+        }
+      });
     }
-  });
+    if (settings.rules.autoReact.atMentions && message.mentions.users.array().length > 0) {
+      AtReactions = getAtReactions(AtReactions);
+      message.mentions.users.forEach((u) => {
+        if (AtReactions.has(u.id)) {
+          const reaction = AtReactions.get(u.id);
+          message.react(reaction.emoji[Math.floor(Math.random() * reaction.emoji.length)])
+            .then()
+            .catch(e => console.error(e));
+        }
+      });
+    }
+    resolve();
+  } catch (err) {
+    reject(err);
+  }
+});

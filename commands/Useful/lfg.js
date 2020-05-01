@@ -69,28 +69,28 @@ const parseRestArgs = (args, bot, game) => {
 exports.help = {
   name: 'lfg',
   description: 'Look for players to join you in a game',
-  usage: 'lfg <game> [mode] [platform] [ranking] [partySize] [expirationTime(*h*m format)]' +
-         '\n\n<game> is *mandatory*' +
-         '\n\n[mode] [platform] [ranking] [partySize] [expirationTime] are all optional -- but if used, a [gamemode] *must* be provided and *before* the other options. ' +
-         'In other words, in order to give a [partySize] [platform] [ranking] or [expirationTime], you must have a [gamemode] chosen, and it must be specified right after the [game]\n' +
+  usage: 'lfg <game> [mode] [platform] [ranking] [partySize] [expirationTime(*h*m format)]'
+         + '\n\n<game> is *mandatory*'
+         + '\n\n[mode] [platform] [ranking] [partySize] [expirationTime] are all optional -- but if used, a [gamemode] *must* be provided and *before* the other options. '
+         + 'In other words, in order to give a [partySize] [platform] [ranking] or [expirationTime], you must have a [gamemode] chosen, and it must be specified right after the [game]\n'
 
-         '\n- Default gamemode & party size are dependent on the game and gamemode respectively' +
-         '\n- \'any\' & \'default\' are valid gamemodes for every game!' +
-         `\n- Default time is set to ${settings.lfg.ttl_default} minutes.` +
-         '\n- Party size & time must be given as positive integers.' +
+         + '\n- Default gamemode & party size are dependent on the game and gamemode respectively'
+         + '\n- \'any\' & \'default\' are valid gamemodes for every game!'
+         + `\n- Default time is set to ${settings.lfg.ttl_default} minutes.`
+         + '\n- Party size & time must be given as positive integers.'
 
-         '\n\nMore LFG Commands ::' +
-         `\nUse "${settings.prefix}lfg list" to see what games you can use!` +
-         `\nUse "${settings.prefix}lfg list <game>" to see more info on a specific game` +
-         `\nUse "${settings.prefix}lfg help" as an alternative way to access this help menu` +
+         + '\n\nMore LFG Commands ::'
+         + `\nUse "${settings.prefix}lfg list" to see what games you can use!`
+         + `\nUse "${settings.prefix}lfg list <game>" to see more info on a specific game`
+         + `\nUse "${settings.prefix}lfg help" as an alternative way to access this help menu`
 
-         '\n\nExamples ::\n' +
-         `${settings.prefix}lfg ow arcade 5 2h30m ║ Overwatch - Arcade - Party of 5 - 2 hour 30 min timer\n` +
-         `${settings.prefix}lfg rl default 2 ps4  ║ Rocket League - Default gamemode - Party of 2 - For PlayStation 4 - Default timer\n` +
-         `${settings.prefix}lfg lol duoq gold     ║ League of Legends - Ranked Duo Queue - Gold Rank - Default party size - Default timer\n` +
-         '\nWarnings :: (these won\'t work the way you probably intended them to)\n' +
-         `${settings.prefix}lfg dota2 4 20        ║ Doesn't give gamemode before party size or timer\n` +
-         `${settings.prefix}lfg rl hoops any      ║ 'Any' is not a valid party size, should be a number! (or 'default')`,
+         + '\n\nExamples ::\n'
+         + `${settings.prefix}lfg ow arcade 5 2h30m ║ Overwatch - Arcade - Party of 5 - 2 hour 30 min timer\n`
+         + `${settings.prefix}lfg rl default 2 ps4  ║ Rocket League - Default gamemode - Party of 2 - For PlayStation 4 - Default timer\n`
+         + `${settings.prefix}lfg lol duoq gold     ║ League of Legends - Ranked Duo Queue - Gold Rank - Default party size - Default timer\n`
+         + '\nWarnings :: (these won\'t work the way you probably intended them to)\n'
+         + `${settings.prefix}lfg dota2 4 20        ║ Doesn't give gamemode before party size or timer\n`
+         + `${settings.prefix}lfg rl hoops any      ║ 'Any' is not a valid party size, should be a number! (or 'default')`,
 };
 
 exports.conf = {
@@ -102,14 +102,13 @@ exports.conf = {
   permLevel: 0,
 };
 
-const addLfgMessage =
-  `If you want to add a game into the LFG game list (for the !lfg command), please DM <@${settings.masterID}> the information for the game by following this template:\n` +
-  '```json\n{\n    "code": "template",\n    "name": "Example Game Title",\n    "aliases": ["other", "names", "to", "choose", "the", "game", "with"],\n    "thumbnail": "<url to image here>",\n' +
-  '    "default_party_size": [4, 6, 5, 8],\n    "modes": ["any", "gamemode1", "gamemode2", "gamemode3"],\n    "modes_proper": ["Any", "Game Mode 1", "Game Mode 2", "Game Mode 3"],\n' +
-  '    "default_game_mode": "any"\n}```' +
-  '\n**•** The values in `default_party_size`, `modes`, & `modes_proper` must correspond and match up with each other\n**•** `default_party_size` values must be 2 or more\n' +
-  '**•** Include the "any" game mode in `modes` as the first value\n**•** `code`, `aliases`, and `modes` values must not contain spaces\n**•** Don\'t worry about the thumbnail! We can always add one later.\n\n' +
-  `By providing a template with information, you'll make <@${settings.masterID}>'s job a lot easier. <:FeelsGoodMan:230477418551312394> Thank you!`;
+const addLfgMessage = `If you want to add a game into the LFG game list (for the !lfg command), please DM <@${settings.masterID}> the information for the game by following this template:\n`
+  + '```json\n{\n    "code": "template",\n    "name": "Example Game Title",\n    "aliases": ["other", "names", "to", "choose", "the", "game", "with"],\n    "thumbnail": "<url to image here>",\n'
+  + '    "default_party_size": [4, 6, 5, 8],\n    "modes": ["any", "gamemode1", "gamemode2", "gamemode3"],\n    "modes_proper": ["Any", "Game Mode 1", "Game Mode 2", "Game Mode 3"],\n'
+  + '    "default_game_mode": "any"\n}```'
+  + '\n**•** The values in `default_party_size`, `modes`, & `modes_proper` must correspond and match up with each other\n**•** `default_party_size` values must be 2 or more\n'
+  + '**•** Include the "any" game mode in `modes` as the first value\n**•** `code`, `aliases`, and `modes` values must not contain spaces\n**•** Don\'t worry about the thumbnail! We can always add one later.\n\n'
+  + `By providing a template with information, you'll make <@${settings.masterID}>'s job a lot easier. <:FeelsGoodMan:230477418551312394> Thank you!`;
 
 exports.run = (bot, message, args, perms) => {
   let game;
@@ -174,9 +173,9 @@ exports.run = (bot, message, args, perms) => {
 
       // Build the page...
       for (let i = page * settings.lfg.split_value; i < nextMax; i++) {
-        str += (i !== (((page + 1) * settings.lfg.split_value) - 1) && i !== bot.games.size - 1) ?
-          `║${g[i].code}${' '.repeat(longestCode - g[i].code.length)} :: ${g[i].name}${' '.repeat(width - longestCode - g[i].name.length)}║\n` :
-          `║${g[i].code}${' '.repeat(longestCode - g[i].code.length)} :: ${g[i].name}${' '.repeat(width - longestCode - g[i].name.length)}║\n╚${'═'.repeat((2 * Math.round(longestCode / 2)) + (2 * Math.round(longestName / 2)) + 3)}╝`;
+        str += (i !== (((page + 1) * settings.lfg.split_value) - 1) && i !== bot.games.size - 1)
+          ? `║${g[i].code}${' '.repeat(longestCode - g[i].code.length)} :: ${g[i].name}${' '.repeat(width - longestCode - g[i].name.length)}║\n`
+          : `║${g[i].code}${' '.repeat(longestCode - g[i].code.length)} :: ${g[i].name}${' '.repeat(width - longestCode - g[i].name.length)}║\n╚${'═'.repeat((2 * Math.round(longestCode / 2)) + (2 * Math.round(longestName / 2)) + 3)}╝`;
       }
       message.author.send(str, {
         code: 'asciidoc',
@@ -231,14 +230,14 @@ exports.run = (bot, message, args, perms) => {
       `\nRankings  :: ${game.ranks.join(', ')}` : '');
     /* eslint-enable */
 
-    str +=
-        '\n\n= Game Mode List =\n' +
-        `╔${'═'.repeat(Math.round(longestMode / 2) - 2)}Code${'═'.repeat(Math.round(longestMode / 2) + (Math.round(longestModeProper / 2) - 4))}GameMode${'═'.repeat(Math.round(longestModeProper / 2) - 2)}Size══╗\n`;
+    str
+        += '\n\n= Game Mode List =\n'
+        + `╔${'═'.repeat(Math.round(longestMode / 2) - 2)}Code${'═'.repeat(Math.round(longestMode / 2) + (Math.round(longestModeProper / 2) - 4))}GameMode${'═'.repeat(Math.round(longestModeProper / 2) - 2)}Size══╗\n`;
     game.modes.forEach((m, index) => {
-      str += (index !== game.modes.length - 1) ?
-        `║${m}${' '.repeat(longestMode - m.length)} :: ${game.modes_proper[index]}${' '.repeat(width - longestMode - (game.modes_proper[index].length - 2))}${(game.default_party_size[index] / 10 >= 1) ? `${game.default_party_size[index]}` : ` ${game.default_party_size[index]}`}  ║\n` :
-        `║${m}${' '.repeat(longestMode - m.length)} :: ${game.modes_proper[index]}${' '.repeat(width - longestMode - (game.modes_proper[index].length - 2))}${(game.default_party_size[index] / 10 >= 1) ? `${game.default_party_size[index]}` : ` ${game.default_party_size[index]}`}  ║\n` +
-        `╚${'═'.repeat((2 * Math.round(longestMode / 2)) + (2 * Math.round(longestModeProper / 2)) + 10)}╝`;
+      str += (index !== game.modes.length - 1)
+        ? `║${m}${' '.repeat(longestMode - m.length)} :: ${game.modes_proper[index]}${' '.repeat(width - longestMode - (game.modes_proper[index].length - 2))}${(game.default_party_size[index] / 10 >= 1) ? `${game.default_party_size[index]}` : ` ${game.default_party_size[index]}`}  ║\n`
+        : `║${m}${' '.repeat(longestMode - m.length)} :: ${game.modes_proper[index]}${' '.repeat(width - longestMode - (game.modes_proper[index].length - 2))}${(game.default_party_size[index] / 10 >= 1) ? `${game.default_party_size[index]}` : ` ${game.default_party_size[index]}`}  ║\n`
+        + `╚${'═'.repeat((2 * Math.round(longestMode / 2)) + (2 * Math.round(longestModeProper / 2)) + 10)}╝`;
     });
 
     message.channel.send(str, {
@@ -291,9 +290,9 @@ exports.run = (bot, message, args, perms) => {
       // parse arguments for Party Size, TTL, Platform and Rank
       const parsedArgs = parseRestArgs(args.slice(3), bot, game);
 
-      ttl = parsedArgs[1] === -1 && parsedArgs[0] !== 0 ?
-        (parsedArgs[0] * 60) :
-        (parsedArgs[0] * 60) + parsedArgs[1];
+      ttl = parsedArgs[1] === -1 && parsedArgs[0] !== 0
+        ? (parsedArgs[0] * 60)
+        : (parsedArgs[0] * 60) + parsedArgs[1];
 
       [partySize, platform, rank] = parsedArgs.slice(2);
 

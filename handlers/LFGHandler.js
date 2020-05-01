@@ -46,11 +46,10 @@ const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
   let titleText = `${lfgObj.party_leader_name} is looking for a ${lfgObj.game} group!`;
   const titleThumbnail = lfgObj.platform ? lfgObj.platform.thumbnail : null;
   let gameThumbnail = game.thumbnail;
-  let lfgDescription =
-    `${lfgObj.platform ? `**Platform:** ${lfgObj.platform.properName}\n` : ''}` +
-    `**Game mode:** ${game.modes_proper[indexOfGame]}\n` +
-    `${lfgObj.rank ? `**Rank:** ${game.ranks_proper[game.ranks.indexOf(lfgObj.rank)]}\n` : ''}` +
-    `**Party size:** ${lfgObj.max_party_size}\n`;
+  let lfgDescription = `${lfgObj.platform ? `**Platform:** ${lfgObj.platform.properName}\n` : ''}`
+    + `**Game mode:** ${game.modes_proper[indexOfGame]}\n`
+    + `${lfgObj.rank ? `**Rank:** ${game.ranks_proper[game.ranks.indexOf(lfgObj.rank)]}\n` : ''}`
+    + `**Party size:** ${lfgObj.max_party_size}\n`;
   let fields = [[
     'Want to join?',
     `Click the 👍 below to reserve a spot!\n<@${lfgObj.party_leader_id}>, click the 🚫 below to cancel the party.\n\n**Party:** <@${lfgObj.party_leader_id}> (1/${lfgObj.max_party_size})`,
@@ -76,11 +75,10 @@ const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
     case 'cancelled':
       titleText = `${lfgObj.party_leader_name}'s party has been cancelled`;
       gameThumbnail = 'https://i.imgur.com/jSYuGrc.png';
-      lfgDescription =
-        `**Game:** ${lfgObj.game}\n` +
-        `${lfgObj.platform !== null ? `**Platform:** ${lfgObj.platform.properName}\n` : ''}` +
-        `**Game mode:** ${game.modes_proper[mode]}\n` +
-        `**Party:** ${lfgObj.party.map(id => `<@${id}>`).join(' ')} (${lfgObj.party.length}/${lfgObj.max_party_size})`;
+      lfgDescription = `**Game:** ${lfgObj.game}\n`
+        + `${lfgObj.platform !== null ? `**Platform:** ${lfgObj.platform.properName}\n` : ''}`
+        + `**Game mode:** ${game.modes_proper[mode]}\n`
+        + `**Party:** ${lfgObj.party.map(id => `<@${id}>`).join(' ')} (${lfgObj.party.length}/${lfgObj.max_party_size})`;
       fields = [];
       timestamp = null;
       expirationLabel = 'Cancelled';

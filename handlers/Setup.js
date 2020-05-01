@@ -2,10 +2,10 @@
 /** @todo Migrate out these comment blocks into documentation */
 const chalk = require('chalk');
 const Discord = require('discord.js');
-const events = require('./events.json');
-const { platforms } = require('../config/lfg/platforms.json');
 const fs = require('fs');
 const TwitchPS = require('twitchps');
+const events = require('./events.json');
+const { platforms } = require('../config/lfg/platforms.json');
 
 const functionsToReload = [];
 const handlers = [];

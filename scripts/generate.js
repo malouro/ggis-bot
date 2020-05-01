@@ -56,16 +56,15 @@ const writeFiles = (settingsObj, reactionsObj) => {
   });
 };
 
-console.log('Generating configuration files for you. Just need some info first...' +
-  '\n\nA (*) means that the setting is required. Otherwise, you can leave the setting blank.' +
-  '\n[Refer to the README for more information on this setup script.]\n');
+console.log('Generating configuration files for you. Just need some info first...'
+  + '\n\nA (*) means that the setting is required. Otherwise, you can leave the setting blank.'
+  + '\n[Refer to the README for more information on this setup script.]\n');
 
 /** Define questions to ask */
 
-const askForToken = () =>
-  new Promise((resolve, reject) => {
-    try {
-      /* eslint-disable */
+const askForToken = () => new Promise((resolve, reject) => {
+  try {
+    /* eslint-disable */
       let notDone = true;
       
       rl.question('* Token: [Discord bot token] ', (token) => {
@@ -82,80 +81,74 @@ const askForToken = () =>
         }
       });
       /* eslint-enable */
-    } catch (err) {
-      reject(err);
-    }
-  });
+  } catch (err) {
+    reject(err);
+  }
+});
 
-const askForBotName = () =>
-  new Promise((resolve, reject) => {
-    try {
-      rl.question(`* Your bot's name: (${json.botNameProper}) `, (name) => {
-        resolve(name.trim());
-      });
-    } catch (err) {
-      reject(err);
-    }
-  });
+const askForBotName = () => new Promise((resolve, reject) => {
+  try {
+    rl.question(`* Your bot's name: (${json.botNameProper}) `, (name) => {
+      resolve(name.trim());
+    });
+  } catch (err) {
+    reject(err);
+  }
+});
 
 const ridWhiteSpace = name => name.replace(/\s/g, '');
 
 const getCode = name => ridWhiteSpace(name).toLowerCase();
 
-const askForPrefix = () =>
-  new Promise((resolve, reject) => {
-    try {
-      rl.question(`* Command prefix: (${json.prefix}) `, (prefix) => {
-        resolve(ridWhiteSpace(prefix));
-      });
-    } catch (err) {
-      reject(err);
-    }
-  });
+const askForPrefix = () => new Promise((resolve, reject) => {
+  try {
+    rl.question(`* Command prefix: (${json.prefix}) `, (prefix) => {
+      resolve(ridWhiteSpace(prefix));
+    });
+  } catch (err) {
+    reject(err);
+  }
+});
 
-const askForMasterID = () =>
-  new Promise((resolve, reject) => {
-    try {
-      rl.question('* Your Discord User ID: ( ) [right click, Copy ID] ', (masterID) => {
-        resolve(masterID.trim());
-      });
-    } catch (err) {
-      reject(err);
-    }
-  });
+const askForMasterID = () => new Promise((resolve, reject) => {
+  try {
+    rl.question('* Your Discord User ID: ( ) [right click, Copy ID] ', (masterID) => {
+      resolve(masterID.trim());
+    });
+  } catch (err) {
+    reject(err);
+  }
+});
 
-const askForMainGuild = () =>
-  new Promise((resolve, reject) => {
-    try {
-      rl.question('* Your Discord Server ID: ( ) [right click, Copy ID] ', (mainGuild) => {
-        resolve(mainGuild.trim());
-      });
-    } catch (err) {
-      reject(err);
-    }
-  });
+const askForMainGuild = () => new Promise((resolve, reject) => {
+  try {
+    rl.question('* Your Discord Server ID: ( ) [right click, Copy ID] ', (mainGuild) => {
+      resolve(mainGuild.trim());
+    });
+  } catch (err) {
+    reject(err);
+  }
+});
 
-const askForTestGuild = () =>
-  new Promise((resolve, reject) => {
-    try {
-      rl.question('  Test Guild Server ID: ( ) [needed only for ExtendedEmoji] ', (testGuild) => {
-        resolve(testGuild.trim());
-      });
-    } catch (err) {
-      reject(err);
-    }
-  });
+const askForTestGuild = () => new Promise((resolve, reject) => {
+  try {
+    rl.question('  Test Guild Server ID: ( ) [needed only for ExtendedEmoji] ', (testGuild) => {
+      resolve(testGuild.trim());
+    });
+  } catch (err) {
+    reject(err);
+  }
+});
 
-const askForImgurToken = () =>
-  new Promise((resolve, reject) => {
-    try {
-      rl.question('  Imgur API Token: ( ) [needed only for `reloadfortunes`] ', (imgurToken) => {
-        resolve(imgurToken.trim());
-      });
-    } catch (err) {
-      reject(err);
-    }
-  });
+const askForImgurToken = () => new Promise((resolve, reject) => {
+  try {
+    rl.question('  Imgur API Token: ( ) [needed only for `reloadfortunes`] ', (imgurToken) => {
+      resolve(imgurToken.trim());
+    });
+  } catch (err) {
+    reject(err);
+  }
+});
 
 /** Start asking questions */
 (async function exec() {
