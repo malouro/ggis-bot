@@ -1,8 +1,12 @@
-# Intro
+# Ggis-bot
+
+[![CircleCI](https://circleci.com/gh/malouro/ggis-bot.svg?style=svg)](https://circleci.com/gh/malouro/ggis-bot)
+
+## Introduction
 
 Ggis-bot was a small, personal summer project that escalated into something a little bigger. Originally designed to be used for a private Discord server among friends, Ggis sports some pretty useful (as well as some pretty *useless*) features that help keep us entertained to this day.
 
-### The $%&# is a "Ggis"?
+## The $%&# is a "Ggis"?
 
 My Discord username is Sigg.
 
@@ -10,7 +14,7 @@ Ggis is Sigg backwards.
 
 Yep, there you go.
 
-### Features & Commands
+## Features & Commands
 
 - **StreamLink** : Pushes notifications when linked users go live on Twitch.tv
 - **LFG** : "Looking for group" helps you find people to play a game with you
@@ -21,7 +25,7 @@ Yep, there you go.
 
 Use the `!help` command to get a full list of commands.
 
-# Insallation & Setup
+## Installation & Setup
 
 ### Requirements
 
