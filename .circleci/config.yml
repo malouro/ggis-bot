@@ -21,8 +21,10 @@ jobs:
             - v1-dependencies-
 
       - run:
-          name: Install
-          command: yarn install
+          name: Install & setup
+          command: |
+            yarn install
+            cp settings.template.json settings.json
 
       - save_cache:
           paths:
