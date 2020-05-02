@@ -16,7 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "chalk": "^4.0.0",
-    "discord.js": "^12.2.0",
+    "discord.js": "^11.6.2",
     "feed-read-parser": "1.0.5",
     "imgur2rss": "github:malouro/imgur2rss#patch-1",
     "jest": "^25.5.3",
