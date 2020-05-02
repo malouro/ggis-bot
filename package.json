@@ -10,7 +10,7 @@
     "clean": "rimraf ./node_modules",
     "clean:install": "npm run clean && npm install",
     "lint": "eslint .",
-    "test": "mocha ./test/unit/*.test.js"
+    "test": "jest ./test/unit"
   },
   "author": "Michael Louro",
   "license": "MIT",
@@ -19,6 +19,7 @@
     "discord.js": "^11.4.2",
     "feed-read-parser": "1.0.5",
     "imgur2rss": "github:malouro/imgur2rss#patch-1",
+    "jest": "^25.5.3",
     "lyrics-fetcher": "1.0.2",
     "mkdirp": "1.0.4",
     "moment": "2.21.0",
@@ -31,11 +32,11 @@
   },
   "false": {},
   "devDependencies": {
-    "chai": "^4.2.0",
+    "@types/jest": "^25.2.1",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^13.2.0",
     "eslint-plugin-import": "^2.20.2",
-    "mocha": "^7.1.2",
-    "sinon": "^9.0.2"
+    "jest-mock-console": "^1.0.0",
+    "wait-for-expect": "^3.0.2"
   }
 }

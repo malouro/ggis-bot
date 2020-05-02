@@ -1,14 +1,19 @@
-# General & Node & pm2 stuff
+# General stuff
 logs
 *.log
+.DS_Store
+.vscode
+Thumbs.db
+
+# Node
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .npm
-.DS_Store
-.vscode
-Thumbs.db
 node_modules
+
+# Dev + test
+coverage
 
 # Fix for img/spoiler directory
 /img/spoilers/gifs/*
