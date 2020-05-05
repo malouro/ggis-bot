@@ -22,7 +22,7 @@
     "jest": "^25.5.3",
     "lyrics-fetcher": "1.0.2",
     "mkdirp": "1.0.4",
-    "moment": "2.25.1",
+    "moment": "2.25.3",
     "rimraf": "^3.0.2",
     "twitchps": "^1.5.0"
   },
