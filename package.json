@@ -35,7 +35,7 @@
     "@types/jest": "^25.2.1",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^13.2.0",
-    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-import": "^2.21.1",
     "jest-mock-console": "^1.0.0",
     "wait-for-expect": "^3.0.2"
   }
