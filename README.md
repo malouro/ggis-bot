@@ -30,6 +30,7 @@ Use the `!help` command to get a full list of commands.
 ### Requirements
 
 - [Latest Node.js](https://nodejs.org/en/)
+- [Yarn](https://yarnpkg.com/) - Alternatively, you can just use `npm`
 
 ### Getting set up
 
@@ -46,6 +47,8 @@ Firstly, you need a Discord development app and its corresponding OAuth token re
 Run the following command in a command prompt within the project directory:
 
 ```bash
+yarn setup
+# or
 npm run setup
 ```
 
@@ -54,6 +57,8 @@ During this setup script, you will be asked a series of configuration questions.
 ### Start the bot
 
 ```bash
+yarn start
+# or
 npm start
 ```
 
