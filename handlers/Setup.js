@@ -6,12 +6,16 @@ const fs = require('fs');
 const TwitchPS = require('twitchps');
 const events = require('./events.json');
 const { platforms } = require('../config/lfg/platforms.json');
+const { init: initGuildSettings } = require('../handlers/GuildSettings');
 
 const functionsToReload = [];
 const handlers = [];
 let lfgUpdateContainer = null;
 
 module.exports = (bot, settings) => {
+  // Store default prefix in the bot Client
+  bot.prefix = settings.prefix;
+
   /* * * Collections * * */
 
   /* Commands */
@@ -171,6 +175,11 @@ module.exports = (bot, settings) => {
       functionsToReload.push(require(`../commands/${cat}/${func}`));
     }
   });
+
+  /**
+   * Initialize per-guild settings
+   */
+  bot.guildOverrides = initGuildSettings();
 
   /**
    * Initialize StreamLink

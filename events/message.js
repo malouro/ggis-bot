@@ -4,9 +4,10 @@
 const fs = require('fs');
 const cmd = require('./commands');
 const settings = require('../settings');
-const msgFilter = require('./message_features/messageFilter');
-const autoReact = require('./message_features/autoReact');
-const extEmoji = require('./message_features/extendedEmoji');
+const msgFilter = require('./messageFeatures/messageFilter');
+const autoReact = require('./messageFeatures/autoReact');
+const extEmoji = require('./messageFeatures/extendedEmoji');
+const { getGuildCommandPrefix } = require('../handlers/GuildSettings');
 
 const RegExExtendedEmojis = /:\w+:(?!\d+>)/g;
 
@@ -14,6 +15,7 @@ module.exports = (message) => {
   if (message.author.bot && process.env.NODE_ENV !== 'test') return; // Ignore other bots' messages
 
   const updatedSettings = JSON.parse(fs.readFileSync('./settings.json', 'utf8'));
+  const prefix = getGuildCommandPrefix(message.client, message);
 
   if (message.channel.type === 'text') {
     if (message.guild.id === settings.mainGuild || message.guild.id === settings.testGuild) {
@@ -30,7 +32,7 @@ module.exports = (message) => {
         const extEmojiOn = updatedSettings.rules.extendedEmoji.enable;
         const autoReactOn = updatedSettings.rules.autoReact.enable;
 
-        if (!message.content.startsWith(settings.prefix)) {
+        if (!message.content.startsWith(prefix)) {
           if (message.content.toString().match(RegExExtendedEmojis) && extEmojiOn) {
             extEmoji(message, settings).then().catch(console.error);
           }
@@ -38,12 +40,12 @@ module.exports = (message) => {
             autoReact(message, settings).then().catch(console.error);
           }
         }
-        cmd(message.client, message, settings);
+        cmd(message.client, message, settings, prefix);
       }
     } else {
-      cmd(message.client, message, settings);
+      cmd(message.client, message, settings, prefix);
     }
   } else {
-    cmd(message.client, message, settings);
+    cmd(message.client, message, settings, prefix);
   }
 };

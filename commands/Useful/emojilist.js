@@ -6,6 +6,7 @@
 
 const Discord = require('discord.js');
 const settings = require('../../settings.json');
+const { getGuildCommandPrefix } = require('../../handlers/GuildSettings');
 
 const { testGuild } = settings;
 
@@ -64,13 +65,15 @@ const buildEmojiList = (bot, message, pageGiven) => {
 };
 
 exports.run = (bot, message, args) => {
+  const prefix = getGuildCommandPrefix(bot, message);
+
   if (args[1]) {
     switch (args[1]) {
       case 'help':
       case 'howto': {
         const str = `Normally, a server can only have 50 custom emojis. Here in ${message.guild.name}, through the power of ${bot.user}, you can access even more emojis!`
           + ` Just type the appropriate code for the emoji you want and ${bot.user} will replace your message with the emoji editted in.\n\n`
-          + `*Use \`${settings.prefix}emojilist\` or \`${settings.prefix}emojilist (page#)\` to see the list of extra emoji you can use!*`;
+          + `*Use \`${prefix}emojilist\` or \`${prefix}emojilist (page#)\` to see the list of extra emoji you can use!*`;
         const embed = new Discord.RichEmbed().setTitle('Extended Emoji List').setDescription(str);
         /** Send the long message embed from above */
         message.channel.send({ embed });

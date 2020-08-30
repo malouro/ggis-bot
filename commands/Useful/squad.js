@@ -8,22 +8,26 @@ const fs = require('fs');
 const moment = require('moment');
 const mkdirp = require('mkdirp');
 const settings = require('../../settings.json');
+const { getGuildCommandPrefix } = require('../../handlers/GuildSettings');
 
 exports.help = {
   name: 'squad',
   description: 'Quickly @mention a group of people with a single command',
-  usage: 'squad [<squadName>/create/delete/join/leave/addto/removefrom/list] <squadName>\n\n'
+  usage: (bot, message) => {
+    const prefix = getGuildCommandPrefix(bot, message);
+    return 'squad [<squadName>/create/delete/join/leave/addto/removefrom/list] <squadName>\n\n'
     + '[ Option list & descriptions: ]\n'
     + 'You must always specify the <squadName>! (but, don\'t include the < > in the command usage)\n'
-    + `${settings.prefix}squad <squadName> will @mention everyone in the squad!\n\n`
+    + `${prefix}squad <squadName> will @mention everyone in the squad!\n\n`
     + 'create     :: Creates a new squad, will be initially empty.\n'
-    + `(admins only: append @mentions at the end of "${settings.prefix}squad create squadName" to create the squad initially with members)\n`
+    + `(admins only: append @mentions at the end of "${prefix}squad create squadName" to create the squad initially with members)\n`
     + 'delete     :: Deletes a squad, can\'t be undone! _ADMIN-ONLY_\n'
-    + `join       :: Join & add yourself to a squad. The next time someone uses "${settings.prefix}squad squadName", you will be included!\n`
+    + `join       :: Join & add yourself to a squad. The next time someone uses "${prefix}squad squadName", you will be included!\n`
     + 'leave      :: Leave a squad. You will no longer be @mentioned with that squad\n'
     + 'addto      :: Add other members to the squad _ADMIN-ONLY_\n'
     + 'removefrom :: Remove other members from the squad _ADMIN-ONLY_\n'
-    + 'list       :: Lists all of the members of the squad',
+    + 'list       :: Lists all of the members of the squad';
+  },
 };
 
 exports.conf = {
@@ -83,17 +87,17 @@ const writeFileIfNotExist = (fname, contents, options, callback) => {
  * @param {Object} squad
  * @param {Discord.Message} message
  */
-const writeNewSquad = (path, squadName, squad, message) => {
+const writeNewSquad = (path, squadName, squad, message, prefix) => {
   mkdirp(path, 0o777, (err) => {
     if (err) throw err;
     else {
       writeFileIfNotExist(`${path}/${squadName}.json`, JSON.stringify(squad), { mode: 0o777 }, (err2, existed) => {
         if (err2) throw err2;
         if (!existed) {
-          message.reply(`Created the **${squadName}** squad! To join this squad use **${settings.prefix}squad join ${squadName}**`);
+          message.reply(`Created the **${squadName}** squad! To join this squad use **${prefix}squad join ${squadName}**`);
           console.log(`[${moment().format(settings.timeFormat)}] File created for squad ${squadName} on the ${message.guild.name} server! (id: ${message.guild.id})`);
         } else {
-          message.reply(`The squad **${squadName}** already exists! If you want to join this squad, and be alerted when other users use **${settings.prefix}squad ${squadName}**, use **${settings.prefix}squad join ${squadName}**`);
+          message.reply(`The squad **${squadName}** already exists! If you want to join this squad, and be alerted when other users use **${prefix}squad ${squadName}**, use **${prefix}squad join ${squadName}**`);
         }
       });
     }
@@ -247,7 +251,7 @@ const leaveSquad = (path, squadName, message) => {
  * @param {String} squadName
  * @param {Discord.Message} message
  */
-const addToSquad = (path, squadName, message) => {
+const addToSquad = (path, squadName, message, prefix) => {
   fs.readFile(`${path}/${squadName}.json`, { encoding: 'utf8', flag: 'r+' }, (readErr, data) => {
     if (readErr) {
       if (readErr.code === 'ENOENT') {
@@ -262,7 +266,7 @@ const addToSquad = (path, squadName, message) => {
           }
         });
       } else {
-        message.reply(`In order to add users to this squad, you need to @ mention them at the end of the command **${settings.prefix}squad addto ${squadName}**`);
+        message.reply(`In order to add users to this squad, you need to @ mention them at the end of the command **${prefix}squad addto ${squadName}**`);
         return;
       }
       fs.writeFile(`${path}/${squadName}.json`, JSON.stringify(tmpSquad), { mode: 0o777 }, (writeErr) => {
@@ -284,7 +288,7 @@ const addToSquad = (path, squadName, message) => {
  * @param {String} squadName
  * @param {Discord.Message} message
  */
-const removeFromSquad = (path, squadName, message) => {
+const removeFromSquad = (path, squadName, message, prefix) => {
   const removedUsers = [];
   fs.readFile(`${path}/${squadName}.json`, { encoding: 'utf8', flag: 'r+' }, (readErr, data) => {
     if (readErr) {
@@ -301,7 +305,7 @@ const removeFromSquad = (path, squadName, message) => {
           }
         });
       } else {
-        message.reply(`In order to remove users from this squad, you need to @ mention them at the end of the command (ie: **${settings.prefix}squad removefrom *@user1 @user2 ...***`);
+        message.reply(`In order to remove users from this squad, you need to @ mention them at the end of the command (ie: **${prefix}squad removefrom *@user1 @user2 ...***`);
         return;
       }
       if (removedUsers.length === 0) {
@@ -334,11 +338,12 @@ exports.run = (bot, message, args) => {
    */
   const tmpSquad = { squad: [] };
   const disallowed = ['create', 'delete', 'join', 'leave', 'addto', 'removefrom', 'list'];
+  const prefix = getGuildCommandPrefix(bot, message);
 
   if (typeof args[1] !== 'undefined') {
     if (args[1] === 'create') {
       if (typeof args[2] === 'undefined') {
-        message.reply(`You need to specify the name of the squad you want to make! (ie: **${settings.prefix}squad create *squadName***)`);
+        message.reply(`You need to specify the name of the squad you want to make! (ie: **${prefix}squad create *squadName***)`);
       } else if (args[2].includes('/')) {
         message.reply('Invalid squad name, can\'t contain \'/\' or any spaces.');
       } else if (disallowed.includes(args[2])) {
@@ -354,7 +359,7 @@ exports.run = (bot, message, args) => {
               });
             } else throw err;
           } else if (files.length >= settings.squad.server_max && message.guild.id !== settings.mainguild) {
-            return message.reply(`This server has already reached the maximum # of saved squads! (${settings.squad.server_max} squads) You can make room by deleting another squad with **${settings.prefix}squad delete *squadName***`);
+            return message.reply(`This server has already reached the maximum # of saved squads! (${settings.squad.server_max} squads) You can make room by deleting another squad with **${prefix}squad delete *squadName***`);
           }
           if (typeof args[3] !== 'undefined' && message.mentions.users.size > 0) {
             if (!message.member.hasPermission('ADMINISTRATOR')) {
@@ -364,12 +369,12 @@ exports.run = (bot, message, args) => {
               tmpSquad.squad.push(user.id);
             });
           }
-          writeNewSquad(`./config/squads/${message.guild.id}`, args[2].toLowerCase(), tmpSquad, message);
+          writeNewSquad(`./config/squads/${message.guild.id}`, args[2].toLowerCase(), tmpSquad, message, prefix);
         });
       }
     } else if (args[1] === 'delete') {
       if (typeof args[2] === 'undefined') {
-        message.reply(`You need to specify the name of the squad you want to delete! (ie: **${settings.prefix}squad delete *squadName***)`);
+        message.reply(`You need to specify the name of the squad you want to delete! (ie: **${prefix}squad delete *squadName***)`);
       } else if (!message.member.hasPermission('ADMINISTRATOR')) {
         message.reply('Sorry, but only admins are allowed to delete squads. Please contact a server admin to help you out! Non-admin users can only use, create, join or leave a squad.');
       } else {
@@ -377,35 +382,35 @@ exports.run = (bot, message, args) => {
       }
     } else if (args[1] === 'join') {
       if (typeof args[2] === 'undefined') {
-        message.reply(`You need to specify the name of the squad you want to join! (ie: **${settings.prefix}squad join *squadName***)`);
+        message.reply(`You need to specify the name of the squad you want to join! (ie: **${prefix}squad join *squadName***)`);
       } else {
         joinSquad(`./config/squads/${message.guild.id}`, args[2].toLowerCase(), message);
       }
     } else if (args[1] === 'leave') {
       if (typeof args[2] === 'undefined') {
-        message.reply(`You need to specify the name of the squad you want to leave. (ie: **${settings.prefix}squad leave *squadName***)`);
+        message.reply(`You need to specify the name of the squad you want to leave. (ie: **${prefix}squad leave *squadName***)`);
       } else {
         leaveSquad(`./config/squads/${message.guild.id}`, args[2].toLowerCase(), message);
       }
     } else if (args[1] === 'addto') {
       if (!message.member.hasPermission('ADMINISTRATOR')) {
-        message.reply(`Sorry, but only admins are allowed to add other users to a squad. Non-admin users can only use, create, join or leave a squad. You may not use the **${settings.prefix}squad addto** command.`);
+        message.reply(`Sorry, but only admins are allowed to add other users to a squad. Non-admin users can only use, create, join or leave a squad. You may not use the **${prefix}squad addto** command.`);
       } else if (typeof args[2] === 'undefined') {
-        message.reply(`You need to specify the name of the squad you want to add to! (ie: **${settings.prefix}squad addto *squadName @user1 @user2 ...***)`);
+        message.reply(`You need to specify the name of the squad you want to add to! (ie: **${prefix}squad addto *squadName @user1 @user2 ...***)`);
       } else {
-        addToSquad(`./config/squads/${message.guild.id}`, args[2].toLowerCase(), message);
+        addToSquad(`./config/squads/${message.guild.id}`, args[2].toLowerCase(), message, prefix);
       }
     } else if (args[1] === 'removefrom') {
       if (!message.member.hasPermission('ADMINISTRATOR')) {
         message.reply('Sorry, but only admins are allowed to remove users from a squad. Non-admin users can only use, create, join or leave a squad.');
       } else if (typeof args[2] === 'undefined') {
-        message.reply(`You need to specify the name of the squad you want to remove from (ie: **${settings.prefix}squad removefrom *squadName @user1 @user2 ...***)`);
+        message.reply(`You need to specify the name of the squad you want to remove from (ie: **${prefix}squad removefrom *squadName @user1 @user2 ...***)`);
       } else {
-        removeFromSquad(`./config/squads/${message.guild.id}`, args[2].toLowerCase(), message);
+        removeFromSquad(`./config/squads/${message.guild.id}`, args[2].toLowerCase(), message, prefix);
       }
     } else if (args[1] === 'list') {
       if (typeof args[2] === 'undefined') {
-        message.reply(`You need to specify the name of the squad you want to list & view! (ie: **${settings.prefix}squad list *squadName***)`);
+        message.reply(`You need to specify the name of the squad you want to list & view! (ie: **${prefix}squad list *squadName***)`);
       } else {
         listSquad(`./config/squads/${message.guild.id}`, args[2].toLowerCase(), message);
       }
@@ -415,7 +420,7 @@ exports.run = (bot, message, args) => {
       fs.readFile(`./config/squads/${message.guild.id}/${fetch}.json`, { encoding: 'utf8', flag: 'r' }, (err, data) => {
         if (err) {
           if (err.code === 'ENOENT') {
-            message.reply(`The **${args[1]}** squad does not exist. To make a new squad use **${settings.prefix}squad create *squadname***`);
+            message.reply(`The **${args[1]}** squad does not exist. To make a new squad use **${prefix}squad create *squadname***`);
           } else {
             throw err;
           }
@@ -423,7 +428,7 @@ exports.run = (bot, message, args) => {
           const fetchedJSON = JSON.parse(data);
           const onlyMember = fetchedJSON.squad.length === 1 && message.author.id === fetchedJSON.squad[0];
           if (fetchedJSON.squad.length === 0 || onlyMember) {
-            message.reply(`The **${fetch}** squad is currently empty (or you are the only member). Have other members join with **${settings.prefix}squad join ${fetch}**`);
+            message.reply(`The **${fetch}** squad is currently empty (or you are the only member). Have other members join with **${prefix}squad join ${fetch}**`);
             return;
           }
           fetchedJSON.squad.forEach((s, index) => {

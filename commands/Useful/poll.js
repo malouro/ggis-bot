@@ -7,17 +7,25 @@
 let polls = require('../../handlers/PollHandler');
 
 const settings = require('../../settings.json');
+const { getGuildCommandPrefix } = require('../../handlers/GuildSettings');
 
 exports.help = {
   name: 'poll',
   description: 'Makes a poll or petition',
-  usage: `poll Question ${settings.poll.divider} Option 1... ${settings.poll.divider} Option 2... ${settings.poll.divider} (etc.) *OR* ${settings.prefix}poll PetitionTopic\n\n\
-Makes a poll/petition with the specified question or topic. Seperate the options with "${settings.poll.divider}", if no options are given, a petition with a YAY and NAY option will be made.\n\n\
-Examples ::\n\n\
-${settings.prefix}poll Thoughts on pineapple pizza? ${settings.poll.divider} WTF ${settings.poll.divider} It's ok I guess ${settings.poll.divider} Hawaiian pizza is best pizza ${settings.poll.divider} pls stop\n\
-» Makes poll with 4 options about pineapple pizza\n\n\
-${settings.prefix}poll Rename the server to "${settings.botnameproper} is #1"\n\
-» Makes a petition to rename the server to an obviously improved name ;)`,
+  usage: (bot, message) => {
+    const prefix = getGuildCommandPrefix(bot, message);
+    return `poll Question ${settings.poll.divider} Option 1... ${settings.poll.divider} Option 2... ${settings.poll.divider} (etc.) *OR* ${prefix}poll PetitionTopic
+
+Makes a poll/petition with the specified question or topic. Separate the options with "${settings.poll.divider}", if no options are given, a petition with a YAY and NAY option will be made.
+
+Examples ::
+
+${prefix}poll Thoughts on pineapple pizza? ${settings.poll.divider} WTF ${settings.poll.divider} It's ok I guess ${settings.poll.divider} Hawaiian pizza is best pizza ${settings.poll.divider} pls stop\n\
+» Makes poll with 4 options about pineapple pizza
+
+${prefix}poll Rename the server to "${settings.botNameProper} is #1"
+» Makes a petition to rename the server to an obviously improved name ;)`;
+  },
 };
 
 exports.conf = {

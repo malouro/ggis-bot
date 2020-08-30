@@ -5,14 +5,23 @@
  */
 
 const settings = require('../../settings.json');
+const { getGuildCommandPrefix } = require('../../handlers/GuildSettings');
 
 const splitVal = settings.helpMenu.split_value;
 
 exports.help = {
   name: 'help',
   description: 'Displays all commands available, separated by category',
-  usage: `help [command/category]\n\nFor more information on a specific command use "${settings.prefix}help [command]" or "${settings.prefix}help [category]", `
-  + 'where [command] is any command you want to learn more about (ie: streamlink, lfg, fortune, etc.), and [category] is the category of commands you want to see a list of (ie: debug, useful, random, memes)',
+  usage: (bot, message) => {
+    const prefix = getGuildCommandPrefix(bot, message);
+    return [
+      'help [command/category]',
+      '\n\n',
+      `For more information on a specific command use "${prefix}help [command]" or "${prefix}help [category]", `,
+      'where [command] is any command you want to learn more about, and [category] is the category of commands',
+      'you want to see a list of.',
+    ].join('');
+  },
 };
 
 exports.conf = {
@@ -20,7 +29,7 @@ exports.conf = {
   visible: true,
   guildOnly: false,
   textChannelOnly: false,
-  aliases: [settings.botname, 'commands', 'commandlist'],
+  aliases: [settings.botName, 'commands', 'commandlist'],
   permLevel: 0,
 };
 
@@ -46,6 +55,7 @@ exports.run = (bot, message, args, perms) => {
   const arg = args[1];
   const dm = (message.channel.type === 'dm');
   const gid = (message.channel.type === 'dm') ? 0 : message.guild.id;
+  const prefix = getGuildCommandPrefix(bot, message);
 
   if (!args[1]) {
     /**
@@ -55,10 +65,10 @@ exports.run = (bot, message, args, perms) => {
     let str;
     const commandGroups = Array.from(bot.commandGroups.keys());
     const longest = commandGroups.reduce((long, name) => Math.max(long, name.length), 0);
-    str = `=== Command List Categories ===\nUse "${settings.prefix}help [category]" for the list of commands in that category\nUse "${settings.prefix}help all" to get a list of every command.\n\n`;
+    str = `=== Command List Categories ===\nUse "${prefix}help [category]" for the list of commands in that category\nUse "${prefix}help all" to get a list of every command.\n\n`;
     bot.commandGroups.forEach((category) => {
       const codeStr = category.code.join('|');
-      str += `${category.name}${' '.repeat(longest - category.name.length)} :: ${settings.prefix}help ${codeStr}${' '.repeat(longest - codeStr.length)} - ${category.description}\n`;
+      str += `${category.name}${' '.repeat(longest - category.name.length)} :: ${prefix}help ${codeStr}${' '.repeat(longest - codeStr.length)} - ${category.description}\n`;
     });
     return message.channel.send(str, { code: 'asciidoc' });
   } if (arg === 'all') {
@@ -66,8 +76,9 @@ exports.run = (bot, message, args, perms) => {
      * !help all
      * Sends all available commands to the user via DM
      */
+    const helpUsageText = this.help.usage(bot, message);
     let str = '=== Showing Every Command ==='
-      + `\nFor help & info, use: ${settings.prefix}${this.help.usage.substr(0, this.help.usage.indexOf('\n'))}\n\n`
+      + `\nFor help & info, use: ${prefix}${helpUsageText.substr(0, helpUsageText.indexOf('\n'))}\n\n`
       + `=== Category List ===\n${settings.commandGroups.map(cat => `${cat.code.join(', ')}`).join(', ')}\n\n`
       + '=== Command List ===\n';
     let ac = 0;
@@ -91,7 +102,7 @@ exports.run = (bot, message, args, perms) => {
         else substr = '';
         if (dm && c.conf.textChannelOnly) substr += ' (Doesn\'t work in DMs!)';
         if (!c.conf.enabled) substr = ' (DISABLED)';
-        str += `${settings.prefix}${c.help.name}${' '.repeat(longest - c.help.name.length)} :: ${c.help.description}${substr}\n`;
+        str += `${prefix}${c.help.name}${' '.repeat(longest - c.help.name.length)} :: ${c.help.description}${substr}\n`;
         if (ac % splitVal === 0) {
           substringIndexes.push(str.length);
         } else if (ac === cmdNames.length) {
@@ -118,8 +129,9 @@ exports.run = (bot, message, args, perms) => {
      * Help menu for a category
      */
     const category = bot.commandGroups.get(bot.commandGroupCategories.get(arg));
+    const helpUsageText = this.help.usage(bot, message);
     let str = `=== ${category.name} Commands ===\nCategory :: ${category.name}\nDescription :: ${category.description}\nCategory aliases :: ${category.code.join(', ')}`
-      + `\n\nFor help & info, use: ${settings.prefix}${this.help.usage.substr(0, this.help.usage.indexOf('\n'))}\n\n=== Command List ===\n`;
+      + `\n\nFor help & info, use: ${prefix}${helpUsageText.substr(0, helpUsageText.indexOf('\n'))}\n\n=== Command List ===\n`;
     let substr;
     const cmdsInCat = []; const cmdNames = [];
     bot.commands.forEach((c) => {
@@ -138,7 +150,7 @@ exports.run = (bot, message, args, perms) => {
       else substr = '';
       if (dm && c.conf.textChannelOnly) substr += ' (Doesn\'t work in DMs!)';
       if (!c.conf.enabled) substr = ' (DISABLED)';
-      str += `${settings.prefix}${c.help.name}${' '.repeat(longest - c.help.name.length)} :: ${c.help.description}${substr}\n`;
+      str += `${prefix}${c.help.name}${' '.repeat(longest - c.help.name.length)} :: ${c.help.description}${substr}\n`;
     });
     return message.channel.send(str, { code: 'asciidoc' });
   } if (bot.commands.has(arg) || bot.aliases.has(arg)) {
@@ -148,15 +160,23 @@ exports.run = (bot, message, args, perms) => {
      */
     let command = bot.commands.get(arg);
     if (!command) command = bot.commands.get(bot.aliases.get(arg));
+
+    let usage = '';
+    if (typeof command.help.usage === 'function') {
+      usage = command.help.usage(bot, message);
+    } else if (typeof command.help.usage === 'string') {
+      ({ usage } = command.help.usage);
+    }
+
     if (checkIfCommandAvailable(command, gid, perms, settings)) {
-      return message.channel.send(`=== ${settings.prefix}${command.help.name} ===\nAliases :: ${command.conf.aliases.map(a => settings.prefix + a).join(', ')}`
+      return message.channel.send(`=== ${prefix}${command.help.name} ===\nAliases :: ${command.conf.aliases.map(a => prefix + a).join(', ')}`
         + `\n\nDescription :: ${command.help.description}\n${(command.conf.guildOnly) ? '\n[ This command is exclusive to this server ]' : ''}`
         + `${(command.conf.textChannelOnly) ? '\n[ This command will NOT work in DMs ]' : ''}\n${(command.conf.textChannelOnly || command.conf.guildOnly) ? '\n' : ''}`
-        + `How to Use :: ${settings.prefix}${command.help.usage}`, { code: 'asciidoc' });
+        + `How to Use :: ${prefix}${usage}`, { code: 'asciidoc' });
     }
     return message.reply('Sorry, you do not have permission to view that command\'s help menu.');
   }
 
   /** Nothing was found, send alert message */
-  return message.reply(`No command or command category **${arg}** was found. Use \`${settings.prefix}${this.help.name}\` or ${bot.user} for a proper list of commands & categories!`);
+  return message.reply(`No command or command category **${arg}** was found. Use \`${prefix}${this.help.name}\` or ${bot.user} for a proper list of commands & categories!`);
 };

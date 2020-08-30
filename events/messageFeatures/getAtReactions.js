@@ -1,5 +1,5 @@
 /**
- * Updates AtReactions object in 'autoReact' event (in ~/events/message_features/)
+ * Updates AtReactions object in 'autoReact' event (in ~/events/messageFeatures/)
  */
 const fs = require('fs');
 
