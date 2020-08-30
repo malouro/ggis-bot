@@ -11,7 +11,7 @@ const extEmoji = require('./message_features/extendedEmoji');
 const RegExExtendedEmojis = /:\w+:(?!\d+>)/g;
 
 module.exports = (message) => {
-  if (message.author.bot) return; // Ignore other bots' messages
+  if (message.author.bot && process.env.NODE_ENV !== 'test') return; // Ignore other bots' messages
 
   const updatedSettings = JSON.parse(fs.readFileSync('./settings.json', 'utf8'));
 
