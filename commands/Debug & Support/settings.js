@@ -31,6 +31,7 @@ exports.conf = {
   permLevel: 3,
 };
 
+/* eslint-disable-next-line no-unused-vars */
 exports.run = (bot, message, args) => {
   message.reply('test');
 };
