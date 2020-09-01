@@ -20,7 +20,7 @@
     "discord.js": "^11.6.2",
     "feed-read-parser": "1.0.5",
     "imgur2rss": "github:malouro/imgur2rss#patch-1",
-    "jest": "^25.5.3",
+    "jest": "^26.4.2",
     "lyrics-fetcher": "1.0.2",
     "mkdirp": "1.0.4",
     "moment": "2.25.1",
@@ -32,7 +32,7 @@
     "url": "https://github.com/malouro/ggis-bot"
   },
   "devDependencies": {
-    "@types/jest": "^25.2.1",
+    "@types/jest": "^26.0.10",
     "dotenv": "^8.2.0",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^13.2.0",
