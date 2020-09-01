@@ -50,7 +50,7 @@ const bot = {
 
 jest.mock('twitchps');
 
-describe('Handlers', () => {
+describe('Bot Setup', () => {
   const restoreConsole = mockConsole();
 
   /* Wait for setup to be done */
@@ -66,9 +66,12 @@ describe('Handlers', () => {
     }, 10000);
   }, 20000);
 
-  afterAll(() => restoreConsole());
+  afterAll(() => {
+    jest.clearAllMocks();
+    restoreConsole();
+  });
 
-  describe('Bot setup', () => {
+  describe('Setup Handler', () => {
     test('initializes necessary bot properties', () => {
       expect(bot.commandGroups).toBeInstanceOf(Collection);
       expect(bot.commandGroupCategories).toBeInstanceOf(Collection);

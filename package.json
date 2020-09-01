@@ -41,7 +41,7 @@
     "wait-for-expect": "^3.0.2"
   },
   "jest": {
-    "clearMocks": true,
+    "clearMocks": false,
     "coverageDirectory": "coverage",
     "testEnvironment": "node",
     "testMatch": [
