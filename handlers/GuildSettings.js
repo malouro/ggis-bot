@@ -14,8 +14,6 @@ exports.init = () => {
         const guildId = file.slice(0, file.length - 5);
         const guildConfig = JSON.parse(fs.readFileSync(path.resolve(guildConfigsPath, `./${file}`), 'utf-8'));
 
-        console.log(guildConfig);
-
         guildOverrides[guildId] = guildConfig;
       }
     });

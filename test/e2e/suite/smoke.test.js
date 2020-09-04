@@ -72,6 +72,4 @@ describe('Smoke Tests', () => {
       expect(clearedUp).toStrictEqual([true, true]);
     });
   });
-
-  test.todo('help menu');
 });

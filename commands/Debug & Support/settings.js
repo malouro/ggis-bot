@@ -17,7 +17,8 @@ ${commandName} <scope> <key> <value>
 
 Examples ::
 
-${prefix}${commandName} bot prefix $ :: Changes command prefix to "$" in this server
+${prefix}${commandName} bot prefix $                ║ Changes command prefix to "$" in this server
+${prefix}${commandName} lfg createTempChannel false ║ Don't create temp channels for LFG in this server
 `.trim();
   },
 };
