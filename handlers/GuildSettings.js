@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const merge = require('lodash.merge');
 
 const guildConfigsPath = path.join(__dirname, '../config/guilds');
 
@@ -29,13 +30,46 @@ exports.getGuildCommandPrefix = (bot, message) => {
     ({ id } = message.guild);
   }
   if (id) {
-    if (bot.guildOverrides[id] && bot.guildOverrides[id].prefix) {
-      return bot.guildOverrides[id].prefix;
+    if (
+      bot.guildOverrides[id]
+      && bot.guildOverrides[id].bot
+      && bot.guildOverrides[id].bot.prefix
+    ) {
+      return bot.guildOverrides[id].bot.prefix;
     }
   }
 
   return bot.prefix;
 };
 
-// exports.update = (bot, id, key, value) => {
-// };
+/**
+ * Sets or updates the given value within the server's settings
+ * @param {Discord.Client} bot The bot instance
+ * @param {import('discord.js').Snowflake} id ID of the Guild
+ * @param {string} scope <scope> in settings
+ * @param {string} key <key> in <scope>
+ * @param {any} value <value> to set <scope.key> to for the given guild
+ * @returns {Promise} result
+ */
+exports.update = (bot, id, scope, key, value) => new Promise((resolve, reject) => {
+  let config = {};
+
+  if (bot.guildOverrides[id]) {
+    config = bot.guildOverrides[id];
+  }
+
+  const updatedConfig = merge(
+    config,
+    {
+      [scope]: { [key]: value },
+    },
+  );
+
+  bot.guildOverrides[id] = updatedConfig;
+
+  fs.writeFile(path.resolve(guildConfigsPath, `./${id}.json`), JSON.stringify(bot.guildOverrides[id]), (err) => {
+    if (err) reject(new Error(`Writing to ${guildConfigsPath}/${id}.json failed with the following error:\n${err}`));
+
+    resolve(updatedConfig);
+  });
+});

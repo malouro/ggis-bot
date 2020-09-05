@@ -4,6 +4,7 @@
  * @desc Roll a x amount of y-sided dice
  */
 
+/* eslint-disable no-restricted-globals */
 const { getGuildCommandPrefix } = require('../../handlers/GuildSettings');
 
 const defaultDie = 20;
@@ -74,7 +75,6 @@ exports.run = (bot, message, args) => {
       rollArgs[0] = Number(rollArgs[0]);
       rollArgs[1] = Number(rollArgs[1]);
 
-      /* eslint-disable */
       if (isNaN(rollArgs[0]) && isNaN(rollArgs[1])) {
         message.reply(roll(1, this.conf.defaultDie, [true, true]));
       } else if (isNaN(rollArgs[0])) {

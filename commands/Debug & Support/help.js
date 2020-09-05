@@ -169,7 +169,7 @@ exports.run = (bot, message, args, perms) => {
     }
 
     if (checkIfCommandAvailable(command, gid, perms, settings)) {
-      return message.channel.send(`=== ${prefix}${command.help.name} ===\nAliases :: ${command.conf.aliases.map(a => prefix + a).join(', ')}`
+      return message.channel.send(`=== ${prefix}${command.help.name} Help Menu ===\nAliases :: ${command.conf.aliases.map(a => prefix + a).join(', ')}`
         + `\n\nDescription :: ${command.help.description}\n${(command.conf.guildOnly) ? '\n[ This command is exclusive to this server ]' : ''}`
         + `${(command.conf.textChannelOnly) ? '\n[ This command will NOT work in DMs ]' : ''}\n${(command.conf.textChannelOnly || command.conf.guildOnly) ? '\n' : ''}`
         + `How to Use :: ${prefix}${usage}`, { code: 'asciidoc' });

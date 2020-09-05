@@ -55,7 +55,7 @@ describe('Bot Setup', () => {
 
   /* Wait for setup to be done */
   beforeAll(async () => {
-    const numberOfExpectedCommands = 29;
+    const numberOfExpectedCommands = 30;
     const lfgGames = fs.readdirSync('./config/lfg/default');
     await Setup(bot, settings);
 

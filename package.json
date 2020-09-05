@@ -21,6 +21,8 @@
     "feed-read-parser": "1.0.5",
     "imgur2rss": "github:malouro/imgur2rss#patch-1",
     "jest": "^26.4.2",
+    "json-beautify": "^1.1.1",
+    "lodash.merge": "^4.6.2",
     "lyrics-fetcher": "1.0.2",
     "mkdirp": "1.0.4",
     "moment": "2.25.1",
@@ -32,7 +34,7 @@
     "url": "https://github.com/malouro/ggis-bot"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.10",
+    "@types/jest": "^26.0.13",
     "dotenv": "^8.2.0",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^13.2.0",
@@ -43,9 +45,14 @@
   "jest": {
     "clearMocks": false,
     "coverageDirectory": "coverage",
+    "collectCoverageFrom": ["commands/**/*.js", "handlers/**/*.js", "events/**/*.js"],
     "testEnvironment": "node",
     "testMatch": [
       "<rootDir>/test/unit/**/*.test.{j,t}s?(x)"
+    ],
+    "setupFilesAfterEnv": ["<rootDir>/test/setupTests.js"],
+    "watchPathIgnorePatterns": [
+      "<rootDir>/config/guilds"
     ]
   }
 }

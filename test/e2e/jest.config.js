@@ -10,6 +10,6 @@ require('dotenv').config({
 });
 
 module.exports = Object.assign(baseJestConfig, {
-  setupFilesAfterEnv: ['<rootDir>/setupE2E.js'],
+  setupFilesAfterEnv: [...baseJestConfig.setupFilesAfterEnv, '<rootDir>/setupE2E.js'],
   testMatch: ['<rootDir>/suite/**/*.test.{t,j}s?(x)'],
 });
