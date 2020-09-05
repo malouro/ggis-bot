@@ -8,7 +8,7 @@
  *  This will decide what to do with message for message filters
  * @param {*} message The message in question
  * @param {*} settings Settings for the bot
- * @returns {Boolean} allowMessage?
+ * @returns {Boolean} deleteMessage?
  */
 /* eslint-disable-next-line no-unused-vars */
 module.exports = (message, settings) => false;
