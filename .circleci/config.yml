@@ -36,3 +36,7 @@ jobs:
       - run:
           name: Tests
           command: yarn test
+
+      - run:
+          name: End-to-end tests
+          command: yarn test:e2e
