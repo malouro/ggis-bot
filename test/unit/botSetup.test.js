@@ -2,6 +2,7 @@ const fs = require('fs');
 const waitForExpect = require('wait-for-expect');
 const mockConsole = require('jest-mock-console').default;
 const { Collection } = require('discord.js');
+const { numberOfCommands } = require('../testHelpers');
 const Setup = require('../../handlers/Setup');
 const { platforms } = require('../../config/lfg/platforms.json');
 
@@ -55,13 +56,12 @@ describe('Bot Setup', () => {
 
   /* Wait for setup to be done */
   beforeAll(async () => {
-    const numberOfExpectedCommands = 30;
     const lfgGames = fs.readdirSync('./config/lfg/default');
     await Setup(bot, settings);
 
     await waitForExpect(() => {
       expect(bot.games.size).toBe(lfgGames.length);
-      expect(bot.commands.size).toBe(numberOfExpectedCommands);
+      expect(bot.commands.size).toBe(numberOfCommands);
       expect(bot.platforms.size).toBe(platforms.length);
     }, 10000);
   }, 20000);

@@ -1,5 +1,6 @@
 const defaultSettings = require('../../settings.example.json');
 
+exports.numberOfCommands = 30;
 exports.settings = {
   ...defaultSettings,
   token: process.env.TOKEN,

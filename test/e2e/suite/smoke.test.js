@@ -2,8 +2,9 @@ const { Client } = require('discord.js');
 const fs = require('fs');
 const waitForExpect = require('wait-for-expect');
 const setupBot = require('../../../handlers/Setup');
-const { settings } = require('../testHelpers');
+const { settings, numberOfCommands } = require('../testHelpers');
 const { platforms } = require('../../../config/lfg/platforms.json');
+const { getGuildCommandPrefix } = require('../../../handlers/GuildSettings');
 
 jest.setTimeout(30000);
 
@@ -12,13 +13,12 @@ const Ggis = new Client();
 describe('Smoke Tests', () => {
   beforeAll(async () => {
     /* Setup bot */
-    const numberOfExpectedCommands = 29;
     const lfgGames = fs.readdirSync('./config/lfg/default');
 
     await setupBot(Ggis, settings);
     await waitForExpect(() => {
       expect(Ggis.games.size).toBe(lfgGames.length);
-      expect(Ggis.commands.size).toBe(numberOfExpectedCommands);
+      expect(Ggis.commands.size).toBe(numberOfCommands);
       expect(Ggis.platforms.size).toBe(platforms.length);
     }, 10000);
 
@@ -44,10 +44,12 @@ describe('Smoke Tests', () => {
 
   test('ping command', async () => {
     const clearedUp = [false, false];
-    const commandToTry = `${settings.prefix}ping`;
-    const channelToTestIn = Ggis.channels.get(
+    const channelToTestIn = Ggis.guilds.get(
+      process.env.TEST_GUILD,
+    ).channels.get(
       process.env.TEST_CHANNEL,
     );
+    const commandToTry = `${getGuildCommandPrefix(Ggis, channelToTestIn)}ping`;
 
     Ggis.on('message', (message) => {
       if (/Pong!/.test(message.content)) {
