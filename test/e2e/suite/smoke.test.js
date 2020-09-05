@@ -2,7 +2,7 @@ const { Client } = require('discord.js');
 const fs = require('fs');
 const waitForExpect = require('wait-for-expect');
 const setupBot = require('../../../handlers/Setup');
-const { settings, numberOfCommands } = require('../testHelpers');
+const { settings, numberOfCommands } = require('../../testHelpers');
 const { platforms } = require('../../../config/lfg/platforms.json');
 const { getGuildCommandPrefix } = require('../../../handlers/GuildSettings');
 

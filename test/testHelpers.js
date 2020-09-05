@@ -1,3 +1,5 @@
+const defaultSettings = require('../settings.example.json');
+
 exports.MOCK_BOT = {
   prefix: '!',
   message: {
@@ -15,7 +17,19 @@ exports.MOCK_BOT = {
   },
 };
 
+exports.numberOfCommands = 30;
+
 exports.makeMockMessage = (args, mockBot = this.MOCK_BOT) => ({
   ...mockBot.message,
   content: args.join(' '),
 });
+
+exports.settings = {
+  ...defaultSettings,
+  token: process.env.TOKEN,
+  prefix: '!',
+  masterID: process.env.MASTER_ID,
+  mainGuild: process.env.TEST_GUILD,
+  testGuild: process.env.TEST_GUILD,
+  mainChannel: process.env.TEST_CHANNEL,
+};
