@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const merge = require('lodash.merge');
+const settings = require('../settings.json');
 
 const guildConfigsPath = path.join(__dirname, '../config/guilds');
 
@@ -23,7 +24,7 @@ exports.init = () => {
   return guildOverrides;
 };
 
-exports.getGuildCommandPrefix = (bot, message) => {
+exports.getGuildSpecificSetting = (bot, message, scope, key, defaultSetting) => {
   let id = null;
 
   if (message && message.guild) {
@@ -32,15 +33,17 @@ exports.getGuildCommandPrefix = (bot, message) => {
   if (id) {
     if (
       bot.guildOverrides[id]
-      && bot.guildOverrides[id].bot
-      && bot.guildOverrides[id].bot.prefix
+      && bot.guildOverrides[id][scope]
+      && bot.guildOverrides[id][scope][key]
     ) {
       return bot.guildOverrides[id].bot.prefix;
     }
   }
 
-  return bot.prefix;
+  return defaultSetting || (scope === 'bot' ? settings.key : settings.scope.key);
 };
+
+exports.getGuildCommandPrefix = (bot, message) => this.getGuildSpecificSetting(bot, message, 'bot', 'prefix', bot.prefix);
 
 /**
  * Sets or updates the given value within the server's settings
