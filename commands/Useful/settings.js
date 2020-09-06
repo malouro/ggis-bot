@@ -5,7 +5,6 @@
  */
 
 /* eslint-disable no-restricted-globals */
-/* */
 const beautify = require('json-beautify');
 const settings = require('../../settings.json');
 const { getGuildCommandPrefix, update: updateGuildConfig } = require('../../handlers/GuildSettings');
@@ -13,12 +12,12 @@ const { getGuildCommandPrefix, update: updateGuildConfig } = require('../../hand
 const commandName = 'settings';
 
 /**
- * Available `types`:
- * - string
- * - number
- * - integer
- * - range
- * - boolean
+ * Available types:
+ * - @type string
+ * - @type number
+ * - @type integer
+ * - @type range
+ * - @type boolean
  */
 const configOptions = {
   bot: {
@@ -28,21 +27,26 @@ const configOptions = {
       description: 'The prefix for executing commands.',
     },
   },
-  lfg: {
-    createTempChannel: {
-      type: 'boolean',
-      default: true,
-      description: 'Whether to make a temporary party channel for LFG',
-    },
-  },
+
+  // =================== Example: ===================
+  // lfg: {
+  //   create_temp_channel: {
+  //     type: 'boolean',
+  //     default: settings.lfg.create_temp_channel,
+  //     description: 'Whether to make a temporary text channel for an LFG party',
+  //   },
+  // },
+  // =================================================
+
+  // For testing purposes only:
   ...(process.env.NODE_ENV === 'test' ? {
     test: {
-      'range 0-12': {
+      'range 0-10': {
         type: 'range',
         min: 0,
-        max: 12,
+        max: 10,
         default: 0,
-        description: 'Range',
+        description: 'Some number within this range',
       },
       number: {
         type: 'number',
@@ -83,15 +87,15 @@ const validateType = (input, expectedType, settingConfig) => {
   // Don't accept "Infinity" or - somehow? - an empty string
   if (!isNaN(input) && input !== '' && input !== 'Infinity') {
     switch (expectedType) {
-      // input = any number (float, int, etc.)
+      // input is any number (float, int, etc.)
       case 'number':
         return [true, Number(input)];
 
-      // input = integer
+      // input is integer
       case 'integer':
         return [Number.isInteger(input), Number(input)];
 
-      // input = a number in given range
+      // input is a number in given range
       case 'range': {
         if (!settingConfig || !settingConfig.min || !settingConfig.max) return [false, null];
         const num = parseFloat(input);
@@ -99,7 +103,7 @@ const validateType = (input, expectedType, settingConfig) => {
         return [num >= settingConfig.min && num <= settingConfig.max, Number(input)];
       }
 
-      // fail otherwise -> Input is a number, but wasn't one of the number types
+      // fail otherwise: input is a number, but was supposed to be something else
       default:
         return [false, null];
     }
