@@ -184,14 +184,14 @@ exports.conf = {
 exports.run = async (bot, message, args) => {
   const prefix = getGuildCommandPrefix(bot, message);
   const getCurrentGuildConfig = (input) => {
-    let config = {};
+    let config = null;
     // Given the ID of the guild
-    if (typeof input === 'string') {
+    if (typeof input === 'string' || !bot.guildOverrides[input]) {
       config = bot.guildOverrides[input];
     } else {
       config = input;
     }
-    const prettyConfig = beautify(config, null, 2, 80);
+    const prettyConfig = config ? beautify(config, null, 2, 80) : 'No setting overrides for this server.';
 
     return [
       "Here's the current config for this server:",
