@@ -16,7 +16,7 @@
   "author": "Mike A. Louro",
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
-    "chalk": "^4.0.0",
+    "chalk": "^4.1.0",
     "discord.js": "^11.6.2",
     "feed-read-parser": "1.0.5",
     "imgur2rss": "github:malouro/imgur2rss#patch-1",
