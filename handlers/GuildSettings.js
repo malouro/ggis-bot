@@ -49,9 +49,9 @@ exports.getGuildCommandPrefix = (bot, message) => this.getGuildSpecificSetting(b
  * Sets or updates the given value within the server's settings
  * @param {Discord.Client} bot The bot instance
  * @param {import('discord.js').Snowflake} id ID of the Guild
- * @param {string} scope <scope> in settings
- * @param {string} key <key> in <scope>
- * @param {any} value <value> to set <scope.key> to for the given guild
+ * @param {string} scope {scope} in settings
+ * @param {string} key {key} in {scope}
+ * @param {any} value {value} to set {scope.key} to for the given guild
  * @returns {Promise} result
  */
 exports.update = (bot, id, scope, key, value) => new Promise((resolve, reject) => {

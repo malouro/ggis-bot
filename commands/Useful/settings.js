@@ -21,6 +21,7 @@ const commandName = 'settings';
  */
 const configOptions = {
   bot: {
+    description: 'General bot settings',
     prefix: {
       type: 'string',
       default: settings.prefix,
@@ -138,7 +139,11 @@ const getAllSettings = () => {
     message += `=== Scope: "${scope}" ===\n\n`;
     const keys = Object.keys(configOptions[scope]);
 
+    delete keys.description;
+
     keys.forEach((key) => {
+      if (key === 'description') return;
+
       message += `${key} :: ${configOptions[scope][key].description || ''} [type: ${getTypeDesc(configOptions[scope][key])}]`;
       message += configOptions[scope][key].default ? ` [default: ${configOptions[scope][key].default}]\n` : '\n';
     });
@@ -155,18 +160,23 @@ exports.help = {
   description: "Change the bot's server settings",
   usage: (bot, message) => {
     const prefix = getGuildCommandPrefix(bot, message);
+    const scopes = Object.keys(configOptions);
     return `
-${commandName} <scope> <setting> <value>
+${commandName} <scope> (<setting> <value>)
 
-<scope> is *mandatory* and can be any of the following:
+<scope> is required and can be any of the following:
 
-- bot :: General bot settings
-- lfg :: LFG-specific settings
+- list :: List all available settings
+- show :: show current config for the server
+${scopes.map(scope => `- ${scope} :: ${configOptions[scope].description}`).join('\n')}
+
+If <scope> is *not* "list" or "show", you must also provide <setting> and <value> options. Use "${prefix}${commandName} list" for more info on available settings & values options.
 
 Examples ::
 
-${prefix}${commandName} bot prefix $                ║ Changes command prefix to "$" in this server
-${prefix}${commandName} lfg createTempChannel false ║ Don't create temp channels for LFG in this server
+${prefix}${commandName} show            ║ Shows the current config for the server, pretty-printed
+${prefix}${commandName} list            ║ Shows all available settings that can be modified
+${prefix}${commandName} bot prefix $    ║ Changes command prefix to "$" in this server
 `.trim();
   },
 };
@@ -186,12 +196,13 @@ exports.run = async (bot, message, args) => {
   const getCurrentGuildConfig = (input) => {
     let config = null;
     // Given the ID of the guild
-    if (typeof input === 'string' || !bot.guildOverrides[input]) {
+    if (typeof input === 'string' && bot.guildOverrides[input]) {
       config = bot.guildOverrides[input];
     } else {
       config = input;
     }
-    const prettyConfig = config ? beautify(config, null, 2, 80) : 'No setting overrides for this server.';
+
+    const prettyConfig = typeof config === 'object' ? beautify(config, null, 2, 80) : 'No setting overrides for this server.';
 
     return [
       "Here's the current config for this server:",
