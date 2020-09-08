@@ -12,11 +12,18 @@
 const fs = require('fs');
 const moment = require('moment');
 const settings = require('../../settings.json');
+const { getGuildCommandPrefix } = require('../../handlers/GuildSettings');
 
 exports.help = {
   name: 'plug',
   description: 'Links the server\'s main Plug.dj community',
-  usage: `plug (set [url])\n\n${settings.prefix}plug :: sends link to the Plug.dj community\n${settings.prefix}plug set [url] :: changes the default Plug.dj community to the given [url]`,
+  usage: (bot, message) => {
+    const prefix = getGuildCommandPrefix(bot, message);
+    return `plug (set [url])
+  
+${prefix}plug :: sends link to the Plug.dj community
+${prefix}plug set [url] :: changes the default Plug.dj community to the given [url]`;
+  },
 };
 
 exports.conf = {
@@ -29,13 +36,15 @@ exports.conf = {
 };
 
 exports.run = (bot, message, args) => {
+  const prefix = getGuildCommandPrefix(bot, message);
+
   if (typeof args[1] === 'undefined') {
     message.channel.send(`${settings.plugdj.main_url}`);
   } else if (args[1] === 'set') {
     if (!message.author.hasPermission('ADMINISTRATOR')) {
       message.reply('Sorry, but this command is **admin exclusive**. Either talk to a server administrator to help you out, or go cry in a corner. <:FeelsBadMan:230445576133541888>');
     } else if (typeof args[2] === 'undefined') {
-      message.reply(`In order to use **${settings.prefix}plug set** you need to specify the URL after "${settings.prefix}plug set"!`);
+      message.reply(`In order to use **${prefix}plug set** you need to specify the URL after "${prefix}plug set"!`);
     } else if (args[2].startsWith('https://')) {
       message.reply(`New Plug.dj link set to ${args[2]}`);
       [, , settings.plugdj.main_url] = args;

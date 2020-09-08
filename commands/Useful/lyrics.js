@@ -9,6 +9,7 @@ const moment = require('moment');
 
 const separator = '|';
 const settings = require('../../settings.json');
+const { getGuildCommandPrefix } = require('../../handlers/GuildSettings');
 
 exports.help = {
   name: 'lyrics',
@@ -26,6 +27,8 @@ exports.conf = {
 };
 
 exports.run = (bot, message, args) => {
+  const prefix = getGuildCommandPrefix(bot, message);
+
   let artist;
   let song;
   args.splice(0, 1);
@@ -35,13 +38,13 @@ exports.run = (bot, message, args) => {
   if (req[0]) {
     artist = req[0].trim();
   } else {
-    return message.reply(`No lyrics for me to search. Please specify the artist and song title! (separate the two with a '${separator}') \`${settings.prefix}lyrics artist ${separator} song\``);
+    return message.reply(`No lyrics for me to search. Please specify the artist and song title! (separate the two with a '${separator}') \`${prefix}lyrics artist ${separator} song\``);
   }
 
   if (req[1]) {
     song = req[1].trim();
   } else {
-    return message.reply(`No song given! Please specify the song title. \`${settings.prefix}lyrics artist | song\``);
+    return message.reply(`No song given! Please specify the song title. \`${prefix}lyrics artist | song\``);
   }
 
   const str = `**${artist} - ${song} Lyrics**\n\`\`\`\n`;

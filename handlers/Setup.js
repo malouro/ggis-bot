@@ -4,14 +4,22 @@ const chalk = require('chalk');
 const Discord = require('discord.js');
 const fs = require('fs');
 const TwitchPS = require('twitchps');
+const eventLoader = require('./EventLoader');
 const events = require('./events.json');
+const reloadCommands = require('./ReloadCommands');
+const reloadLFG = require('./ReloadLFG');
+const streamlink = require('./StreamLinkHandler');
 const { platforms } = require('../config/lfg/platforms.json');
+const { init: initGuildSettings } = require('../handlers/GuildSettings');
 
 const functionsToReload = [];
 const handlers = [];
 let lfgUpdateContainer = null;
 
 module.exports = (bot, settings) => {
+  // Store default prefix in the bot Client
+  bot.prefix = settings.prefix;
+
   /* * * Collections * * */
 
   /* Commands */
@@ -43,7 +51,7 @@ module.exports = (bot, settings) => {
    * Includes events for:
    * - ready, reconnecting, disconnect, message, guildCreate, messageReactionAdd, etc...
    */
-  require('./EventLoader')(bot, settings);
+  eventLoader(bot, settings);
 
   /**
    * Permission Levels
@@ -173,6 +181,11 @@ module.exports = (bot, settings) => {
   });
 
   /**
+   * Initialize per-guild settings
+   */
+  bot.guildOverrides = initGuildSettings();
+
+  /**
    * Initialize StreamLink
    *
    * - Run StreamLinkHandler.init(bot)
@@ -180,7 +193,6 @@ module.exports = (bot, settings) => {
    * - Tie the stream-up, stream-down and viewcount events to streamlinkHandler functions
    * - Two funcs for adding and removing topics from TwitchPS and embed into bot Client
    */
-  const streamlink = require('./StreamLinkHandler');
   streamlink.init(bot).then((value) => {
     bot = value.client;
     bot.twitch = new TwitchPS({ init_topics: value.topics, reconnect: true, debug: false });
@@ -262,8 +274,8 @@ module.exports = (bot, settings) => {
    * reloadCommands and reloadLFG are separate files
    * They are mentioned within the ReloadCommand(s) and ReloadLFG commands
    */
-  bot.reloadCommands = require('./ReloadCommands');
-  bot.reloadLFG = require('./ReloadLFG');
+  bot.reloadCommands = reloadCommands;
+  bot.reloadLFG = reloadLFG;
 
   /**
    * Reloading handler functions

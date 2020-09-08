@@ -4,15 +4,19 @@
  * @desc Roll a x amount of y-sided dice
  */
 
-const settings = require('../../settings');
+/* eslint-disable no-restricted-globals */
+const { getGuildCommandPrefix } = require('../../handlers/GuildSettings');
 
 const defaultDie = 20;
 
 exports.help = {
   name: 'roll',
   description: 'Roll a set of dice',
-  usage: `roll xdy\n\nx - Number of dice to roll\nd - (static, do not change)\ny - Number of sides for the dice\n\nIf options aren't specified, or there is a mistake in the parsing of the arguments, the default roll value is a single ${defaultDie}-sided die`
-  + `\n\nExample 1 :: ${settings.prefix}roll 1d20\nRolls a single 20-sided die.\n\nExample 2 :: ${settings.prefix}roll 3d10\nRolls three 10-sided dice`,
+  usage: (bot, message) => {
+    const prefix = getGuildCommandPrefix(bot, message);
+    return `roll xdy\n\nx - Number of dice to roll\nd - (static, do not change)\ny - Number of sides for the dice\n\nIf options aren't specified, or there is a mistake in the parsing of the arguments, the default roll value is a single ${defaultDie}-sided die`
+    + `\n\nExample 1 :: ${prefix}roll 1d20\nRolls a single 20-sided die.\n\nExample 2 :: ${prefix}roll 3d10\nRolls three 10-sided dice`;
+  },
 };
 
 exports.conf = {
@@ -71,7 +75,6 @@ exports.run = (bot, message, args) => {
       rollArgs[0] = Number(rollArgs[0]);
       rollArgs[1] = Number(rollArgs[1]);
 
-      /* eslint-disable */
       if (isNaN(rollArgs[0]) && isNaN(rollArgs[1])) {
         message.reply(roll(1, this.conf.defaultDie, [true, true]));
       } else if (isNaN(rollArgs[0])) {

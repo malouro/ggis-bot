@@ -4,7 +4,6 @@ const chalk = require('chalk');
 const moment = require('moment');
 const settings = require('../settings');
 
-// const optionEmojiNumbers = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '0⃣'];
 const optionEmojiLetters = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯'];
 
 const reactInOrder = (message, n, options) => {

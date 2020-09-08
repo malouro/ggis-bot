@@ -14,6 +14,7 @@ node_modules
 
 # Dev + test
 coverage
+.env.test
 
 # Fix for img/spoiler directory
 /img/spoilers/gifs/*

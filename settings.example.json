@@ -33,8 +33,7 @@
   "rules": {
     "enable": true,
     "filters": {
-      "enable": true,
-      "sailorMoon": true
+      "enable": true
     },
     "autoReact": {
       "enable": true,

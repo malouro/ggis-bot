@@ -10,6 +10,7 @@ const lfgFuncMRA = require('../../events/messageReactionAdd');
 const lfgFuncMRR = require('../../events/messageReactionRemove');
 const lfgFuncMD = require('../../events/messageDelete');
 const settings = require('../../settings');
+const { getGuildCommandPrefix } = require('../../handlers/GuildSettings');
 
 const countRegexMatches = (str, regex) => (str.match(new RegExp(regex, 'g')) || []).length;
 
@@ -69,7 +70,9 @@ const parseRestArgs = (args, bot, game) => {
 exports.help = {
   name: 'lfg',
   description: 'Look for players to join you in a game',
-  usage: 'lfg <game> [mode] [platform] [ranking] [partySize] [expirationTime(*h*m format)]'
+  usage: (bot, message) => {
+    const prefix = getGuildCommandPrefix(bot, message);
+    return 'lfg <game> [mode] [platform] [ranking] [partySize] [expirationTime(*h*m format)]'
          + '\n\n<game> is *mandatory*'
          + '\n\n[mode] [platform] [ranking] [partySize] [expirationTime] are all optional -- but if used, a [gamemode] *must* be provided and *before* the other options. '
          + 'In other words, in order to give a [partySize] [platform] [ranking] or [expirationTime], you must have a [gamemode] chosen, and it must be specified right after the [game]\n'
@@ -80,17 +83,18 @@ exports.help = {
          + '\n- Party size & time must be given as positive integers.'
 
          + '\n\nMore LFG Commands ::'
-         + `\nUse "${settings.prefix}lfg list" to see what games you can use!`
-         + `\nUse "${settings.prefix}lfg list <game>" to see more info on a specific game`
-         + `\nUse "${settings.prefix}lfg help" as an alternative way to access this help menu`
+         + `\nUse "${prefix}lfg list" to see what games you can use!`
+         + `\nUse "${prefix}lfg list <game>" to see more info on a specific game`
+         + `\nUse "${prefix}lfg help" as an alternative way to access this help menu`
 
          + '\n\nExamples ::\n'
-         + `${settings.prefix}lfg ow arcade 5 2h30m ║ Overwatch - Arcade - Party of 5 - 2 hour 30 min timer\n`
-         + `${settings.prefix}lfg rl default 2 ps4  ║ Rocket League - Default gamemode - Party of 2 - For PlayStation 4 - Default timer\n`
-         + `${settings.prefix}lfg lol duoq gold     ║ League of Legends - Ranked Duo Queue - Gold Rank - Default party size - Default timer\n`
+         + `${prefix}lfg ow arcade 5 2h30m ║ Overwatch - Arcade - Party of 5 - 2 hour 30 min timer\n`
+         + `${prefix}lfg rl default 2 ps4  ║ Rocket League - Default gamemode - Party of 2 - For PlayStation 4 - Default timer\n`
+         + `${prefix}lfg lol duoq gold     ║ League of Legends - Ranked Duo Queue - Gold Rank - Default party size - Default timer\n`
          + '\nWarnings :: (these won\'t work the way you probably intended them to)\n'
-         + `${settings.prefix}lfg dota2 4 20        ║ Doesn't give gamemode before party size or timer\n`
-         + `${settings.prefix}lfg rl hoops any      ║ 'Any' is not a valid party size, should be a number! (or 'default')`,
+         + `${prefix}lfg dota2 4 20        ║ Doesn't give gamemode before party size or timer\n`
+         + `${prefix}lfg rl hoops any      ║ 'Any' is not a valid party size, should be a number! (or 'default')`;
+  },
 };
 
 exports.conf = {
@@ -111,6 +115,8 @@ const addLfgMessage = `If you want to add a game into the LFG game list (for the
   + `By providing a template with information, you'll make <@${settings.masterID}>'s job a lot easier. <:FeelsGoodMan:230477418551312394> Thank you!`;
 
 exports.run = (bot, message, args, perms) => {
+  const prefix = getGuildCommandPrefix(bot, message);
+
   let game;
   let j;
   let ttl;
@@ -201,7 +207,7 @@ exports.run = (bot, message, args, perms) => {
       game = bot.games.get(bot.gameAliases.get(args[2]));
     } else {
       // warn that nothing was found
-      return message.reply(`Game **${args[2]}** was not found. For a list of available games, use \`${settings.prefix}lfg list\` (with no extra arguments)`);
+      return message.reply(`Game **${args[2]}** was not found. For a list of available games, use \`${prefix}lfg list\` (with no extra arguments)`);
     }
 
     // Get longest string size
@@ -257,7 +263,7 @@ exports.run = (bot, message, args, perms) => {
 
     /** No [game] was given */
     if (typeof args[1] === 'undefined') {
-      return message.reply(`You must specify a game in order to use LFG! For a list of available games, use \`${settings.prefix}lfg list\``);
+      return message.reply(`You must specify a game in order to use LFG! For a list of available games, use \`${prefix}lfg list\``);
     }
 
     /** Check if game given exists */
@@ -266,7 +272,7 @@ exports.run = (bot, message, args, perms) => {
     } else if (bot.gameAliases.has(args[1])) { // check aliases
       game = bot.games.get(bot.gameAliases.get(args[1]));
     } else { // warn that nothing was found
-      return message.reply(`Game **${args[1]}** was not found. For a list of available games, use \`${settings.prefix}lfg list\``);
+      return message.reply(`Game **${args[1]}** was not found. For a list of available games, use \`${prefix}lfg list\``);
     }
 
     /** Check if the game mode given exists for the game given */
@@ -279,7 +285,7 @@ exports.run = (bot, message, args, perms) => {
         j = game.modes.indexOf(args[2]);
       } else {
         // otherwise, warn the user that the game was not found
-        return message.reply(`Game mode **${args[2]}** for **${game.name}** was not found. For more information about this game (like available game modes, aliases, etc.), use \`${settings.prefix}lfg list ${args[1]}\``);
+        return message.reply(`Game mode **${args[2]}** for **${game.name}** was not found. For more information about this game (like available game modes, aliases, etc.), use \`${prefix}lfg list ${args[1]}\``);
       }
     } else {
       // set to default game mode for that game, if a game mode isn't given

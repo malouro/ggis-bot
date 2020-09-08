@@ -34,11 +34,21 @@ const checkIfAbleToUse = (cmd, perms, message, settings) => {
   return true;
 };
 
-module.exports = (bot, message, settings) => {
-  if (message.content.startsWith(`<@${bot.user.id}>`)) bot.commands.get('help').run(bot, message, message.content.split(/ +/), bot.getPerms(message));
-  if (!message.content.startsWith(settings.prefix)) return;
+module.exports = (bot, message, settings, prefix) => {
+  if (message.content.startsWith(`<@!${bot.user.id}>`)) {
+    bot.commands
+      .get('help')
+      .run(
+        bot,
+        message,
+        message.content.split(/ +/),
+        bot.getPerms(message),
+      );
+  }
 
-  const args = message.content.substring(settings.prefix.length).split(/ +/);
+  if (!message.content.startsWith(prefix)) return;
+
+  const args = message.content.substring(prefix.length).split(/ +/);
   const command = args[0].toLowerCase();
   const perms = bot.getPerms(message);
   let cmd;
