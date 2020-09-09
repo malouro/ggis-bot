@@ -34,7 +34,7 @@ exports.getGuildSpecificSetting = (bot, message, scope, key, defaultSetting) => 
     if (
       bot.guildOverrides[id]
       && bot.guildOverrides[id][scope]
-      && bot.guildOverrides[id][scope][key]
+      && key in bot.guildOverrides[id][scope]
     ) {
       return bot.guildOverrides[id][scope][key];
     }
