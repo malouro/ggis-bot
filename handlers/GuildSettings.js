@@ -36,7 +36,7 @@ exports.getGuildSpecificSetting = (bot, message, scope, key, defaultSetting) => 
       && bot.guildOverrides[id][scope]
       && bot.guildOverrides[id][scope][key]
     ) {
-      return bot.guildOverrides[id].bot.prefix;
+      return bot.guildOverrides[id][scope][key];
     }
   }
 
