@@ -34,13 +34,13 @@ exports.getGuildSpecificSetting = (bot, message, scope, key, defaultSetting) => 
     if (
       bot.guildOverrides[id]
       && bot.guildOverrides[id][scope]
-      && key in bot.guildOverrides[id][scope]
+      && Object.prototype.hasOwnProperty.call(bot.guildOverrides[id][scope], key)
     ) {
       return bot.guildOverrides[id][scope][key];
     }
   }
 
-  return defaultSetting || (scope === 'bot' ? settings.key : settings.scope.key);
+  return defaultSetting || (scope === 'bot' ? settings[key] : settings[scope][key]);
 };
 
 exports.getGuildCommandPrefix = (bot, message) => this.getGuildSpecificSetting(bot, message, 'bot', 'prefix', bot.prefix);
