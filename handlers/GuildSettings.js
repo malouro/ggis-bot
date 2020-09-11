@@ -1,3 +1,4 @@
+const Discord = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const merge = require('lodash.merge');
@@ -24,12 +25,43 @@ exports.init = () => {
   return guildOverrides;
 };
 
-exports.getGuildSpecificSetting = (bot, message, scope, key, defaultSetting) => {
+/**
+ * Returns back the value of a config setting for the given server.
+ * @param {Discord.Client} bot Bot instance
+ * @param {Discord.Guild|Discord.Message|Discord.Channel|import('discord.js').Snowflake} input A message, channel, guild or ID for the given server
+ * @param {string} scope {scope} of the setting
+ * @param {string} key the name (or {key}) of the setting to grab
+ * @param {any} [defaultSetting]
+ */
+exports.getGuildSpecificSetting = (bot, input, scope, key, defaultSetting) => {
   let id = null;
 
-  if (message && message.guild) {
-    ({ id } = message.guild);
+  /* Input = string */
+  if (typeof message === 'string') {
+    id = input;
+  /* Input = Channel|Message */
+  } else if (
+    input
+    && (
+      process.env.NODE_ENV !== 'test'
+      && (input instanceof Discord.Channel || input instanceof Discord.Message)
+    )
+    && input.guild
+  ) {
+    ({ id } = input.guild);
+  /* Input = Guild */
+  } else if (
+    process.env.NODE_ENV !== 'test'
+    && input instanceof Discord.Guild
+    && input.id
+  ) {
+    ({ id } = input);
   }
+
+  if (!bot.guilds.has(id)) {
+    return console.error(`Guild of ID ${id} does not exist; was the input valid?`);
+  }
+
   if (id) {
     if (
       bot.guildOverrides[id]
@@ -40,14 +72,18 @@ exports.getGuildSpecificSetting = (bot, message, scope, key, defaultSetting) => 
     }
   }
 
-  return defaultSetting || (scope === 'bot' ? settings[key] : settings[scope][key]);
+  // eslint-disable-next-line no-nested-ternary
+  return (typeof defaultSetting === 'undefined')
+    ? (scope === 'bot' ? settings[key] : settings[scope][key])
+    : defaultSetting;
 };
 
-exports.getGuildCommandPrefix = (bot, message) => this.getGuildSpecificSetting(bot, message, 'bot', 'prefix', bot.prefix);
+/* Returns command prefix within the given server */
+exports.getGuildCommandPrefix = (bot, input) => this.getGuildSpecificSetting(bot, input, 'bot', 'prefix', bot.prefix);
 
 /**
  * Sets or updates the given value within the server's settings
- * @param {Discord.Client} bot The bot instance
+ * @param {import('discord.js').Client} bot The bot instance
  * @param {import('discord.js').Snowflake} id ID of the Guild
  * @param {string} scope {scope} in settings
  * @param {string} key {key} in {scope}

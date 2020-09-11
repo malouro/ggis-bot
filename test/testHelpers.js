@@ -1,7 +1,11 @@
+const { Collection } = require('discord.js');
 const defaultSettings = require('../settings.example.json');
 
 exports.MOCK_GUILD_ID = 'MOCK_GUILD_ID';
 exports.MOCK_CHANNEL_ID = 'MOCK_CHANNEL_ID';
+exports.MOCK_GUILD = {
+  id: this.MOCK_GUILD_ID,
+};
 exports.MOCK_BOT = {
   clearMocks: () => {
     this.MOCK_BOT.message.reply.mockClear();
@@ -18,6 +22,9 @@ exports.MOCK_BOT = {
       id: this.MOCK_GUILD_ID,
     },
   },
+  guilds: new Collection([
+    [this.MOCK_GUILD_ID, this.MOCK_GUILD],
+  ]),
   guildOverrides: {},
 };
 
