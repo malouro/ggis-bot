@@ -4565,10 +4565,10 @@ tweetnacl@^1.0.0:
   resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-1.0.3.tgz#ac0af71680458d8a6378d0d0d050ab1407d35596"
   integrity sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==
 
-twitchps@^1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/twitchps/-/twitchps-1.5.0.tgz#61b61b7505df6cf27a979ba289670c6e08a10789"
-  integrity sha512-6M/ZeSkB7DlIu4XmSGuKLd2OuzYtq1kTR3kvIFYUaWKRxsoOPr+P/wi85wms+8rSLPXwpTEKlwg10epKfK2AKA==
+twitchps@^1.5.5:
+  version "1.5.5"
+  resolved "https://registry.yarnpkg.com/twitchps/-/twitchps-1.5.5.tgz#89f5a29e2c763134de6fddba8bf089b4f550670a"
+  integrity sha512-PBuDPik+5OgwIvJ+QchdEVY6kD8T9fHVjW3i6qAV78waNM/OiAGTe95UBIsJgHFBoovnnL9FWOmMKTDB/n5w0w==
   dependencies:
     events "^3.0.0"
     shortid "^2.2.8"
@@ -4826,12 +4826,7 @@ ws@^6.0.0:
   dependencies:
     async-limiter "~1.0.0"
 
-ws@^7.0.0:
-  version "7.2.5"
-  resolved "https://registry.yarnpkg.com/ws/-/ws-7.2.5.tgz#abb1370d4626a5a9cd79d8de404aa18b3465d10d"
-  integrity sha512-C34cIU4+DB2vMyAbmEKossWq2ZQDr6QEyuuCzWrM9zfw1sGc0mYiJ0UnG9zzNykt49C2Fi34hvr2vssFQRS6EA==
-
-ws@^7.2.3:
+ws@^7.0.0, ws@^7.2.3:
   version "7.3.1"
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.3.1.tgz#d0547bf67f7ce4f12a72dfe31262c68d7dc551c8"
   integrity sha512-D3RuNkynyHmEJIpD2qrgVkc9DQ23OrN/moAwZX4L8DfvszsJxpjQuUq3LMx6HoYji9fbIOBY18XWBsAux1ZZUA==
