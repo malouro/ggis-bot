@@ -43,16 +43,16 @@ exports.getGuildSpecificSetting = (bot, input, scope, key, defaultSetting) => {
   } else if (
     input
     && (
-      process.env.NODE_ENV !== 'test'
-      && (input instanceof Discord.Channel || input instanceof Discord.Message)
+      process.env.NODE_ENV === 'test'
+      || input instanceof Discord.Channel
+      || input instanceof Discord.Message
     )
     && input.guild
   ) {
     ({ id } = input.guild);
   /* Input = Guild */
   } else if (
-    process.env.NODE_ENV !== 'test'
-    && input instanceof Discord.Guild
+    (process.env.NODE_ENV === 'test' || input instanceof Discord.Guild)
     && input.id
   ) {
     ({ id } = input);
