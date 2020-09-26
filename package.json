@@ -4,7 +4,7 @@
   "description": "A Discord chat bot that does things.",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node index.js",
     "setup": "(yarn install || npm install) && node ./scripts/setup.js",
     "generate": "node ./scripts/generate.js",
     "clean": "rimraf ./node_modules",
