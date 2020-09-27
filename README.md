@@ -42,7 +42,7 @@ Firstly, you need a Discord development app and its corresponding OAuth token re
 4. At the top of the page, under **App details** there should be a **Client ID**. We'll need this soon!
 5. (Feel free to edit any other preferences for your bot while you're here on this page, because we're about to navigate away from it.)
 6. Click **Save Changes** to save your bot's information.
-7. Paste the following URL into your browser, but replace **INSERT_CLIENT_ID_HERE** with your Client ID from step 4: `https://discordapp.com/oauth2/authorize?client_id=INSERT_CLIENT_ID_HERE&scope=bot&permissions=523762774`<br>This will invite your bot into a server of your choice! (Note: You need to have the 'Manage server' permission on the server you wish to invite the bot into.)
+7. Paste the following URL into your browser, but replace **INSERT_CLIENT_ID_HERE** with your Client ID from step **4**: `https://discordapp.com/oauth2/authorize?client_id=INSERT_CLIENT_ID_HERE&scope=bot&permissions=523762774`<br>This will invite your bot into a server of your choice! (Note: You need to have the 'Manage server' permission on the server you wish to invite the bot into.)
 
 Run the following command in a command prompt within the project directory:
 
