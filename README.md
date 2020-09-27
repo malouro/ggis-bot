@@ -16,14 +16,14 @@ Yep, there you go.
 
 ## Features & Commands
 
-- **StreamLink** : Pushes notifications when linked users go live on Twitch.tv
 - **LFG** : "Looking for group" helps you find people to play a game with you
-- **AutoReact** : Automatic emoji reactions or message replies when specified users get @mentioned or when specific phrases are said
+- **StreamLink** : Pushes notifications when linked users go live on Twitch.tv
+- **AutoReact** : Automatic emoji reactions or message replies when specified users get @mentioned, or when specific phrases are said
 - Programmable **chat filters**
 - Fetch random posts from any of Reddit's subreddits
 - Open up fortune cookies, random Key & Peele videos, and other useless & silly commands
 
-Use the `!help` command to get a full list of commands.
+Use the `!help` command, or ping the bot to get a full list of commands.
 
 ## Installation & Setup
 

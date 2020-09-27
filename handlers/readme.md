@@ -15,7 +15,7 @@ This directory contains core modules that get accessed across several commands, 
 | [ReloadLFG](#rlfg)    | Reloads the LFG game library                    |
 
 
-## <a name="setup">Setup</a>
+## <a id="setup">Setup</a>
 
 As implied by the name, this code is executed at start up from the main `app.js` file and serves as the main entry point for the bot.
 
@@ -27,7 +27,7 @@ Below is a list of things that get executed at this stage:
   > Note: Eventually, a `reloadEvents` function will also be instantiated here, but for now this is a work in progress while I figure some stuff out
 
 
-## <a name="eldr">EventLoader</a>
+## <a id="eldr">EventLoader</a>
 
 Here, any events that the Client (our bot) needs to listen to are defined. By tying these event emitters to functions within our `~/events/` directory, we can control how the bot will handle incoming messages, emoji reactions, creation or deletion of channels & guilds, and so on.
 
@@ -51,7 +51,7 @@ Here, any events that the Client (our bot) needs to listen to are defined. By ty
 
 > Check out the Discord.js docs [here](https://discord.js.org/#/docs/main/stable/class/Client) for more info on Events.
 
-## <a name="lfg">LFGHandler</a>
+## <a id="lfg">LFGHandler</a>
 
 All `!lfg` related events are handled in here.
 
@@ -127,13 +127,13 @@ let lfgObject = {
 
 *Note: more details on the functions are given within the JavaScript file itself*
 
-## <a name="rlc">ReloadCommands</a>
+## <a id="rlc">ReloadCommands</a>
 
 This script is ran to update any command(s) in real time. If changes need to be made to a command, it is not necessary to restart the whole app; just run `!reload [command]`
 
 If a `[command]` argument is not provided, *all* the bot's commands will be reloaded.
 
-## <a name="rlfg">ReloadLFG</a>
+## <a id="rlfg">ReloadLFG</a>
 
 This script is will reload any updates made to the LFG library--that is, any of the .json config files within the `~/config/lfg/` directory.
 
