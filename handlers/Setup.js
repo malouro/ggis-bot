@@ -133,7 +133,12 @@ module.exports = (bot, settings) => {
   fs.readdir('./commands/', (err, folders) => {
     folders.forEach((folder) => {
       fs.readdir(`./commands/${folder}`, (errInCatDir, files) => {
-        if (errInCatDir) throw errInCatDir;
+        if (errInCatDir) {
+          if (errInCatDir.code === 'ENOTDIR') {
+            return;
+          }
+          throw errInCatDir;
+        }
         console.log(chalk.bgBlue(`Loading a total of ${files.length} commands from /${folder}/`));
         files.forEach((f) => {
           const contents = require(`../commands/${folder}/${f}`);
