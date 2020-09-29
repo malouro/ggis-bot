@@ -243,7 +243,11 @@ exports.run = async (bot, message, args) => {
   if (!keys.includes(key)) return message.reply(`\`${key}\` is not an available setting within \`${scope}\`.\n\n${fullListMessage}`);
 
   /* Check <value> */
-  if (!args[3]) return message.reply(`No \`value\` given. Please provide a value of of type \`${configOptions[scope][key].type || 'string'}\` for this setting.\n\n${fullListMessage}`);
+  if (!args[3]) {
+    return message.reply(
+      `No \`value\` given. Please provide a value of of type \`${configOptions[scope][key].type || 'string'}\` for this setting.\n\n${fullListMessage}`,
+    );
+  }
   const value = args[3];
   const expectedType = configOptions[scope][key].type || 'string';
   const [valid, castedValue] = validateType(value, expectedType);
