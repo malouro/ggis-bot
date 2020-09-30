@@ -271,8 +271,6 @@ exports.disableUser = (message, bot, user) => {
  *
  *  @param {Discord.Message} message
  *  @param {Discord.Client} bot
- *  @param {Discord.User} user
- *
  */
 exports.enableGuild = (message, bot) => {
   if (!bot.streamLink.guilds.has(message.guild.id)) {
@@ -295,8 +293,6 @@ exports.enableGuild = (message, bot) => {
  *
  *  @param {Discord.Message} message
  *  @param {Discord.Client} bot
- *  @param {Discord.User} user
- *
  */
 exports.disableGuild = (message, bot) => {
   if (!bot.streamLink.guilds.has(message.guild.id)) {
@@ -561,8 +557,8 @@ exports.statusMenu = (message, bot) => {
  * Applies after the use of !streamlink status, if the guild contains StreamLink'd users
  *
  *  @param {Discord.Message} message
- *  @param {bot.streamLink.guilds["message.guild.id"]} guild The guild's StreamLink object
- *  @param {bot.streamLink.users.filter(Users in guild)} users Collection of StreamLink user objects for users in the guild
+ *  @param {Discord.Guild} guild The guild's StreamLink object
+ *  @param {Discord.Collection<Discord.Snowflake, Discord.User>} users Collection of StreamLink user objects for users in the guild
  *
  * Displays status of all StreamLink connected members on the server
  * Shows whether users are currently live, enabled, and if live: viewer count, game, etc.

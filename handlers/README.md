@@ -7,15 +7,15 @@ This directory contains core modules that get accessed across several commands, 
 | File                  | Description                                     |
 |:----------------------|-------------------------------------------------|
 | [Setup](#setup)       | Start up file that serves as the first point of contact |
-| [EventLoader](#eldr)  | Ties JavaScript to eventListeners<br>(ie: message, guildCreate, channelDelete, etc)|
+| [EventLoader](#eldr)  | Ties JavaScript to eventListeners<br>(ie: message, guildCreate, channelDelete, etc) |
 | [LFGHandler](#lfg)    | For use with LFG commands/events                |
 | PollHandler           | For use with creating polls/petitions           |
-| StreamLinkHandler     | For use with StreamLink commands/events         |
+| [StreamLinkHandler](#slh) | For use with StreamLink commands/events     |
 | [ReloadCommands](#rlc)| Reloads required files for all commands         |
 | [ReloadLFG](#rlfg)    | Reloads the LFG game library                    |
 
 
-## <a id="setup">Setup</a>
+## <a id="setup"></a>Setup
 
 As implied by the name, this code is executed at start up from the main `app.js` file and serves as the main entry point for the bot.
 
@@ -27,7 +27,7 @@ Below is a list of things that get executed at this stage:
   > Note: Eventually, a `reloadEvents` function will also be instantiated here, but for now this is a work in progress while I figure some stuff out
 
 
-## <a id="eldr">EventLoader</a>
+## <a id="eldr"></a>EventLoader
 
 Here, any events that the Client (our bot) needs to listen to are defined. By tying these event emitters to functions within our `~/events/` directory, we can control how the bot will handle incoming messages, emoji reactions, creation or deletion of channels & guilds, and so on.
 
@@ -53,7 +53,7 @@ Here are the events that we track explicitly with Ggis. For the entire list of C
 
 > Check out the Discord.js docs [here](https://discord.js.org/#/docs/main/stable/class/Client) for more info on Events.
 
-## <a id="lfg">LFGHandler</a>
+## <a id="lfg"></a>LFGHandler
 
 All `!lfg` related events are handled in here.
 
@@ -129,9 +129,9 @@ let lfgObject = {
 
 > Note: More details on the functions are given within [the source code itself](https://github.com/malouro/ggis-bot/blob/master/handlers/LFGHandler.js)
 
-## <a id="sl">StreamLinkHandler</a>
+## <a id="slh"></a>StreamLinkHandler
 
-This is the handler that 
+This is the handler that manages the events & notifications for StreamLink. This includes things like, when a subscribed stream goes live, adding and enabling StreamLink in servers/channels, and more.
 
 ### Configuration
 
@@ -139,7 +139,7 @@ Configuration for StreamLink are contained within the `config/streamlink` direct
 
 When the bot joins a new server, a JSON file for the guild is created within `config/streamlink/guilds` under the file name of `{GUILD_ID}.json`. Likewise, these config files are deleted once the bot *leaves* the server as well.
 
-### Methods & functions
+### Methods & Functions
 
 The handler for StreamLink concerns itself mainly with the different Twitch events that can occur and performing the operations needed to modify the configuration mentioned above.
 
@@ -148,29 +148,36 @@ Here's a list of the different methods & functions contained within the handler:
 |Func|Parameters        |Description|
 |:---|------------------|-----------|
 | init | `Discord.Client` bot | Initializes StreamLink for the bot.<br>Reads existing config files and loads them into the bot |
-|streamUp | `Discord.Client` bot<br>`Object` data | Event that occurs when a subscribed stream goes live
-| streamDown |
-| viewCount |
-| enableUser |
-| disableUser |
-| enableGuild |
-| disableGuild |
-| addUser |
-| removeUser |
-| addGuild |
-| removeGuild |
-| addChannel |
-| removeChannel |
+|streamUp | `Discord.Client` bot<br>`Object` data | Event that occurs when a subscribed stream goes live |
+| streamDown | `Discord.Client` bot<br>`Object` data | Event that occurs when a subscribed stream goes offline |
+| viewCount | `Discord.Client` bot<br>`Object` data | Method to check what game the user is streaming and how many viewers are tuned in |
+| enableUser | `Discord.Message` message<br>`Discord.Client` bot<br>`Discord.User` user | Enables StreamLink for a given user |
+| disableUser | `Discord.Message` message<br>`Discord.Client` bot<br>`Discord.User` user | Disables StreamLink for a given user |
+| enableGuild | `Discord.Message` message<br>`Discord.Client` bot | Enables StreamLink in the current server |
+| disableGuild | `Discord.Message` message<br>`Discord.Client` bot | Disables StreamLink in the current server |
+| addUser | | |
+| removeUser | | |
+| addGuild | | Event that triggers when the bot joins a new guild and configures the necessary stuff for StreamLink |
+| removeGuild | | Event that triggers when the bot leaves a guild and needs to remove StreamLink configuration |
+| addChannel | | Adds the current channel as a StreamLink notification channel |
+| removeChannel | | Removes the current channel from StreamLink notifications |
+| statusMenu | | Generate status menu from `!streamlink status` |
+| perUserStatus | | Generates particular status menu for users enabled/configured for StreamLink (also used in `!streamlink status`) |
+| saveUser | | Saves StreamLink configuration for a user |
+| saveGuild | | Saves StreamLink configuration for a server |
+| logEvent | | Logs StreamLink events (when a subscribed stream goes live, etc.) |
 
-### Functions
 
-## <a id="rlc">ReloadCommands</a>
+> Note: More details on the functions are given within [the source code itself](https://github.com/malouro/ggis-bot/blob/master/handlers/StreamLinkHandler.js)
+
+
+## <a id="rlc"></a>ReloadCommands
 
 This script is ran to update any command(s) in real time. If changes need to be made to a command, it is not necessary to restart the whole app; just run `!reload [command]`
 
 If a `[command]` argument is not provided, *all* the bot's commands will be reloaded.
 
-## <a id="rlfg">ReloadLFG</a>
+## <a id="rlfg"></a>ReloadLFG
 
 This script is will reload any updates made to the LFG library--that is, any of the .json config files within the `~/config/lfg/` directory.
 
@@ -178,8 +185,7 @@ Executed from `!reloadlfg [game]`
 
 If a `[game]` argument is not provided, *all* of the games in the LFG library will be reloaded.
 
-> TODO: Document the other handlers?
 
-## <a id="poll"></a>
+## <a id="poll"></a>Poll Handler
 
-* Poll
+This handles creating and management of polls created via the `!poll` command.
