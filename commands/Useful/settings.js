@@ -51,14 +51,6 @@ const configOptions = {
     },
   },
 
-  foo: {
-    bar: {
-      type: 'array',
-      innerType: 'number',
-      description: 'An array of numbers',
-    },
-  },
-
   // =================== Example: ===================
   // lfg: {
   //   create_temp_channel: {
