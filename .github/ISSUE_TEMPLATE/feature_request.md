@@ -1,13 +1,13 @@
 ---
-name: Feature request
+name: Enhancement or feature request
 about: Suggest an idea for Ggis
 title: ''
-labels: new feature
+labels: enhancement
 assignees: ''
 
 ---
 
-**Is your feature request related to an existing command or feature?**
+**Is your enhancement related to an existing command or feature?**
 <!-- Mention the existing feature, command, etc. here. -->
 
 **Describe the solution you'd like**
