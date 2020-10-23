@@ -2,7 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const waitForExpect = require('wait-for-expect');
 const settingsCommand = require('../../../commands/Useful/settings');
-const { MOCK_BOT, MOCK_GUILD_ID, makeMockMessage } = require('../../testHelpers');
+const {
+  MOCK_BOT, MOCK_GUILD_ID, MOCK_CHANNEL_ID, MOCK_USER_ID, makeMockMessage,
+} = require('../../testHelpers');
 const { serverSettings: testServerSettings } = require('../../data');
 
 const pathToMockGuildConfig = path.resolve(__dirname, `../../../config/guilds/${MOCK_GUILD_ID}.json`);
@@ -59,11 +61,18 @@ describe('Settings Command', () => {
     ['number', ['10'], 10],
     ['boolean', ['true'], true],
     ['boolean', ['false'], false],
+    ['range', ['0'], 0],
+    ['range', ['5'], 5],
+    ['range', ['10'], 10],
+    ['textChannel', [`<#${MOCK_CHANNEL_ID}>`], `"${MOCK_CHANNEL_ID}"`],
+    ['user', [`<!@${MOCK_USER_ID}>`], `"${MOCK_USER_ID}"`],
     ['arrayOfStrings', ['one', 'two'], '\\[\\s*"one",\\s*"two"\\s*\\]'],
     ['arrayOfStrings', ['1337', '12345678900987654321'], '\\[\\s*"1337",\\s*"12345678900987654321"\\s*\\]'],
     ['arrayOfNumbers', ['1', '2', '3'], '\\[\\s*1,\\s*2,\\s*3\\s*\\]'],
     ['arrayOfBooleans', ['true', 'false'], '\\[\\s*true,\\s*false\\s*\\]'],
     ['arrayOfRanges', ['1', '5', '10'], '\\[\\s*1,\\s*5,\\s*10\\s*\\]'],
+    ['arrayOfTextChannels', [`<#${MOCK_CHANNEL_ID}>`], `\\[\\s*"${MOCK_CHANNEL_ID}"\\s*\\]`],
+    ['arrayOfUsers', [`<!@${MOCK_USER_ID}>`], `\\[\\s*"${MOCK_USER_ID}"\\s*\\]`],
   ])('setting of type `%s` with input "%s" sets to correct value successfully`', async (type, value, expectation) => {
     const args = ['!settings', 'test', type, ...value];
 
@@ -74,6 +83,12 @@ describe('Settings Command', () => {
   test.each([
     ['number', ['foo']],
     ['boolean', ['not-boolean']],
+    ['range', ['-1']],
+    ['range', ['11']],
+    ['textChannel', ['#not-really-a-text-channel']],
+    ['textChannel', ['<#999999999>']],
+    ['user', ['@NotAUser']],
+    ['user', ['<!@999999999>']],
     ['arrayOfNumbers', ['not', 'numbers']],
     ['arrayOfBooleans', ['not', 'booleans']],
     ['arrayOfRanges', ['not', 'in', 'range']],
