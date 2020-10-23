@@ -59,6 +59,9 @@ describe('Settings Command', () => {
     ['number', ['10'], 10],
     ['boolean', ['true'], true],
     ['boolean', ['false'], false],
+    ['range', ['0'], 0],
+    ['range', ['5'], 5],
+    ['range', ['10'], 10],
     ['arrayOfStrings', ['one', 'two'], '\\[\\s*"one",\\s*"two"\\s*\\]'],
     ['arrayOfStrings', ['1337', '12345678900987654321'], '\\[\\s*"1337",\\s*"12345678900987654321"\\s*\\]'],
     ['arrayOfNumbers', ['1', '2', '3'], '\\[\\s*1,\\s*2,\\s*3\\s*\\]'],
@@ -74,6 +77,8 @@ describe('Settings Command', () => {
   test.each([
     ['number', ['foo']],
     ['boolean', ['not-boolean']],
+    ['range', ['-1']],
+    ['range', ['11']],
     ['arrayOfNumbers', ['not', 'numbers']],
     ['arrayOfBooleans', ['not', 'booleans']],
     ['arrayOfRanges', ['not', 'in', 'range']],

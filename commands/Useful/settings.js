@@ -114,7 +114,12 @@ const validateType = (input, expectedType, settingConfig) => {
 
       // input is a number in given range
       case 'range': {
-        if (!settingConfig || !settingConfig.min || !settingConfig.max) return [false, null];
+        if (
+          !settingConfig
+          || !('min' in settingConfig)
+          || !('max' in settingConfig)
+        ) return [false, null];
+
         const num = parseFloat(input);
 
         return [num >= settingConfig.min && num <= settingConfig.max, Number(input)];

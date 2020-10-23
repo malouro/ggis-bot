@@ -1,7 +1,7 @@
 /** @type {import('../../commands/Useful/settings').ServerSettings} */
 exports.serverSettings = {
   test: {
-    'range 0-10': {
+    range: {
       type: 'range',
       min: 0,
       max: 10,
