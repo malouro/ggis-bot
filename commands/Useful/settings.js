@@ -120,6 +120,10 @@ const validateType = (input, expectedType, settingConfig) => {
         return [num >= settingConfig.min && num <= settingConfig.max, Number(input)];
       }
 
+      // Allow for strings that look like numbers
+      case 'string':
+        break;
+
       // fail otherwise: input is a number, but was supposed to be something else
       default:
         return [false, null];
