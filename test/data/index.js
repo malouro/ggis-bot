@@ -20,6 +20,12 @@ exports.serverSettings = {
     string: {
       type: 'string',
     },
+    textChannel: {
+      type: 'textChannel',
+    },
+    user: {
+      type: 'user',
+    },
     arrayOfStrings: {
       type: 'array',
       innerType: 'string',
@@ -41,6 +47,16 @@ exports.serverSettings = {
       type: 'array',
       innerType: 'boolean',
       description: 'An array of booleans',
+    },
+    arrayOfTextChannels: {
+      type: 'array',
+      innerType: 'textChannel',
+      description: 'An array of text channels',
+    },
+    arrayOfUsers: {
+      type: 'array',
+      innerType: 'user',
+      description: 'An array of users',
     },
   },
 };

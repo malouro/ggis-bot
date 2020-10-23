@@ -15,8 +15,8 @@ const commandName = 'settings';
 /**
  *-------------------------------------------------------------------------------
  *
- * @typedef {"string"|"number"|"integer"|"range"|"boolean"|"array"} ServerSettingType - Types that the setting values can be
- * @typedef {"string"|"number"|"integer"|"range"|"boolean"} ServerSettingTypeInsideArray - Types of the inner elements of array-typed settings
+ * @typedef {"string"|"number"|"integer"|"range"|"boolean"|"array"|"textChannel"|"user"} ServerSettingType - Types that the setting values can be
+ * @typedef {"string"|"number"|"integer"|"range"|"boolean"|"textChannel"|"user"} ServerSettingTypeInsideArray - Types of the inner elements of array-typed settings
  *
  * -------------------------------------------------------------------------------
  *
@@ -75,15 +75,16 @@ const configOptions = {
  * @param {string|Array<string>} input String input for the value attempting to be set
  * @param {ServerSettingType} expectedType Type the input is expected to be
  * @param {ServerSettingKey} settingConfig Config object for the setting
+ * @param {import('discord.js').Client} bot Ggis-bot
  * @returns {Array<Boolean, any>}
  */
-const validateType = (input, expectedType, settingConfig) => {
+const validateType = (input, expectedType, settingConfig, bot) => {
   // Input MUST be `string`, EXCEPT for `array` type
   // (if not then something went haywire; time to abort)
   if (typeof input !== 'string') {
     if (expectedType === 'array') {
       const recurseValidation = input.map(element => validateType(
-        element, settingConfig.innerType, settingConfig,
+        element, settingConfig.innerType, settingConfig, bot,
       ));
 
       return [
@@ -122,17 +123,35 @@ const validateType = (input, expectedType, settingConfig) => {
 
         const num = parseFloat(input);
 
-        return [num >= settingConfig.min && num <= settingConfig.max, Number(input)];
+        return [num >= settingConfig.min && num <= settingConfig.max, num];
       }
 
-      // Allow for strings that look like numbers
+      // Allow for strings that look like numbers or Snowflakes
       case 'string':
+      case 'textChannel':
+      case 'user':
         break;
 
       // fail otherwise: input is a number, but was supposed to be something else
       default:
         return [false, null];
     }
+  }
+
+  const snowflakeRegExp = /[1-9][0-9]+/;
+
+  // If input looks like a `#text-channel` mention or Snowflake
+  if ((input.match(`<#${snowflakeRegExp}>`) || input.match(snowflakeRegExp)) && expectedType === 'textChannel') {
+    const channelSnowflake = input.replace(/[<#>]/g, '');
+
+    return [bot.channels.has(channelSnowflake), channelSnowflake];
+  }
+
+  // If input looks like a `@User` mention or Snowflake
+  if ((input.match(`<!@${snowflakeRegExp}>`) || input.match(snowflakeRegExp)) && expectedType === 'user') {
+    const userSnowflake = input.replace(/[<!@>]/g, '');
+
+    return [bot.users.has(userSnowflake), userSnowflake];
   }
 
   // String type setting can accept anything that came in via "args"
@@ -279,7 +298,7 @@ exports.run = async (bot, message, args) => {
   /* If multiple strings were given for <value>, send over the array of arguments */
   /* (Otherwise, just send the single value) */
   const value = (args.length >= 4 && expectedType === 'array') ? Array.from(args).slice(3, args.length) : args[3];
-  const [valid, castedValue] = validateType(value, expectedType, configOptions[scope][key]);
+  const [valid, castedValue] = validateType(value, expectedType, configOptions[scope][key], bot);
 
   if (!valid) {
     return message.reply(
