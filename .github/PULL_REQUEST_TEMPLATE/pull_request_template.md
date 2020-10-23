@@ -11,8 +11,8 @@
 ### Merge checks
 
 - [ ] I have looked at the repo's [contribution guidelines](https://github.com/malouro/ggis-bot/blob/master/CONTRIBUTING.md)*
-- [ ] I have written any necessary documentation for my change, including but not limited to...*
-  - `help` command docs
+- [ ] If applicable, I have written any necessary documentation for my change, including but not limited to...*
+  - `!help` command docs
   - inline source-code docs
   - README updates
 - [ ] I have tested my change with a test bot on a test server
