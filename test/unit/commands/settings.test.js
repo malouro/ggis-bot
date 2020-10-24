@@ -58,7 +58,8 @@ describe('Settings Command', () => {
 
   test.each([
     ['string', ['test-value'], '"test-value"'],
-    ['number', ['10'], 10],
+    ['number', ['10.5'], 10.5],
+    ['integer', ['10'], 10],
     ['boolean', ['true'], true],
     ['boolean', ['false'], false],
     ['range', ['0'], 0],
@@ -82,6 +83,7 @@ describe('Settings Command', () => {
 
   test.each([
     ['number', ['foo']],
+    ['integer', ['10.5']],
     ['boolean', ['not-boolean']],
     ['range', ['-1']],
     ['range', ['11']],

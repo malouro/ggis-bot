@@ -111,7 +111,7 @@ const validateType = (input, expectedType, settingConfig, bot) => {
 
       // input is integer
       case 'integer':
-        return [Number.isInteger(input), Number(input)];
+        return [Number.isInteger(Number(input)), Number(input)];
 
       // input is a number in given range
       case 'range': {
@@ -126,7 +126,7 @@ const validateType = (input, expectedType, settingConfig, bot) => {
         return [num >= settingConfig.min && num <= settingConfig.max, num];
       }
 
-      // Allow for strings that look like numbers or Snowflakes
+      // Allow for strings that look like numbers (or Snowflakes)
       case 'string':
       case 'textChannel':
       case 'user':
@@ -159,6 +159,12 @@ const validateType = (input, expectedType, settingConfig, bot) => {
   return [expectedType === 'string', input];
 };
 
+/**
+ * Returns description for given config setting
+ *
+ * @param {ServerSettingKey} setting
+ * @return {string} Setting description
+ */
 const getTypeDesc = (setting) => {
   const { type } = setting;
   switch (type) {
@@ -170,11 +176,20 @@ const getTypeDesc = (setting) => {
       return 'integer (whole number)';
     case 'range':
       return `number between ${setting.min || 0} and ${setting.max || Infinity}`;
+    case 'array':
+      return `array of \`${setting.innerType || 'string'}\`s`;
+    case 'textChannel':
+      return 'text channel (`#text-channel` or channel ID)';
+    case 'user':
+      return 'user (`@User` mention or user ID)';
     default:
       return 'string';
   }
 };
 
+/**
+ * @return {string} Description of all available config settings
+ */
 const getAllSettings = () => {
   let message = "Here's the full list of settings that can be configured:\n\n```asciidoc\n";
   const scopes = Object.keys(configOptions);
@@ -211,8 +226,8 @@ ${commandName} <scope> (<setting> <value>)
 <scope> is required and can be any of the following:
 
 - list :: List all available settings
-- show :: show current config for the server
-${scopes.map(scope => `- ${scope} :: ${configOptions[scope].description}`).join('\n')}
+- show :: Show current config for the server
+${scopes.map(scope => `- ${scope} :: ${configOptions[scope].description || '<no description>'}`).join('\n')}
 
 If <scope> is *not* "list" or "show", you must also provide <setting> and <value> options. Use "${prefix}${commandName} list" for more info on available settings & values options.
 
@@ -234,7 +249,6 @@ exports.conf = {
   permLevel: 3,
 };
 
-/* eslint-disable-next-line no-unused-vars */
 exports.run = async (bot, message, args) => {
   const prefix = getGuildCommandPrefix(bot, message);
   const getCurrentGuildConfig = (input) => {
