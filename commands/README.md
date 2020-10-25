@@ -32,9 +32,9 @@ exports.help = {
 };
 ```
 
-If usage examples contain the command prefix in some way (ie: usage: "!help lfg"), switch the usage to a function & replace the instances of the command prefix with calls from `getGuildCommandPrefix(...)` so that the help menus reflect the given guild's settings config.
+If your usage examples contain the command prefix in some way (ie: usage: "!help lfg"), switch `usage` to a function & replace the instances of the command prefix with calls from `getGuildCommandPrefix(...)` so that the help menus reflect the given guild's configured command prefix.
 
-For example:
+eg:
 
 ```js
 exports.help = {
@@ -75,7 +75,7 @@ This is the configuration for the given command. Here are the available options 
 * **permLevel**
   * `number` 
   * Minimum permission level allowed to use the command
-  * See perm. level docs in the source code comments within `handlers/Setup` for more details on what the different permission levels are
+  * See perm. level docs in the source code comments within [`handlers/Setup`](https://github.com/malouro/ggis-bot/blob/master/handlers/Setup.js#L66) for more details on what the different permission levels are
 
 ### <a id="exports-run"></a>`exports.run`
 
@@ -87,7 +87,7 @@ exports.run = (
   message: Discord.Message, // message from command usage
   args: array<string>, // array of command arguments sent by user
   perms: number // permission level of user
-)
+) => void
 ```
 
 ## Category Folders
