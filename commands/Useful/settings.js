@@ -51,6 +51,32 @@ const configOptions = {
     },
   },
 
+  commandChannels: {
+    description: 'Controls where and how commands are allowed to be used',
+    enabled: {
+      type: 'boolean',
+      default: settings.commandChannels.enabled,
+      description: 'Enables control of command channels',
+    },
+    whitelist: {
+      type: 'array',
+      innerType: 'textChannel',
+      default: settings.commandChannels.whitelist,
+      description: 'List of channels where command usage is allowed',
+    },
+    blacklist: {
+      type: 'array',
+      innerType: 'textChannel',
+      default: settings.commandChannels.blacklist,
+      description: 'List of channels where command usage is NOT allowed',
+    },
+    strictMode: {
+      type: 'boolean',
+      default: settings.commandChannels.strictMode,
+      description: 'If on: deletes non-command messages in whitelist channels & commands in blacklist channels',
+    },
+  },
+
   // =================== Example: ===================
   // lfg: {
   //   create_temp_channel: {
@@ -64,6 +90,41 @@ const configOptions = {
   // For testing purposes only:
   ...(process.env.NODE_ENV === 'test' ? testServerSettings : {}
   ),
+};
+
+exports.help = {
+  name: commandName,
+  description: "Change the bot's server settings",
+  usage: (bot, message) => {
+    const prefix = getGuildCommandPrefix(bot, message);
+    const scopes = Object.keys(configOptions);
+    return `
+${commandName} <scope> (<setting> <value>)
+
+<scope> is required and can be any of the following:
+
+- list :: List all available settings
+- show :: Show current config for the server
+${scopes.map(scope => `- ${scope} :: ${configOptions[scope].description || '<no description>'}`).join('\n')}
+
+If <scope> is *not* "list" or "show", you must also provide <setting> and <value> options. Use "${prefix}${commandName} list" for more info on available settings & values options.
+
+Examples ::
+
+${prefix}${commandName} show            ║ Shows the current config for the server, pretty-printed
+${prefix}${commandName} list            ║ Shows all available settings that can be modified
+${prefix}${commandName} bot prefix $    ║ Changes command prefix to "$" in this server
+`.trim();
+  },
+};
+
+exports.conf = {
+  enabled: true,
+  visible: true,
+  guildOnly: false,
+  textChannelOnly: true,
+  aliases: [],
+  permLevel: 3,
 };
 
 /**
@@ -212,41 +273,6 @@ const getAllSettings = () => {
 
   message += '```';
   return message;
-};
-
-exports.help = {
-  name: commandName,
-  description: "Change the bot's server settings",
-  usage: (bot, message) => {
-    const prefix = getGuildCommandPrefix(bot, message);
-    const scopes = Object.keys(configOptions);
-    return `
-${commandName} <scope> (<setting> <value>)
-
-<scope> is required and can be any of the following:
-
-- list :: List all available settings
-- show :: Show current config for the server
-${scopes.map(scope => `- ${scope} :: ${configOptions[scope].description || '<no description>'}`).join('\n')}
-
-If <scope> is *not* "list" or "show", you must also provide <setting> and <value> options. Use "${prefix}${commandName} list" for more info on available settings & values options.
-
-Examples ::
-
-${prefix}${commandName} show            ║ Shows the current config for the server, pretty-printed
-${prefix}${commandName} list            ║ Shows all available settings that can be modified
-${prefix}${commandName} bot prefix $    ║ Changes command prefix to "$" in this server
-`.trim();
-  },
-};
-
-exports.conf = {
-  enabled: true,
-  visible: true,
-  guildOnly: false,
-  textChannelOnly: true,
-  aliases: [],
-  permLevel: 3,
 };
 
 exports.run = async (bot, message, args) => {

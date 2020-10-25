@@ -48,6 +48,12 @@
     },
     "memes": true
   },
+  "commandChannels": {
+    "enabled": true,
+    "whitelist": [],
+    "blacklist": [],
+    "strictMode": false
+  },
   "helpMenu": {
     "split_value": 20
   },
