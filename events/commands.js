@@ -72,6 +72,9 @@ module.exports = (bot, message, settings, prefix) => {
     cmd = bot.commands.get(bot.aliases.get(command));
   }
 
+  /**
+   * Check if the current channel is white/blacklisted for command only channels
+   */
   const [disallowed, deleteMessage] = validateCommandOnly(bot, message, Boolean(cmd), settings);
 
   if (deleteMessage) {
@@ -79,7 +82,7 @@ module.exports = (bot, message, settings, prefix) => {
     message.delete();
     return;
   }
-  if (disallowed) return;
+  if (disallowed) return; // ignore if message/command is disallowed
 
   // if something was found, check to see if we can appropriately run the command
   if (cmd) {
