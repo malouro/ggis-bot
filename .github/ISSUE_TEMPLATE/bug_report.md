@@ -11,9 +11,11 @@ assignees: ''
 <!-- A clear and concise description of what the bug is. -->
 
 **How to reproduce**
+
 Steps to reproduce the behavior:
 
 <!--
+eg:
 1. Run this command `!blah blah blah`
 2. Click on 'abc', or do 'xyz', etc.
 3. See error in console
