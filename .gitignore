@@ -2,7 +2,8 @@
 logs
 *.log
 .DS_Store
-.vscode
+.vscode/*
+.idea
 Thumbs.db
 
 # Node
@@ -15,6 +16,7 @@ node_modules
 # Dev + test
 coverage
 .env.test
+!.vscode/launch.json
 
 # Fix for img/spoiler directory
 /img/spoilers/gifs/*

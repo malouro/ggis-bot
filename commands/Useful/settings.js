@@ -7,18 +7,40 @@
 /* eslint-disable no-restricted-globals */
 const beautify = require('json-beautify');
 const settings = require('../../settings.json');
+const { serverSettings: testServerSettings } = require('../../test/data');
 const { getGuildCommandPrefix, update: updateGuildConfig } = require('../../handlers/GuildSettings');
 
 const commandName = 'settings';
 
 /**
- * Available types:
- * - @type string
- * - @type number
- * - @type integer
- * - @type range
- * - @type boolean
+ *-------------------------------------------------------------------------------
+ *
+ * @typedef {"string"|"number"|"integer"|"range"|"boolean"|"array"|"textChannel"|"user"} ServerSettingType - Types that the setting values can be
+ * @typedef {"string"|"number"|"integer"|"range"|"boolean"|"textChannel"|"user"} ServerSettingTypeInsideArray - Types of the inner elements of array-typed settings
+ *
+ * -------------------------------------------------------------------------------
+ *
+ * @typedef {Object} ServerSettingKey - These are the individual settings that can be altered themselves
+ *
+ * @property {ServerSettingType} ServerSettingKey.type
+ * @property {any} ServerSettingKey.default
+ * @property {string} ServerSettingKey.description
+ * @property {number} [ServerSettingKey.min] - Minimum value when `type` is "range"
+ * @property {number} [ServerSettingKey.max] - Maximum value when `type` is "range"
+ * @property {ServerSettingTypeInsideArray} [ServerSettingKey.innerType] - Type of the inner array elements when `type` is "array"
+ *
+ *-------------------------------------------------------------------------------
+ *
+ * @typedef {Object.<string, ServerSettingKey>} ServerSettingScope - These are the "categories" for the settings
+ *
+ * @property {string} ServerSettingScope.description - Description for the scope of settings
+ *
+ *-------------------------------------------------------------------------------
+ *
+ * @typedef {Object.<string, ServerSettingScope>} ServerSettings
  */
+
+/** @type {ServerSettings} */
 const configOptions = {
   bot: {
     description: 'General bot settings',
@@ -40,29 +62,7 @@ const configOptions = {
   // =================================================
 
   // For testing purposes only:
-  ...(process.env.NODE_ENV === 'test' ? {
-    test: {
-      'range 0-10': {
-        type: 'range',
-        min: 0,
-        max: 10,
-        default: 0,
-        description: 'Some number within this range',
-      },
-      number: {
-        type: 'number',
-      },
-      integer: {
-        type: 'integer',
-      },
-      boolean: {
-        type: 'boolean',
-      },
-      string: {
-        type: 'string',
-      },
-    },
-  } : {}
+  ...(process.env.NODE_ENV === 'test' ? testServerSettings : {}
   ),
 };
 
@@ -72,14 +72,31 @@ const configOptions = {
  * (this is because we want to convert the input, which is always `string` into
  * something suitable for the given expectedType)
  *
- * @param {string} input String input for the value attempting to be set
- * @param {string} expectedType Type the input is expected to be
- * @param {Object} settingConfig Config object for the setting
+ * @param {string|Array<string>} input String input for the value attempting to be set
+ * @param {ServerSettingType} expectedType Type the input is expected to be
+ * @param {ServerSettingKey} settingConfig Config object for the setting
+ * @param {import('discord.js').Client} bot Ggis-bot
  * @returns {Array<Boolean, any>}
  */
-const validateType = (input, expectedType, settingConfig) => {
-  // Input MUST be `string`, if not then something went haywire; time to abort
-  if (typeof input !== 'string') return [false, null];
+const validateType = (input, expectedType, settingConfig, bot) => {
+  // Input MUST be `string`, EXCEPT for `array` type
+  // (if not then something went haywire; time to abort)
+  if (typeof input !== 'string') {
+    if (expectedType === 'array') {
+      const recurseValidation = input.map(element => validateType(
+        element, settingConfig.innerType, settingConfig, bot,
+      ));
+
+      return [
+        // If any element fails validation against the `innerType`, then input was invalid
+        Array.isArray(input)
+        && recurseValidation.every(([valid]) => valid === true),
+        // Return casted values
+        recurseValidation.map(([, value]) => value),
+      ];
+    }
+    return [false, null];
+  }
 
   if (input === 'true' || input === 'false') {
     return [expectedType === 'boolean', Boolean(input === 'true')];
@@ -98,16 +115,43 @@ const validateType = (input, expectedType, settingConfig) => {
 
       // input is a number in given range
       case 'range': {
-        if (!settingConfig || !settingConfig.min || !settingConfig.max) return [false, null];
+        if (
+          !settingConfig
+          || !('min' in settingConfig)
+          || !('max' in settingConfig)
+        ) return [false, null];
+
         const num = parseFloat(input);
 
-        return [num >= settingConfig.min && num <= settingConfig.max, Number(input)];
+        return [num >= settingConfig.min && num <= settingConfig.max, num];
       }
+
+      // Allow for strings that look like numbers or Snowflakes
+      case 'string':
+      case 'textChannel':
+      case 'user':
+        break;
 
       // fail otherwise: input is a number, but was supposed to be something else
       default:
         return [false, null];
     }
+  }
+
+  const snowflakeRegExp = /[1-9][0-9]+/;
+
+  // If input looks like a `#text-channel` mention or Snowflake
+  if ((input.match(`<#${snowflakeRegExp}>`) || input.match(snowflakeRegExp)) && expectedType === 'textChannel') {
+    const channelSnowflake = input.replace(/[<#>]/g, '');
+
+    return [bot.channels.has(channelSnowflake), channelSnowflake];
+  }
+
+  // If input looks like a `@User` mention or Snowflake
+  if ((input.match(`<!@${snowflakeRegExp}>`) || input.match(snowflakeRegExp)) && expectedType === 'user') {
+    const userSnowflake = input.replace(/[<!@>]/g, '');
+
+    return [bot.users.has(userSnowflake), userSnowflake];
   }
 
   // String type setting can accept anything that came in via "args"
@@ -243,15 +287,28 @@ exports.run = async (bot, message, args) => {
   if (!keys.includes(key)) return message.reply(`\`${key}\` is not an available setting within \`${scope}\`.\n\n${fullListMessage}`);
 
   /* Check <value> */
-  if (!args[3]) return message.reply(`No \`value\` given. Please provide a value of of type \`${configOptions[scope][key].type || 'string'}\` for this setting.\n\n${fullListMessage}`);
-  const value = args[3];
+  if (!args[3]) {
+    return message.reply(
+      `No \`value\` given. Please provide a value of of type \`${configOptions[scope][key].type || 'string'}\` for this setting.\n\n${fullListMessage}`,
+    );
+  }
+
   const expectedType = configOptions[scope][key].type || 'string';
-  const [valid, castedValue] = validateType(value, expectedType);
+
+  /* If multiple strings were given for <value>, send over the array of arguments */
+  /* (Otherwise, just send the single value) */
+  const value = (args.length >= 4 && expectedType === 'array') ? Array.from(args).slice(3, args.length) : args[3];
+  const [valid, castedValue] = validateType(value, expectedType, configOptions[scope][key], bot);
+
   if (!valid) {
     return message.reply(
       `\`${value}\` is not a valid value. Expected type of \`${expectedType}\``.concat(
         expectedType === 'range'
           ? ` (between ${configOptions[scope][key].min || 0} - ${configOptions[scope][key].max || Infinity})`
+          : '',
+      ).concat(
+        expectedType === 'array'
+          ? ` with elements of type \`${configOptions[scope][key].innerType || 'string'}\``
           : '',
       ),
     );
