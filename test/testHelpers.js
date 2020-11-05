@@ -31,15 +31,21 @@ exports.MOCK_BOT = {
       id: this.MOCK_GUILD_ID,
     },
   },
-  guilds: new Collection([
-    [this.MOCK_GUILD_ID, this.MOCK_GUILD],
-  ]),
-  channels: new Collection([
-    [this.MOCK_CHANNEL_ID, this.MOCK_CHANNEL],
-  ]),
-  users: new Collection([
-    [this.MOCK_USER_ID, this.MOCK_USER],
-  ]),
+  guilds: {
+    cache: new Collection([
+      [this.MOCK_GUILD_ID, this.MOCK_GUILD],
+    ]),
+  },
+  channels: {
+    cache: new Collection([
+      [this.MOCK_CHANNEL_ID, this.MOCK_CHANNEL],
+    ]),
+  },
+  users: {
+    cache: new Collection([
+      [this.MOCK_USER_ID, this.MOCK_USER],
+    ]),
+  },
   guildOverrides: {},
 };
 
