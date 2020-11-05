@@ -37,6 +37,7 @@ jobs:
           name: Tests
           command: yarn test
 
-      - run:
-          name: End-to-end tests
-          command: yarn test:e2e
+    # End-to-end suite disabled for now
+    #   - run:
+    #       name: End-to-end tests
+    #       command: yarn test:e2e

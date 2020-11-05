@@ -11,17 +11,11 @@ jest.setTimeout(30000);
 const Ggis = new Client();
 
 describe('Smoke Tests', () => {
-  let online = false;
-
   beforeAll(async () => {
     /* Setup bot */
     const lfgGames = fs.readdirSync('./config/lfg/default');
 
     await setupBot(Ggis, settings);
-
-    Ggis.on('ready', () => { online = true; });
-    Ggis.on('disconnect', () => { online = false; });
-
     await waitForExpect(() => {
       expect(Ggis.games.size).toBe(lfgGames.length);
       expect(Ggis.commands.size).toBe(numberOfCommands);
@@ -31,23 +25,29 @@ describe('Smoke Tests', () => {
     /* Login */
     await Ggis.login(settings.token);
     await waitForExpect(() => {
-      expect(online).toBe(true);
+      expect(Ggis.ws.status).toBe(0);
     });
   });
 
   afterAll(async () => {
     await Ggis.destroy();
+
     await waitForExpect(() => {
-      expect(online).toBe(false);
       expect(global.ALL_CLEAR).toBe(true);
     });
+
+    // await Ggis.removeAllListeners();
+    // await Ggis.ws.removeAllListeners();
+    await Ggis.removeTwitchTopic('twitch');
+    process.exit(0);
   });
 
   test('bot should log in successfully', () => {
+    expect(Ggis.ws.status).toBe(0);
     expect(Ggis.guilds.cache.has(process.env.TEST_GUILD)).toBe(true);
   });
 
-  test('ping command', async () => {
+  test('ping command', async (done) => {
     const clearedUp = [false, false];
     const channelToTestIn = Ggis.guilds.cache.get(
       process.env.TEST_GUILD,
@@ -77,6 +77,7 @@ describe('Smoke Tests', () => {
 
     await waitForExpect(() => {
       expect(clearedUp).toStrictEqual([true, true]);
+      done();
     });
   });
 });

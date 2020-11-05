@@ -205,11 +205,13 @@ module.exports = async (bot, settings) => {
 
   bot = client;
 
-  bot.twitch = new TwitchPS({
+  const twitch = new TwitchPS({
     init_topics: topics.length > 0 ? topics : [{ topic: 'video-playback.twitch' }],
-    reconnect: true,
+    reconnect: process.env.NODE_ENV !== 'test',
     debug: process.env.DEBUG,
   });
+
+  bot.twitch = twitch;
   bot.twitch.on('stream-up', data => streamlink.streamUp(bot, data));
   bot.twitch.on('stream-down', data => streamlink.streamDown(bot, data));
   bot.twitch.on('viewcount', data => streamlink.viewCount(bot, data));
