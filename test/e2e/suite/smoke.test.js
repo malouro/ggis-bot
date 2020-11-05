@@ -46,7 +46,7 @@ describe('Smoke Tests', () => {
     const clearedUp = [false, false];
     const channelToTestIn = Ggis.guilds.cache.get(
       process.env.TEST_GUILD,
-    ).channels.get(
+    ).channels.cache.get(
       process.env.TEST_CHANNEL,
     );
     const commandToTry = `${getGuildCommandPrefix(Ggis, channelToTestIn)}ping`;
