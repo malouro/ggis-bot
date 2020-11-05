@@ -39,12 +39,12 @@ describe('Smoke Tests', () => {
 
   test('bot should log in successfully', () => {
     expect(Ggis.status).toBe(0);
-    expect(Ggis.guilds.has(process.env.TEST_GUILD)).toBe(true);
+    expect(Ggis.guilds.cache.has(process.env.TEST_GUILD)).toBe(true);
   });
 
   test('ping command', async () => {
     const clearedUp = [false, false];
-    const channelToTestIn = Ggis.guilds.get(
+    const channelToTestIn = Ggis.guilds.cache.get(
       process.env.TEST_GUILD,
     ).channels.get(
       process.env.TEST_CHANNEL,
