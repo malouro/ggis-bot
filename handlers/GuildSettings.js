@@ -58,7 +58,7 @@ exports.getGuildSpecificSetting = (bot, input, scope, key, defaultSetting) => {
     ({ id } = input);
   }
 
-  if (!bot.guilds.has(id)) {
+  if (!bot.guilds.cache.has(id)) {
     return console.error(`Guild of ID ${id} does not exist; was the input valid?`);
   }
 

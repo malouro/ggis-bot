@@ -10,7 +10,7 @@ module.exports = (member) => {
   // If yes, does the user exist on another server? Or can we remove the user w/ no issue?
   let existsElsewhere = false;
   member.client.streamLink.guilds.forEach((g) => {
-    if (member.client.guilds.get(g).members.has(member.id)) {
+    if (member.client.guilds.cache.get(g).members.cache.has(member.id)) {
       existsElsewhere = true; // if yes, let's *not* remove the StreamLink info
     }
   });

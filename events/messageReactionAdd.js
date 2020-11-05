@@ -2,9 +2,18 @@
 
 let lfg = require('../handlers/LFGHandler');
 
-module.exports = (messageReaction, user) => {
+/**
+ * @param {import('discord.js').MessageReaction} messageReaction
+ * @param {import('discord.js').User} user
+ */
+module.exports = async (messageReaction, user) => {
+  console.log(user);
+
   if (user.bot) return; // Ignore the bot's reactions
   const bot = messageReaction.message.client;
+
+  if (messageReaction.message.partial) await messageReaction.message.fetch();
+  if (messageReaction.partial) await messageReaction.fetch();
 
   /**
    * LFG

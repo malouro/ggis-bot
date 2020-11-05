@@ -151,7 +151,7 @@ const validateType = (input, expectedType, settingConfig, bot) => {
   if ((input.match(`<!@${snowflakeRegExp}>`) || input.match(snowflakeRegExp)) && expectedType === 'user') {
     const userSnowflake = input.replace(/[<!@>]/g, '');
 
-    return [bot.users.has(userSnowflake), userSnowflake];
+    return [bot.users.cache.has(userSnowflake), userSnowflake];
   }
 
   // String type setting can accept anything that came in via "args"
