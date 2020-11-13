@@ -43,6 +43,9 @@ const settings = {
       description: 'Memes & dreams',
     },
   ],
+  streamlink: {
+    no_init: true,
+  },
 };
 
 const bot = {
