@@ -64,4 +64,7 @@ exports.settings = {
   mainGuild: process.env.TEST_GUILD,
   testGuild: process.env.TEST_GUILD,
   mainChannel: process.env.TEST_CHANNEL,
+  streamlink: {
+    no_init: true,
+  },
 };

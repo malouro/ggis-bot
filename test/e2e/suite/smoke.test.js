@@ -31,15 +31,9 @@ describe('Smoke Tests', () => {
 
   afterAll(async () => {
     await Ggis.destroy();
-
     await waitForExpect(() => {
       expect(global.ALL_CLEAR).toBe(true);
     });
-
-    // await Ggis.removeAllListeners();
-    // await Ggis.ws.removeAllListeners();
-    await Ggis.removeTwitchTopic('twitch');
-    process.exit(0);
   });
 
   test('bot should log in successfully', () => {
@@ -47,7 +41,7 @@ describe('Smoke Tests', () => {
     expect(Ggis.guilds.cache.has(process.env.TEST_GUILD)).toBe(true);
   });
 
-  test('ping command', async (done) => {
+  test('ping command works', async (done) => {
     const clearedUp = [false, false];
     const channelToTestIn = Ggis.guilds.cache.get(
       process.env.TEST_GUILD,
