@@ -30,12 +30,12 @@ const DEFAULT_EMBED_COLOR = 0x009395;
 
 /**
  * @function buildMessage
- * Builds a RichEmbed Discord message to send for the LFG
+ * Builds a Discord embed message to send for the LFG
  *
- * @returns {Discord.RichEmbed}
+ * @returns {import('discord.js').EmbedField}
  */
 const buildMessage = (bot, lfgObj, { type = 'default' } = {}) => {
-  const embed = new Discord.RichEmbed();
+  const embed = new Discord.MessageEmbed();
   const game = bot.games.get(lfgObj.code);
   const mode = game.modes.indexOf(lfgObj.mode);
   const indexOfGame = game.modes.indexOf(lfgObj.mode);
@@ -185,7 +185,7 @@ const addLFG = (bot, object) => {
 
     const embed = buildMessage(bot, object);
 
-    bot.channels.get(object.channel).send({ embed }).then((message) => {
+    bot.channels.cache.get(object.channel).send({ embed }).then((message) => {
       object.id = message.id;
       bot.lfgStack.set(object.id, object);
       if (isFirstEntry) bot.lfgUpdate(true, INTERVAL);
@@ -213,7 +213,7 @@ const complete = (bot, id) => {
     const stack = bot.lfgStack.get(id);
     const game = bot.games.get(stack.code);
     const mode = game.modes.indexOf(stack.mode);
-    const embed = new Discord.RichEmbed()
+    const embed = new Discord.MessageEmbed()
       .setTitle(`${stack.party_leader_name}'s party is now full & ready to go!`)
       .setDescription(`**Game:** ${stack.game}\n**Game mode:** ${game.modes_proper[mode]}\n**Party:** ${stack.party.map(m => `<@${m}>`).join(' ')}`)
       .setColor(0x009395)
@@ -223,7 +223,7 @@ const complete = (bot, id) => {
     ch.send({ embed });
 
     if (settings.lfg.delete_on_complete) {
-      bot.channels.get(stack.channel).fetchMessage(id).then(messageToDelete => messageToDelete.delete());
+      bot.channels.cache.get(stack.channel).messages.get(id).then(messageToDelete => messageToDelete.delete());
     }
 
     // Remove from LFG stack
@@ -240,30 +240,34 @@ const complete = (bot, id) => {
  * @function addToParty
  * Add a user into an LFG party
  *
- * @param {Discord.Client} bot
- * @param {Snowflake} id - LFG id
- * @param {Snowflake} userid - User id to add into LFG party
+ * @param {import('discord.js').Client} bot
+ * @param {import('discord.js').Snowflake} id - LFG id
+ * @param {import('discord.js').Snowflake} userid - User id to add into LFG party
  */
-const addToParty = (bot, id, userid) => {
+const addToParty = async (bot, id, userid) => {
   try {
     // Push user into party array
     const stack = bot.lfgStack.get(id);
     stack.party.push(userid);
 
     const embed = buildMessage(bot, stack);
-    const ch = bot.channels.get(stack.channel);
+    /** @type {import('discord.js').TextChannel} */
+    const ch = bot.channels.cache.get(stack.channel);
     const { guild } = ch;
 
-    ch.fetchMessage(stack.id).then((message) => {
-      message.edit({ embed }).then(() => {
+    if (ch.type !== 'text') throw new Error('Not a text channel, can\'t add to party.');
+
+    ch.messages.fetch(stack.id).then((message) => {
+      message.edit('', { embed }).then((msg) => {
+        console.log(`Updated with ${msg}`);
       }).catch(err => console.error(err));
     }).catch(err => console.error(err));
 
     bot.lfgStack.set(id, stack);
 
     // Attempt to move user into party leader's channel
-    const memberToMoveTo = guild.members.get(bot.lfgStack.get(id).party_leader_id);
-    const memberToMove = guild.members.get(userid);
+    const memberToMoveTo = guild.members.cache.get(bot.lfgStack.get(id).party_leader_id);
+    const memberToMove = guild.members.cache.get(userid);
     if (typeof memberToMoveTo.voiceChannel !== 'undefined') {
       memberToMove.edit({ channel: memberToMoveTo.voiceChannelID }, `Moved by @${settings.botNameProper} for LFG`).then().catch(err => console.error(err));
     }
@@ -293,8 +297,8 @@ const removeFromParty = (bot, id, userid) => {
       bot.lfgStack.get(id).party.splice(index, 1);
       const stack = bot.lfgStack.get(id);
       const embed = buildMessage(bot, stack);
-      const ch = bot.channels.get(stack.channel);
-      ch.fetchMessage(stack.id).then((message) => {
+      const ch = bot.channels.cache.get(stack.channel);
+      ch.messages.fetch(stack.id).then((message) => {
         message.edit({ embed }).then(() => {
         }).catch(err => console.error(err));
       }).catch(err => console.error(err));
@@ -313,9 +317,9 @@ const timeout = (bot, id) => {
   try {
     // Edit or delete LFG message when it times out
     const stack = bot.lfgStack.get(id);
-    const ch = bot.channels.get(stack.channel);
+    const ch = bot.channels.cache.get(stack.channel);
 
-    ch.fetchMessage(stack.id).then((message) => {
+    ch.messages.fetch(stack.id).then((message) => {
       const logTimeout = () => {
         console.log(chalk.bgYellow.black(`[${moment().format(settings.timeFormat)}] ${stack.party_leader_name}'s LFG for ${stack.game} has timed out.`));
       };
@@ -350,7 +354,7 @@ const warning = (bot, id, timeLeft) => {
     const stack = bot.lfgStack.get(id);
     const game = bot.games.get(stack.code);
     const mode = game.modes.indexOf(stack.mode);
-    const embed = new Discord.RichEmbed()
+    const embed = new Discord.MessageEmbed()
       .setTitle(`${stack.party_leader_name}'s party has ${timeLeft} minutes left before it times out!`)
       .setDescription(`**Game:** ${stack.game}\n**Game mode:** ${game.modes_proper[mode]}\n**Party:** ${stack.party.map(m => `<@${m}>`).join(' ')} (${stack.party.length}/${stack.max_party_size})`)
       .setColor(0x009395);
@@ -384,7 +388,7 @@ const cancel = (bot, id, removed) => {
     }
 
     // Attempt to fetch message
-    bot.channels.get(stack.channel).fetchMessage(stack.id).then((message) => {
+    bot.channels.cache.get(stack.channel).fetchMessage(stack.id).then((message) => {
       const afterCancel = () => {
         bot.lfgStack.delete(id);
         if (bot.lfgStack.size === 0) bot.lfgUpdate(false);

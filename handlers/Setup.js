@@ -16,7 +16,10 @@ const functionsToReload = [];
 const handlers = [];
 let lfgUpdateContainer = null;
 
-module.exports = (bot, settings) => {
+/**
+ * @param {import('discord.js').Client} bot
+ */
+module.exports = async (bot, settings) => {
   // Store default prefix in the bot Client
   bot.prefix = settings.prefix;
 
@@ -198,15 +201,26 @@ module.exports = (bot, settings) => {
    * - Tie the stream-up, stream-down and viewcount events to streamlinkHandler functions
    * - Two funcs for adding and removing topics from TwitchPS and embed into bot Client
    */
-  streamlink.init(bot).then((value) => {
-    bot = value.client;
-    bot.twitch = new TwitchPS({ init_topics: value.topics, reconnect: true, debug: false });
+  if (settings.streamlink.no_init !== true) {
+    const { client, topics } = await streamlink.init(bot);
+
+    bot = client;
+
+    const twitch = new TwitchPS({
+      init_topics: topics.length > 0 ? topics : [{ topic: 'video-playback.twitch' }],
+      reconnect: process.env.NODE_ENV !== 'test',
+      debug: process.env.DEBUG,
+    });
+
+    bot.twitch = twitch;
     bot.twitch.on('stream-up', data => streamlink.streamUp(bot, data));
     bot.twitch.on('stream-down', data => streamlink.streamDown(bot, data));
     bot.twitch.on('viewcount', data => streamlink.viewCount(bot, data));
-    bot.addTwitchTopic = (stream) => { bot.twitch.addTopic({ topic: `video-playback.${stream.toLowerCase()}` }); };
+    bot.addTwitchTopic = (stream) => {
+      bot.twitch.addTopic({ topic: `video-playback.${stream.toLowerCase()}` });
+    };
     bot.removeTwitchTopic = (stream) => { bot.twitch.removeTopic({ topic: `video-playback.${stream.toLowerCase()}` }); };
-  }).catch(err => console.log(err));
+  }
 
   /**
    * Create lfg library

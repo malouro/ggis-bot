@@ -25,28 +25,27 @@ describe('Smoke Tests', () => {
     /* Login */
     await Ggis.login(settings.token);
     await waitForExpect(() => {
-      expect(Ggis.status).toBe(0);
+      expect(Ggis.ws.status).toBe(0);
     });
   });
 
   afterAll(async () => {
     await Ggis.destroy();
     await waitForExpect(() => {
-      expect(Ggis.status).toBe(5);
       expect(global.ALL_CLEAR).toBe(true);
     });
   });
 
   test('bot should log in successfully', () => {
-    expect(Ggis.status).toBe(0);
-    expect(Ggis.guilds.has(process.env.TEST_GUILD)).toBe(true);
+    expect(Ggis.ws.status).toBe(0);
+    expect(Ggis.guilds.cache.has(process.env.TEST_GUILD)).toBe(true);
   });
 
-  test('ping command', async () => {
+  test('ping command works', async (done) => {
     const clearedUp = [false, false];
-    const channelToTestIn = Ggis.guilds.get(
+    const channelToTestIn = Ggis.guilds.cache.get(
       process.env.TEST_GUILD,
-    ).channels.get(
+    ).channels.cache.get(
       process.env.TEST_CHANNEL,
     );
     const commandToTry = `${getGuildCommandPrefix(Ggis, channelToTestIn)}ping`;
@@ -72,6 +71,7 @@ describe('Smoke Tests', () => {
 
     await waitForExpect(() => {
       expect(clearedUp).toStrictEqual([true, true]);
+      done();
     });
   });
 });
