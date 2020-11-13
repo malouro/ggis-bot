@@ -165,7 +165,7 @@ exports.run = (bot, message, args, perms) => {
     if (typeof command.help.usage === 'function') {
       usage = command.help.usage(bot, message);
     } else if (typeof command.help.usage === 'string') {
-      ({ usage } = command.help.usage);
+      ({ usage } = command.help);
     }
 
     if (checkIfCommandAvailable(command, gid, perms, settings)) {
