@@ -47,6 +47,13 @@
     },
     "memes": true
   },
+  "commandChannels": {
+    "enabled": true,
+    "locklist": ["Channels that ONLY accept commands", "NO normal messages", "(These are different per-server)"],
+    "whitelist": ["Channels that allow command usage", "(These are different per-server)"],
+    "blacklist": ["Channels that disallow command usage", "(These are different per-server)"],
+    "strictMode": false
+  },
   "helpMenu": {
     "split_value": 20
   },

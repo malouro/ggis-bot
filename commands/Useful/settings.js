@@ -58,6 +58,12 @@ const configOptions = {
       default: settings.commandChannels.enabled,
       description: 'Enables control of command channels',
     },
+    locklist: {
+      type: 'array',
+      innerType: 'textChannel',
+      default: settings.commandChannels.locklist,
+      description: 'List of channels that ONLY accept command usage',
+    },
     whitelist: {
       type: 'array',
       innerType: 'textChannel',
@@ -73,7 +79,7 @@ const configOptions = {
     strictMode: {
       type: 'boolean',
       default: settings.commandChannels.strictMode,
-      description: 'If on: deletes non-command messages in whitelist channels & commands in blacklist channels',
+      description: 'If on: deletes non-compliant messages g',
     },
   },
 
@@ -103,17 +109,19 @@ ${commandName} <scope> (<setting> <value>)
 
 <scope> is required and can be any of the following:
 
-- list :: List all available settings
-- show :: Show current config for the server
+- list  :: List all available settings
+- show  :: Show current config for the server
+- reset :: Reset a specific setting, or all settings
 ${scopes.map(scope => `- ${scope} :: ${configOptions[scope].description || '<no description>'}`).join('\n')}
 
 If <scope> is *not* "list" or "show", you must also provide <setting> and <value> options. Use "${prefix}${commandName} list" for more info on available settings & values options.
 
 Examples ::
 
-${prefix}${commandName} show            ║ Shows the current config for the server, pretty-printed
-${prefix}${commandName} list            ║ Shows all available settings that can be modified
-${prefix}${commandName} bot prefix $    ║ Changes command prefix to "$" in this server
+${prefix}${commandName} show             ║ Shows the current config for the server
+${prefix}${commandName} list             ║ Shows all available settings that can be modified
+${prefix}${commandName} reset bot prefix ║ Reset the bot prefix for this server
+${prefix}${commandName} bot prefix $     ║ Changes command prefix to "$" in this server
 `.trim();
   },
 };
