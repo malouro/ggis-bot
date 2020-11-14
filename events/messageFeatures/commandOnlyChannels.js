@@ -19,12 +19,16 @@ module.exports = (bot, message, isCommand, settings) => {
   );
 
   const enabled = getCommandChannelsSetting('enabled');
-  /** @type {import('discord.js').Collection} */
+  const locklist = getCommandChannelsSetting('locklist');
   const whitelist = getCommandChannelsSetting('whitelist');
   const blacklist = getCommandChannelsSetting('blacklist');
   const strictModeEnabled = getCommandChannelsSetting('strictMode');
 
   if (enabled) {
+    if (locklist.includes(message.channel.id)) {
+      return [!isCommand, strictModeEnabled];
+    }
+
     // If channel is in blacklist, disallow if it's a command
     if (blacklist.includes(message.channel.id)) {
       return [isCommand, strictModeEnabled];

@@ -50,6 +50,7 @@
   },
   "commandChannels": {
     "enabled": true,
+    "locklist": [],
     "whitelist": [],
     "blacklist": [],
     "strictMode": false
