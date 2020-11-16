@@ -380,6 +380,7 @@ exports.run = async (bot, message, args) => {
       scope,
       key,
     ).catch((err) => {
+      errorOnReset = err;
       console.error(err);
       message.reply([
         'Uh-oh, something went wrong trying to remove that setting override.',
@@ -387,7 +388,6 @@ exports.run = async (bot, message, args) => {
         '',
         `Check \`${prefix}settings show\` to see this server's setting configuration.`,
       ].join('\n'));
-      errorOnReset = err;
     });
 
     if (errorOnReset) return null;
@@ -426,12 +426,19 @@ ${getCurrentGuildConfig(configAfterReset)}
     );
   }
 
+  let errorOnUpdate = null;
   const updatedConfig = await updateGuildConfig(bot, message.guild.id, scope, key, castedValue)
     .catch((err) => {
+      errorOnUpdate = err;
       console.error(err);
-      message.reply('Uh-oh. Something went wrong trying to save the server config! :(');
+      message.reply([
+        'Uh-oh, something went wrong trying to save or update the server\'s settings.',
+        '',
+        `Check \`${prefix}settings show\` to see this server's current configuration.`,
+      ].join('\n'));
     });
 
+  if (errorOnUpdate) return null;
   return message.reply(`
 Successful change of \`${scope}.${key}\` to \`${value}\`!
 
