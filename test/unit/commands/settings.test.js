@@ -56,6 +56,17 @@ describe('Settings Command', () => {
     expect(MOCK_BOT.message.reply).toHaveBeenCalledWith(expect.stringContaining(`"bot": { "prefix": "${newPrefix}" }`));
   });
 
+  test('resets server settings via `!settings reset`', async () => {
+    const setupArgs = ['!settings', 'test', 'boolean', 'true'];
+    const resetArgs = ['!settings', 'reset', 'test', 'boolean'];
+
+    await settingsCommand.run(MOCK_BOT, makeMockMessage(setupArgs), setupArgs);
+    expect(MOCK_BOT.guildOverrides[MOCK_GUILD_ID].test.boolean).toBe(true);
+
+    await settingsCommand.run(MOCK_BOT, makeMockMessage(resetArgs), resetArgs);
+    expect(MOCK_BOT.guildOverrides[MOCK_GUILD_ID].test.boolean).toBeUndefined();
+  });
+
   test.each([
     ['string', ['test-value'], '"test-value"'],
     ['number', ['10.5'], 10.5],
