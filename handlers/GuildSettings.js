@@ -112,3 +112,34 @@ exports.update = (bot, id, scope, key, value) => new Promise((resolve, reject) =
     resolve(updatedConfig);
   });
 });
+
+/**
+ * Resets/removes a setting within the config
+ * @param {import('discord.js').Client} bot The bot instance
+ * @param {import('discord.js').Snowflake} id ID of the guild
+ * @param {string} scope {scope} in settings
+ * @param {string} key {key} in {scope}
+ * @returns {Promise} result from updated config
+ */
+exports.deleteSetting = (bot, id, scope, key) => new Promise((resolve, reject) => {
+  try {
+    let updatedConfig = bot.guildOverrides[id];
+
+    if (!scope || !key) reject(new Error('`key` or `scope` is missing'));
+    if (scope in bot.guildOverrides[id] && key in bot.guildOverrides[id][scope]) {
+      delete bot.guildOverrides[id][scope][key];
+
+      updatedConfig = bot.guildOverrides[id];
+
+      fs.writeFile(path.resolve(guildConfigsPath, `./${id}.json`), JSON.stringify(bot.guildOverrides[id]), (err) => {
+        if (err) reject(new Error(`Writing to ${guildConfigsPath}/${id}.json failed with the following error:\n${err}`));
+
+        resolve(updatedConfig);
+      });
+    } else {
+      reject(new Error(`Scope "${scope}" or key "${key}" are not currently overridden in this guild. Nothing to reset/remove.`));
+    }
+  } catch (err) {
+    reject(err);
+  }
+});

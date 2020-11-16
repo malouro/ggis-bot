@@ -8,7 +8,7 @@
 const beautify = require('json-beautify');
 const settings = require('../../settings.json');
 const { serverSettings: testServerSettings } = require('../../test/data');
-const { getGuildCommandPrefix, update: updateGuildConfig } = require('../../handlers/GuildSettings');
+const { getGuildCommandPrefix, update: updateGuildConfig, deleteSetting } = require('../../handlers/GuildSettings');
 
 const commandName = 'settings';
 
@@ -109,13 +109,15 @@ ${commandName} <scope> (<setting> <value>)
 
 <scope> is required and can be any of the following:
 
-- list  :: List all available settings
-- show  :: Show current config for the server
-- reset :: Reset a specific setting, or all settings
+- list   :: List all available settings
+- show   :: Show current config for the server
+- reset  :: Reset a specific setting, or all settings
+- remove :: Alias for "reset"
+
 ${scopes.map(scope => `- ${scope} :: ${configOptions[scope].description || '<no description>'}`).join('\n')}
 
 If <scope> is *not* "list" or "show", you must also provide <setting> and <value> options. Use "${prefix}${commandName} list" for more info on available settings & values options.
-
+If using "reset" or "remove, you must list the <scope> and <setting> options after.
 Examples ::
 
 ${prefix}${commandName} show             ║ Shows the current config for the server
@@ -147,7 +149,7 @@ exports.conf = {
  * @param {import('discord.js').Client} bot Ggis-bot
  * @returns {Array<Boolean, any>}
  */
-const validateType = (input, expectedType, settingConfig, bot) => {
+function validateType(input, expectedType, settingConfig, bot) {
   // Input MUST be `string`, EXCEPT for `array` type
   // (if not then something went haywire; time to abort)
   if (typeof input !== 'string') {
@@ -226,7 +228,7 @@ const validateType = (input, expectedType, settingConfig, bot) => {
   // String type setting can accept anything that came in via "args"
   // (since they *should* be strings to begin with)
   return [expectedType === 'string', input];
-};
+}
 
 /**
  * Returns description for given config setting
@@ -234,7 +236,7 @@ const validateType = (input, expectedType, settingConfig, bot) => {
  * @param {ServerSettingKey} setting
  * @return {string} Setting description
  */
-const getTypeDesc = (setting) => {
+function getTypeDesc(setting) {
   const { type } = setting;
   switch (type) {
     case 'string':
@@ -254,12 +256,12 @@ const getTypeDesc = (setting) => {
     default:
       return 'string';
   }
-};
+}
 
 /**
  * @return {string} Description of all available config settings
  */
-const getAllSettings = () => {
+function getAllSettings() {
   let message = "Here's the full list of settings that can be configured:\n\n```asciidoc\n";
   const scopes = Object.keys(configOptions);
 
@@ -281,11 +283,35 @@ const getAllSettings = () => {
 
   message += '```';
   return message;
-};
+}
+
+/**
+ * @param {string} scope Scope in configOptions to check if valid
+ * @returns {boolean} If the given scope is valid or not
+ */
+function validateScope(scope) {
+  const scopes = Object.keys(configOptions);
+
+  return scopes.includes(scope);
+}
+
+/**
+ * @param {string} scope Scope in configOptions to check
+ * @param {string} key Key within scope to check
+ * @returns {boolean} If the given key is valid within the scope
+ */
+function validateSetting(scope, key) {
+  const keys = Object.keys(configOptions[scope]);
+
+  return keys.includes(key);
+}
 
 exports.run = async (bot, message, args) => {
+  let reset = false;
   const prefix = getGuildCommandPrefix(bot, message);
-  const getCurrentGuildConfig = (input) => {
+  const fullListMessage = `To see a full list of available settings and scopes, use \`${prefix}${commandName} list\``;
+
+  function getCurrentGuildConfig(input) {
     let config = null;
     // Given the ID of the guild
     if (typeof input === 'string' && bot.guildOverrides[input]) {
@@ -303,10 +329,15 @@ exports.run = async (bot, message, args) => {
       prettyConfig,
       '```',
     ].join('\n');
-  };
-  const fullListMessage = `To see a full list of available settings and scopes, use \`${prefix}${commandName} list\``;
+  }
 
-  if (!args[1]) return message.reply(`You must provide a scope to specify what type of settings you want to configure.\n\n${fullListMessage}`);
+  function checkScopeWasGiven() {
+    if (!args[1]) {
+      message.reply(`You must provide a scope to specify what type of settings you want to configure.\n\n${fullListMessage}`);
+      return false;
+    }
+    return true;
+  }
 
   /**
    * !settings list
@@ -322,17 +353,50 @@ exports.run = async (bot, message, args) => {
   if (args[1] === 'show') {
     return message.reply(getCurrentGuildConfig(message.guild.id));
   }
+  /**
+   * !settings reset
+   * Resets a given server setting(s)
+   */
+  if (args[1] === 'reset' || args[1] === 'remove') {
+    reset = true;
+    args.shift();
+  }
 
   /* Check <scope> */
-  const scopes = Object.keys(configOptions);
   const scope = args[1];
-  if (!scopes.includes(scope)) return message.reply(`\`${scope}\` is not an available scope of settings that can be configured.\n\n${fullListMessage}`);
+  if (!checkScopeWasGiven(scope)) return null;
+  if (!validateScope(scope)) return message.reply(`\`${scope}\` is not an available scope of settings that can be configured.\n\n${fullListMessage}`);
 
   /* Check <key> */
   if (!args[2]) return message.reply(`No \`key\` given. Please provide the name of the setting you want to edit for this server.\n\n${fullListMessage}`);
-  const keys = Object.keys(configOptions[scope]);
   const key = args[2];
-  if (!keys.includes(key)) return message.reply(`\`${key}\` is not an available setting within \`${scope}\`.\n\n${fullListMessage}`);
+  if (!validateSetting(scope, key)) return message.reply(`\`${key}\` is not an available setting within \`${scope}\`.\n\n${fullListMessage}`);
+
+  if (reset) {
+    let errorOnReset = null;
+    const configAfterReset = await deleteSetting(
+      bot,
+      message.guild.id,
+      scope,
+      key,
+    ).catch((err) => {
+      console.error(err);
+      message.reply([
+        'Uh-oh, something went wrong trying to remove that setting override.',
+        'Maybe this server doesn\'t have that setting configured?',
+        '',
+        `Check \`${prefix}settings show\` to see this server's setting configuration.`,
+      ].join('\n'));
+      errorOnReset = err;
+    });
+
+    if (errorOnReset) return null;
+    return message.reply(`
+Successfully removed override of setting \`${scope}.${key}\`
+
+${getCurrentGuildConfig(configAfterReset)}
+`.trim());
+  }
 
   /* Check <value> */
   if (!args[3]) {
