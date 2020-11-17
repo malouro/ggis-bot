@@ -55,31 +55,31 @@ const configOptions = {
     description: 'Controls where and how commands are allowed to be used',
     enabled: {
       type: 'boolean',
-      default: settings.commandChannels.enabled,
+      default: (settings.commandChannels && settings.commandChannels.enabled) || true,
       description: 'Enables control of command channels',
     },
     locklist: {
       type: 'array',
       innerType: 'textChannel',
-      default: settings.commandChannels.locklist,
+      default: (settings.commandChannels && settings.commandChannels.locklist) || [],
       description: 'List of channels that ONLY accept command usage',
     },
     whitelist: {
       type: 'array',
       innerType: 'textChannel',
-      default: settings.commandChannels.whitelist,
+      default: (settings.commandChannels && settings.commandChannels.whitelist) || [],
       description: 'List of channels where command usage is allowed',
     },
     blacklist: {
       type: 'array',
       innerType: 'textChannel',
-      default: settings.commandChannels.blacklist,
+      default: (settings.commandChannels && settings.commandChannels.blacklist) || [],
       description: 'List of channels where command usage is NOT allowed',
     },
     strictMode: {
       type: 'boolean',
-      default: settings.commandChannels.strictMode,
-      description: 'If on: deletes non-compliant messages g',
+      default: (settings.commandChannels && settings.commandChannels.strictMode) || false,
+      description: 'If on: deletes non-compliant messages in correlating channels',
     },
   },
 
