@@ -1,4 +1,5 @@
 const { Collection } = require('discord.js');
+const waitForExpect = require('wait-for-expect');
 const defaultSettings = require('../settings.example.json');
 
 exports.MOCK_GUILD_ID = 'MOCK_GUILD_ID';
@@ -53,6 +54,12 @@ exports.makeMockMessage = (args, mockBot = this.MOCK_BOT) => ({
   ...mockBot.message,
   content: args.join(' '),
 });
+
+exports.checkBotIsSetup = async (timeout = 10000) => {
+  await waitForExpect(() => {
+    expect(global.BOT_SETUP_DONE).toBe(true);
+  }, timeout);
+};
 
 exports.settings = {
   ...defaultSettings,

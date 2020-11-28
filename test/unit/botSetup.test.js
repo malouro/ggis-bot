@@ -1,9 +1,7 @@
-const fs = require('fs');
-const waitForExpect = require('wait-for-expect');
 const mockConsole = require('jest-mock-console').default;
 const { Collection } = require('discord.js');
 const Setup = require('../../handlers/Setup');
-const { platforms } = require('../../config/lfg/platforms.json');
+const { checkBotIsSetup } = require('../testHelpers');
 
 const settings = {
   botName: 'ggis',
@@ -58,14 +56,8 @@ describe('Bot Setup', () => {
 
   /* Wait for setup to be done */
   beforeAll(async () => {
-    const lfgGames = fs.readdirSync('./config/lfg/default');
     await Setup(bot, settings);
-
-    await waitForExpect(() => {
-      expect(bot.games.size).toBe(lfgGames.length);
-      expect(bot.platforms.size).toBe(platforms.length);
-      expect(global.BOT_SETUP_DONE).toBe(true);
-    }, 10000);
+    await checkBotIsSetup();
   }, 20000);
 
   afterAll(() => {
