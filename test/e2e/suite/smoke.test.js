@@ -1,9 +1,7 @@
 const { Client } = require('discord.js');
-const fs = require('fs');
 const waitForExpect = require('wait-for-expect');
 const setupBot = require('../../../handlers/Setup');
-const { settings, numberOfCommands } = require('../../testHelpers');
-const { platforms } = require('../../../config/lfg/platforms.json');
+const { settings, checkBotIsSetup } = require('../../testHelpers');
 const { getGuildCommandPrefix } = require('../../../handlers/GuildSettings');
 
 jest.setTimeout(30000);
@@ -13,14 +11,8 @@ const Ggis = new Client();
 describe('Smoke Tests', () => {
   beforeAll(async () => {
     /* Setup bot */
-    const lfgGames = fs.readdirSync('./config/lfg/default');
-
     await setupBot(Ggis, settings);
-    await waitForExpect(() => {
-      expect(Ggis.games.size).toBe(lfgGames.length);
-      expect(Ggis.commands.size).toBe(numberOfCommands);
-      expect(Ggis.platforms.size).toBe(platforms.length);
-    }, 10000);
+    await checkBotIsSetup();
 
     /* Login */
     await Ggis.login(settings.token);
