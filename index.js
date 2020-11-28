@@ -14,11 +14,7 @@
 const Discord = require('discord.js');
 const settings = require('./settings.json');
 
-const bot = new Discord.Client({
-  ws: {
-    intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS'],
-  },
-});
+const bot = new Discord.Client();
 
 require('./handlers/Setup')(bot, settings);
 
