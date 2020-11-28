@@ -6,8 +6,6 @@
 
 let lfgHandler = require('../../handlers/LFGHandler');
 
-const lfgFuncMRA = require('../../events/messageReactionAdd');
-const lfgFuncMRR = require('../../events/messageReactionRemove');
 const lfgFuncMD = require('../../events/messageDelete');
 const settings = require('../../settings');
 const { getGuildCommandPrefix } = require('../../handlers/GuildSettings');
@@ -383,12 +381,8 @@ exports.reloadHandler = () => new Promise((resolve, reject) => {
   try {
     delete require.cache[require.resolve('../../handlers/LFGHandler')];
     lfgHandler = require('../../handlers/LFGHandler');
-    lfgFuncMRA.reloadHandler()
-      .then(lfgFuncMRR.reloadHandler()
-        .then(lfgFuncMD.reloadHandler()
-          .then(resolve())
-          .catch(err => console.log(err)))
-        .catch(err => console.log(err)))
+    lfgFuncMD.reloadHandler()
+      .then(resolve())
       .catch(err => console.log(err));
   } catch (err) {
     reject(err);

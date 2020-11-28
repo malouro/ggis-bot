@@ -132,7 +132,7 @@ exports.streamUp = (bot, data) => {
             if (guild.style !== 'minimal') embed.setThumbnail(u.avatarURL);
             embed.addField('Info:', `${u.username} is now live${(u.presence.game !== null) ? ` & streaming **${u.presence.game.name}**!` : '!'} Check it out here:${(guild.style !== 'standard') ? `\n\nhttps://www.twitch.tv/${user.stream}` : ''}`);
             guild.channels.forEach((channel) => {
-              const c = bot.channels.get(channel);
+              const c = bot.channels.cache.get(channel);
               c.send({ embed })
                 .then(() => { if (guild.style === 'standard') c.send(`https://www.twitch.tv/${user.stream}`); })
                 .catch(console.error);
