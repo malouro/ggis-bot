@@ -33,11 +33,11 @@ module.exports = (bot, message, isCommand, settings) => {
     if (blacklist.includes(message.channel.id)) {
       return [isCommand, strictModeEnabled];
     }
-    // If channel isn't in the whitelist, disallow if it's a commandS
+    // If channel isn't in the whitelist, disallow if it's a command
     // If none of the whitelist channels exist anymore, always allow
     if (whitelist.length > 0 && !whitelist.includes(message.channel.id)) {
       return [
-        isCommand || !whitelist.some(channel => message.guild.channels.has(channel)),
+        isCommand || !whitelist.some(channel => message.guild.channels.cache.has(channel)),
         strictModeEnabled,
       ];
     }

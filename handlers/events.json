@@ -2,8 +2,6 @@
     "events": [
         "message",
         "messageDelete",
-        "messageReactionAdd",
-        "messageReactionRemove",
         "guildCreate",
         "guildDelete",
         "guildMemberRemove",
