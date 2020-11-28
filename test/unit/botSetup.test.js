@@ -2,7 +2,6 @@ const fs = require('fs');
 const waitForExpect = require('wait-for-expect');
 const mockConsole = require('jest-mock-console').default;
 const { Collection } = require('discord.js');
-const { numberOfCommands } = require('../testHelpers');
 const Setup = require('../../handlers/Setup');
 const { platforms } = require('../../config/lfg/platforms.json');
 
@@ -64,8 +63,8 @@ describe('Bot Setup', () => {
 
     await waitForExpect(() => {
       expect(bot.games.size).toBe(lfgGames.length);
-      expect(bot.commands.size).toBe(numberOfCommands);
       expect(bot.platforms.size).toBe(platforms.length);
+      expect(global.BOT_SETUP_DONE).toBe(true);
     }, 10000);
   }, 20000);
 
@@ -85,7 +84,7 @@ describe('Bot Setup', () => {
 
   describe('Event Loader', () => {
     test('loads event handlers', () => {
-      expect(bot.on).toHaveBeenCalledTimes(11);
+      expect(bot.on).toHaveBeenCalledTimes(9);
     });
   });
 });
