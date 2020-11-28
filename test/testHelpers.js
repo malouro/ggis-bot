@@ -49,8 +49,6 @@ exports.MOCK_BOT = {
   guildOverrides: {},
 };
 
-exports.numberOfCommands = 30;
-
 exports.makeMockMessage = (args, mockBot = this.MOCK_BOT) => ({
   ...mockBot.message,
   content: args.join(' '),
