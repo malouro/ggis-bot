@@ -66,6 +66,24 @@ module.exports = (bot, game) => {
           }
         });
       }
+      // always reload platforms?
+      fs.readFile('./config/lfg/platforms.json', 'utf8', (error, content) => {
+        const config = JSON.parse(content);
+        const { platforms } = config;
+
+        bot.platforms = new Discord.Collection();
+
+        console.log(chalk.bgYellow.black(`Loading ${platforms.length} platforms into Platforms Collection.`));
+
+        platforms.forEach((platform) => {
+          console.log(chalk.bgYellow.gray(`Loading platform ... ${platform.properName}`));
+
+          bot.platforms.set(platform.code, platform);
+          platform.aliases.forEach((alias) => {
+            bot.platformAliases.set(alias, platform.code);
+          });
+        });
+      });
     } catch (err) {
       reject(err);
     }

@@ -2,6 +2,13 @@
     "code": "stardew",
     "name": "Stardew Valley",
     "aliases": [],
+    "platforms": [
+        "pc",
+        "switch",
+        "ps4",
+        "xbox",
+        "android"
+    ],
     "thumbnail": "http://www.stickpng.com/assets/images/58f367aca4fa116215a923ef.png",
     "default_party_size": [4, 4, 4],
     "modes": ["any", "online", "coop"],

@@ -1,10 +1,42 @@
 {
     "code": "gmod",
     "name": "Garry's Mod",
-    "aliases": ["garrysmod"],
+    "aliases": [
+        "garrysmod"
+    ],
     "thumbnail": "https://www.terageek.org/wp-content/uploads/2016/10/GMod-logo-600x600.png",
-    "default_party_size": [8,8,8,8,8,8,16,16,16],
-    "modes": ["any","rp","ttt","troubleinterroristtown","murder","prophunt","custom","private","privateserver"],
-    "modes_proper": ["Any","Roleplay","Trouble in Terrorist Town","Trouble in Terrorist Town","Murder","Prop Hunt","Custom Lobby","Private Server","Private Server"],
+    "default_party_size": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        16,
+        16,
+        16
+    ],
+    "modes": [
+        "any",
+        "rp",
+        "ttt",
+        "troubleinterroristtown",
+        "murder",
+        "prophunt",
+        "custom",
+        "private",
+        "privateserver"
+    ],
+    "modes_proper": [
+        "Any",
+        "Roleplay",
+        "Trouble in Terrorist Town",
+        "Trouble in Terrorist Town",
+        "Murder",
+        "Prop Hunt",
+        "Custom Lobby",
+        "Private Server",
+        "Private Server"
+    ],
     "default_game_mode": "any"
 }
