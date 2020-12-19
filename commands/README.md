@@ -101,7 +101,7 @@ Commands are automatically assigned to the category associated with the folder a
 
 eg:
 
-```json
+```js
 // settings.json
 {
   "commandGroups": [
