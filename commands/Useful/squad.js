@@ -150,8 +150,8 @@ const listSquad = (path, squadName, message) => {
       // alphabetical order:
       const tmpArrayUsers = [];
       tmpSquad.squad.forEach((uid) => {
-        if (typeof message.guild.members.get(uid) !== 'undefined') {
-          tmpArrayUsers.push(message.guild.members.get(uid).user.username);
+        if (typeof message.guild.members.cache.get(uid) !== 'undefined') {
+          tmpArrayUsers.push(message.guild.members.cache.get(uid).user.username);
         }
       });
       tmpArrayUsers.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));

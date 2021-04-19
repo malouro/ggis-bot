@@ -28,12 +28,12 @@ exports.run = (bot, message, args) => {
         m.edit('Successfully reloaded all commands!')
           .then(m.delete(1500)
             .then(message.delete(1500))
-            .catch(console.error()))
-          .catch(console.error());
+            .catch(console.error))
+          .catch(console.error);
       }).catch((e) => {
         m.edit(`Command reload failed:\n\`\`\`${e.stack}\`\`\``)
           .then(message.delete(1500))
-          .catch(console.error());
+          .catch(console.error);
       });
     });
   } else {
@@ -46,9 +46,8 @@ exports.run = (bot, message, args) => {
       message.channel.send(`Cannot find the command: ${args[1]}`).then((m) => {
         m.delete(1500)
           .then(message.delete(1500)
-            .then()
-            .catch(console.error()))
-          .catch(console.error());
+            .catch(console.error))
+          .catch(console.error);
       });
     } else {
       message.channel.send(`Reloading: ${command}`).then((m) => {
@@ -56,12 +55,12 @@ exports.run = (bot, message, args) => {
           m.edit(`Successfully reloaded command: ${command}`)
             .then(m.delete(1500))
             .then(message.delete(1500))
-            .catch(errOnDel => console.log(errOnDel))
-            .catch(console.error());
-        }).catch((e) => {
-          m.edit(`Command reload failed: ${command}\n\`\`\`${e.stack}\`\`\``)
+            .catch(console.error)
+            .catch(console.error);
+        }).catch((error) => {
+          m.edit(`Command reload failed: ${command}\n\`\`\`${error.stack}\`\`\``)
             .then(message.delete(1500))
-            .catch(console.error());
+            .catch(console.error);
         });
       });
     }

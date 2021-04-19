@@ -13,7 +13,7 @@
  *          Replace message w/ an embed that places in the ExtendedEmoji
  *          Deletes old message & have Ggis send a new one:
  *          @desc {Embed}
- *              ON - If Embed is On => Sends a RichEmbed that has author, thumbnail, etc
+ *              ON - If Embed is On => Sends a MessageEmbed that has author, thumbnail, etc
  *              OFF - If Embed is Off => Sends a regular Discord message
  *      @desc :Method 2:
  *          React to the message with the ExtendedEmoji
@@ -25,7 +25,7 @@ const RegExExtendedEmojis = /:\w+:(?!\d+>)/g;
 
 module.exports = (message, settings) => new Promise((resolve, reject) => {
   try {
-    const g = message.client.guilds.get(settings.testGuild);
+    const g = message.client.guilds.cache.get(settings.testGuild);
     if (typeof g === 'undefined') resolve(message);
     let emojiCodes = [];
     const emojis = new Map();
@@ -60,7 +60,7 @@ module.exports = (message, settings) => new Promise((resolve, reject) => {
     if (edit) {
       message.delete().then((msg) => {
         if (settings.rules.extendedEmoji.embed) {
-          const embed = new Discord.RichEmbed()
+          const embed = new Discord.MessageEmbed()
             .setTitle('says:')
             .setDescription(str)
             .setAuthor(msg.author.username, msg.author.displayAvatarURL)

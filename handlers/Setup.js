@@ -16,7 +16,10 @@ const functionsToReload = [];
 const handlers = [];
 let lfgUpdateContainer = null;
 
-module.exports = (bot, settings) => {
+/**
+ * @param {import('discord.js').Client} bot
+ */
+module.exports = async (bot, settings) => {
   // Store default prefix in the bot Client
   bot.prefix = settings.prefix;
 
@@ -130,22 +133,28 @@ module.exports = (bot, settings) => {
    *                                      (and w/e else needs to be stated about the command)
    *      }
    */
-  fs.readdir('./commands/', (err, folders) => {
-    folders.forEach((folder) => {
-      fs.readdir(`./commands/${folder}`, (errInCatDir, files) => {
-        if (errInCatDir) throw errInCatDir;
-        console.log(chalk.bgBlue(`Loading a total of ${files.length} commands from /${folder}/`));
-        files.forEach((f) => {
-          const contents = require(`../commands/${folder}/${f}`);
-          console.log(chalk.bgCyan.black(`Loading command ${contents.help.name} ... ✓`));
-          bot.commands.set(contents.help.name, contents);
-          bot.commands.get(contents.help.name).conf.category = `${folder}`;
-          contents.conf.aliases.forEach((alias) => {
-            bot.aliases.set(alias, contents.help.name);
-          });
+  fs.readdirSync('./commands/').forEach((folder) => {
+    try {
+      const files = fs.readdirSync(`./commands/${folder}`);
+      console.log(chalk.bgBlue(`Loading a total of ${files.length} commands from /${folder}/`));
+
+      files.forEach((f) => {
+        const contents = require(`../commands/${folder}/${f}`);
+        console.log(chalk.bgCyan.black(`Loading command ${contents.help.name} ... ✓`));
+        bot.commands.set(contents.help.name, contents);
+        bot.commands.get(contents.help.name).conf.category = folder;
+        contents.conf.aliases.forEach((alias) => {
+          bot.aliases.set(alias, contents.help.name);
         });
       });
-    });
+    } catch (errInCatDir) {
+      if (errInCatDir) {
+        if (errInCatDir.code === 'ENOTDIR') {
+          return;
+        }
+        throw errInCatDir;
+      }
+    }
   });
 
   /**
@@ -193,15 +202,26 @@ module.exports = (bot, settings) => {
    * - Tie the stream-up, stream-down and viewcount events to streamlinkHandler functions
    * - Two funcs for adding and removing topics from TwitchPS and embed into bot Client
    */
-  streamlink.init(bot).then((value) => {
-    bot = value.client;
-    bot.twitch = new TwitchPS({ init_topics: value.topics, reconnect: true, debug: false });
+  if (settings.streamlink.no_init !== true) {
+    const { client, topics } = await streamlink.init(bot);
+
+    bot = client;
+
+    const twitch = new TwitchPS({
+      init_topics: topics.length > 0 ? topics : [{ topic: 'video-playback.twitch' }],
+      reconnect: process.env.NODE_ENV !== 'test',
+      debug: process.env.DEBUG,
+    });
+
+    bot.twitch = twitch;
     bot.twitch.on('stream-up', data => streamlink.streamUp(bot, data));
     bot.twitch.on('stream-down', data => streamlink.streamDown(bot, data));
     bot.twitch.on('viewcount', data => streamlink.viewCount(bot, data));
-    bot.addTwitchTopic = (stream) => { bot.twitch.addTopic({ topic: `video-playback.${stream.toLowerCase()}` }); };
+    bot.addTwitchTopic = (stream) => {
+      bot.twitch.addTopic({ topic: `video-playback.${stream.toLowerCase()}` });
+    };
     bot.removeTwitchTopic = (stream) => { bot.twitch.removeTopic({ topic: `video-playback.${stream.toLowerCase()}` }); };
-  }).catch(err => console.log(err));
+  }
 
   /**
    * Create lfg library
@@ -222,27 +242,26 @@ module.exports = (bot, settings) => {
    *                        (corresponds with an element from modes, not modes_proper)
    *  }
    */
+  // ========================
+  // Default LFG Game Library
+  // ========================
+  try {
+    fs.readdirSync('./config/lfg/default').forEach((file, i, files) => {
+      if (i === 0) console.log(chalk.bgYellow.black(`Loading a total of ${files.length} games into Games Collection.`));
 
-  /**
-   * @todo Per-server LFG game lists
-   * Need to consider how this will be implemented!
-   */
-
-  // Games
-  fs.readdir('./config/lfg/default', (err, files) => {
-    if (err) console.error(err);
-    console.log(chalk.bgYellow.black(`Loading a total of ${files.length} games into Games Collection.`));
-    files.forEach((f) => {
-      const contents = JSON.parse(fs.readFileSync(`./config/lfg/default/${f}`, 'utf8'));
+      const contents = JSON.parse(fs.readFileSync(`./config/lfg/default/${file}`, 'utf8'));
       console.log(chalk.bgYellow.gray(`Loading game ... ${contents.name}`));
+
       bot.games.set(contents.code, contents);
       contents.aliases.forEach((alias) => {
         bot.gameAliases.set(alias, contents.code);
       });
     });
-  });
+  } catch (err) { throw new Error(err); }
 
-  // Platforms
+  // ==========================
+  // Default LFG Platforms List
+  // ==========================
   console.log(chalk.bgYellow.black(`Loading ${platforms.length} platforms into Platforms Collection.`));
   platforms.forEach((platform) => {
     console.log(chalk.bgYellow.gray(`Loading platform ... ${platform.properName}`));
@@ -295,7 +314,7 @@ module.exports = (bot, settings) => {
       });
       events.reloaders.forEach((file) => {
         delete require.cache[require.resolve(`./${file}`)];
-        bot[`${file}`] = require(`./${file}`);
+        bot[file] = require(`./${file}`);
       });
       resolve();
     } catch (err) {
@@ -303,31 +322,6 @@ module.exports = (bot, settings) => {
     }
   });
 
-  /**
-   * @todo Find a way to get this to work properly
-   *
-   *    Work in progress !!
-   *
-   * Ideally, this would reload any event (located in /events/) in case of changes
-   * For now, this remains here, even though the actual ReloadEvent command is
-   * disabled and not functioning properly yet.
-   *
-   * @param {String} event
-   */
 
-  /*
-  bot.reloadEvents = (event) => {
-    Promise((resolve, reject) => {
-      try {
-        if (event) eventLoader.reloadHandler(bot, event).then().catch(console.error);
-        else eventLoader.reloadHandler(bot).then().catch(console.error);
-        resolve();
-      } catch (err) {
-        reject(err);
-      }
-    });
-  }
-  */
-
-  /** FINISHED */
+  if (process.env.NODE_ENV === 'test') global.BOT_SETUP_DONE = true; /** FINISHED */
 };

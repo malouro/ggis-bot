@@ -7,7 +7,7 @@ const moment = require('moment');
 let streamlink = require('../handlers/StreamLinkHandler');
 
 const checkForCurrentGuilds = (bot) => {
-  bot.guilds.forEach((guild) => {
+  bot.guilds.cache.forEach((guild) => {
     fs.readFile(`./config/streamlink/guilds/${guild}.json`, (err) => {
       if (err) {
         if (err.code === 'ENOENT') {

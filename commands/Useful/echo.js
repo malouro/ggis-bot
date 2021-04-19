@@ -71,7 +71,7 @@ exports.run = (bot, message, args, perms) => {
             givenArgs = true;
             lastArg = index;
             if (args[index + 1]) {
-              opts.channel = bot.channels.get(args[index + 1]);
+              opts.channel = bot.channels.cache.get(args[index + 1]);
               if (typeof opts.channel === 'undefined') message.reply(`The channel ${args[index + 1]} doesn't seem to exist`);
               else twoArgsLast = true;
             } else {
