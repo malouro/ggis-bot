@@ -29,10 +29,22 @@
     {
       "code": "switch",
       "properName": "Nintendo Switch",
-      "thumbnail": "",
+      "thumbnail": "https://e7.pngegg.com/pngimages/124/387/png-clipart-nintendo-switch-framed-video-game-logo-nintendo-angle-text.png",
       "aliases": [
         "nintendoswitch"
       ]
+    },
+    {
+      "code": "android",
+      "properName": "Android",
+      "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Android_robot.svg/872px-Android_robot.svg.png",
+      "aliases": []
+    },
+    {
+      "code": "ios",
+      "properName": "iOS",
+      "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/IOS_logo.svg/1024px-IOS_logo.svg.png",
+      "aliases": ["iphone"]
     }
   ]
 }

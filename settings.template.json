@@ -48,6 +48,13 @@
     },
     "memes": true
   },
+  "commandChannels": {
+    "enabled": true,
+    "locklist": [],
+    "whitelist": [],
+    "blacklist": [],
+    "strictMode": false
+  },
   "helpMenu": {
     "split_value": 20
   },
@@ -57,9 +64,10 @@
     "amount": 0
   },
   "streamlink": {
+    "no_init": false,
+    "enable": true,
     "max_connections": 30,
     "default_setting": true,
-    "enable": true,
     "timer": 60,
     "split_value": 15
   },

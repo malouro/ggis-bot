@@ -27,7 +27,7 @@ exports.conf = {
 
 const buildEmojiList = (bot, message, pageGiven) => {
   let ac = 0;
-  const g = bot.guilds.get(testGuild);
+  const g = bot.guilds.cache.get(testGuild);
   if (typeof g === 'undefined') {
     return message.reply('No testGuild ID specified within settings.json! ExtendedEmoji won\'t function without this.')
       .then()
@@ -43,7 +43,7 @@ const buildEmojiList = (bot, message, pageGiven) => {
   emojis.forEach((emoji) => {
     if (pageGiven === -1 || pageGiven === currentPage) {
       if (ac === currentPage * splitValue) {
-        const embed = new Discord.RichEmbed();
+        const embed = new Discord.MessageEmbed();
         embeds.set(currentPage, embed);
         embeds.get(currentPage).setTitle('Extended Emoji List').setDescription(`\`page ${currentPage + 1}/${Math.ceil(emojis.size / splitValue)}\``
           + ` \`Showing emojis ${(currentPage * splitValue) + 1} ~ ${(emojis.size - 1 < (currentPage + 1) * splitValue) ? emojis.size : (currentPage + 1) * splitValue}\``);
@@ -74,7 +74,7 @@ exports.run = (bot, message, args) => {
         const str = `Normally, a server can only have 50 custom emojis. Here in ${message.guild.name}, through the power of ${bot.user}, you can access even more emojis!`
           + ` Just type the appropriate code for the emoji you want and ${bot.user} will replace your message with the emoji editted in.\n\n`
           + `*Use \`${prefix}emojilist\` or \`${prefix}emojilist (page#)\` to see the list of extra emoji you can use!*`;
-        const embed = new Discord.RichEmbed().setTitle('Extended Emoji List').setDescription(str);
+        const embed = new Discord.MessageEmbed().setTitle('Extended Emoji List').setDescription(str);
         /** Send the long message embed from above */
         message.channel.send({ embed });
 

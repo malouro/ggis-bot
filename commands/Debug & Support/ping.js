@@ -22,8 +22,9 @@ exports.conf = {
   permLevel: 0,
 };
 
+/** @param {import('discord.js').Client} bot */
 exports.run = (bot, message) => {
-  const ping = Math.round(bot.ping);
+  const ping = Math.round(bot.ws.ping);
   message.reply(`Pong! \`${ping} ms\``);
   console.log(`[${moment().format(settings.timeFormat)}] Ping! Pong! ${ping} ms`);
 };

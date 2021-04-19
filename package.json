@@ -4,7 +4,7 @@
   "description": "A Discord chat bot that does things.",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node index.js",
     "setup": "(yarn install || npm install) && node ./scripts/setup.js",
     "generate": "node ./scripts/generate.js",
     "clean": "rimraf ./node_modules",
@@ -17,7 +17,7 @@
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
     "chalk": "^4.1.0",
-    "discord.js": "^11.6.2",
+    "discord.js": "^12.3.1",
     "feed-read-parser": "1.0.5",
     "imgur2rss": "github:malouro/imgur2rss#patch-1",
     "jest": "^26.4.2",
@@ -25,7 +25,7 @@
     "lodash.merge": "^4.6.2",
     "lyrics-fetcher": "1.0.2",
     "mkdirp": "1.0.4",
-    "moment": "2.27.0",
+    "moment": "2.29.0",
     "rimraf": "^3.0.2",
     "twitchps": "^1.5.5"
   },
@@ -34,11 +34,13 @@
     "url": "https://github.com/malouro/ggis-bot"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.13",
+    "@types/jest": "^26.0.14",
+    "babel-jest": "^26.6.3",
+    "coffee-script": "^1.12.7",
     "dotenv": "^8.2.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^14.2.0",
-    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-import": "^2.22.1",
     "jest-mock-console": "^1.0.0",
     "wait-for-expect": "^3.0.2"
   },
@@ -59,6 +61,12 @@
     ],
     "watchPathIgnorePatterns": [
       "<rootDir>/config/guilds"
-    ]
+    ],
+    "transformIgnorePatterns": [
+      "\\.pnp\\.[^\\/]+$"
+    ],
+    "transform": {
+      "\\.coffee$": "<rootDir>/test/coffee-processor.js"
+    }
   }
 }

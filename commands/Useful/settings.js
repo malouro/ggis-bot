@@ -7,18 +7,40 @@
 /* eslint-disable no-restricted-globals */
 const beautify = require('json-beautify');
 const settings = require('../../settings.json');
-const { getGuildCommandPrefix, update: updateGuildConfig } = require('../../handlers/GuildSettings');
+const { serverSettings: testServerSettings } = require('../../test/data');
+const { getGuildCommandPrefix, update: updateGuildConfig, deleteSetting } = require('../../handlers/GuildSettings');
 
 const commandName = 'settings';
 
 /**
- * Available types:
- * - @type string
- * - @type number
- * - @type integer
- * - @type range
- * - @type boolean
+ *-------------------------------------------------------------------------------
+ *
+ * @typedef {"string"|"number"|"integer"|"range"|"boolean"|"array"|"textChannel"|"user"} ServerSettingType - Types that the setting values can be
+ * @typedef {"string"|"number"|"integer"|"range"|"boolean"|"textChannel"|"user"} ServerSettingTypeInsideArray - Types of the inner elements of array-typed settings
+ *
+ * -------------------------------------------------------------------------------
+ *
+ * @typedef {Object} ServerSettingKey - These are the individual settings that can be altered themselves
+ *
+ * @property {ServerSettingType} ServerSettingKey.type
+ * @property {any} ServerSettingKey.default
+ * @property {string} ServerSettingKey.description
+ * @property {number} [ServerSettingKey.min] - Minimum value when `type` is "range"
+ * @property {number} [ServerSettingKey.max] - Maximum value when `type` is "range"
+ * @property {ServerSettingTypeInsideArray} [ServerSettingKey.innerType] - Type of the inner array elements when `type` is "array"
+ *
+ *-------------------------------------------------------------------------------
+ *
+ * @typedef {Object.<string, ServerSettingKey>} ServerSettingScope - These are the "categories" for the settings
+ *
+ * @property {string} ServerSettingScope.description - Description for the scope of settings
+ *
+ *-------------------------------------------------------------------------------
+ *
+ * @typedef {Object.<string, ServerSettingScope>} ServerSettings
  */
+
+/** @type {ServerSettings} */
 const configOptions = {
   bot: {
     description: 'General bot settings',
@@ -26,6 +48,38 @@ const configOptions = {
       type: 'string',
       default: settings.prefix,
       description: 'The prefix for executing commands.',
+    },
+  },
+
+  commandChannels: {
+    description: 'Controls where and how commands are allowed to be used',
+    enabled: {
+      type: 'boolean',
+      default: settings.commandChannels.enabled,
+      description: 'Enables control of command channels',
+    },
+    locklist: {
+      type: 'array',
+      innerType: 'textChannel',
+      default: settings.commandChannels.locklist,
+      description: 'List of channels that ONLY accept command usage',
+    },
+    whitelist: {
+      type: 'array',
+      innerType: 'textChannel',
+      default: settings.commandChannels.whitelist,
+      description: 'List of channels where command usage is allowed',
+    },
+    blacklist: {
+      type: 'array',
+      innerType: 'textChannel',
+      default: settings.commandChannels.blacklist,
+      description: 'List of channels where command usage is NOT allowed',
+    },
+    strictMode: {
+      type: 'boolean',
+      default: settings.commandChannels.strictMode,
+      description: 'If on: deletes non-compliant messages in correlating channels',
     },
   },
 
@@ -40,30 +94,47 @@ const configOptions = {
   // =================================================
 
   // For testing purposes only:
-  ...(process.env.NODE_ENV === 'test' ? {
-    test: {
-      'range 0-10': {
-        type: 'range',
-        min: 0,
-        max: 10,
-        default: 0,
-        description: 'Some number within this range',
-      },
-      number: {
-        type: 'number',
-      },
-      integer: {
-        type: 'integer',
-      },
-      boolean: {
-        type: 'boolean',
-      },
-      string: {
-        type: 'string',
-      },
-    },
-  } : {}
+  ...(process.env.NODE_ENV === 'test' ? testServerSettings : {}
   ),
+};
+
+exports.help = {
+  name: commandName,
+  description: "Change the bot's server settings",
+  usage: (bot, message) => {
+    const prefix = getGuildCommandPrefix(bot, message);
+    const scopes = Object.keys(configOptions);
+    return `
+${commandName} <scope> (<setting> <value>)
+
+<scope> is required and can be any of the following:
+
+- list   :: List all available settings
+- show   :: Show current config for the server
+- reset  :: Reset a specific setting, or all settings
+- remove :: Alias for "reset"
+
+${scopes.map(scope => `- ${scope} :: ${configOptions[scope].description || '<no description>'}`).join('\n')}
+
+If <scope> is *not* "list" or "show", you must also provide <setting> and <value> options. Use "${prefix}${commandName} list" for more info on available settings & values options.
+If using "reset" or "remove, you must list the <scope> and <setting> options after.
+Examples ::
+
+${prefix}${commandName} show             ║ Shows the current config for the server
+${prefix}${commandName} list             ║ Shows all available settings that can be modified
+${prefix}${commandName} reset bot prefix ║ Reset the bot prefix for this server
+${prefix}${commandName} bot prefix $     ║ Changes command prefix to "$" in this server
+`.trim();
+  },
+};
+
+exports.conf = {
+  enabled: true,
+  visible: true,
+  guildOnly: false,
+  textChannelOnly: true,
+  aliases: [],
+  permLevel: 3,
 };
 
 /**
@@ -72,14 +143,31 @@ const configOptions = {
  * (this is because we want to convert the input, which is always `string` into
  * something suitable for the given expectedType)
  *
- * @param {string} input String input for the value attempting to be set
- * @param {string} expectedType Type the input is expected to be
- * @param {Object} settingConfig Config object for the setting
+ * @param {string|Array<string>} input String input for the value attempting to be set
+ * @param {ServerSettingType} expectedType Type the input is expected to be
+ * @param {ServerSettingKey} settingConfig Config object for the setting
+ * @param {import('discord.js').Client} bot Ggis-bot
  * @returns {Array<Boolean, any>}
  */
-const validateType = (input, expectedType, settingConfig) => {
-  // Input MUST be `string`, if not then something went haywire; time to abort
-  if (typeof input !== 'string') return [false, null];
+function validateType(input, expectedType, settingConfig, bot) {
+  // Input MUST be `string`, EXCEPT for `array` type
+  // (if not then something went haywire; time to abort)
+  if (typeof input !== 'string') {
+    if (expectedType === 'array') {
+      const recurseValidation = input.map(element => validateType(
+        element, settingConfig.innerType, settingConfig, bot,
+      ));
+
+      return [
+        // If any element fails validation against the `innerType`, then input was invalid
+        Array.isArray(input)
+        && recurseValidation.every(([valid]) => valid === true),
+        // Return casted values
+        recurseValidation.map(([, value]) => value),
+      ];
+    }
+    return [false, null];
+  }
 
   if (input === 'true' || input === 'false') {
     return [expectedType === 'boolean', Boolean(input === 'true')];
@@ -94,15 +182,26 @@ const validateType = (input, expectedType, settingConfig) => {
 
       // input is integer
       case 'integer':
-        return [Number.isInteger(input), Number(input)];
+        return [Number.isInteger(Number(input)), Number(input)];
 
       // input is a number in given range
       case 'range': {
-        if (!settingConfig || !settingConfig.min || !settingConfig.max) return [false, null];
+        if (
+          !settingConfig
+          || !('min' in settingConfig)
+          || !('max' in settingConfig)
+        ) return [false, null];
+
         const num = parseFloat(input);
 
-        return [num >= settingConfig.min && num <= settingConfig.max, Number(input)];
+        return [num >= settingConfig.min && num <= settingConfig.max, num];
       }
+
+      // Allow for strings that look like numbers (or Snowflakes)
+      case 'string':
+      case 'textChannel':
+      case 'user':
+        break;
 
       // fail otherwise: input is a number, but was supposed to be something else
       default:
@@ -110,12 +209,34 @@ const validateType = (input, expectedType, settingConfig) => {
     }
   }
 
+  const snowflakeRegExp = /[1-9][0-9]+/;
+
+  // If input looks like a `#text-channel` mention or Snowflake
+  if ((input.match(`<#${snowflakeRegExp}>`) || input.match(snowflakeRegExp)) && expectedType === 'textChannel') {
+    const channelSnowflake = input.replace(/[<#>]/g, '');
+
+    return [bot.channels.cache.has(channelSnowflake), channelSnowflake];
+  }
+
+  // If input looks like a `@User` mention or Snowflake
+  if ((input.match(`<!@${snowflakeRegExp}>`) || input.match(snowflakeRegExp)) && expectedType === 'user') {
+    const userSnowflake = input.replace(/[<!@>]/g, '');
+
+    return [bot.users.cache.has(userSnowflake), userSnowflake];
+  }
+
   // String type setting can accept anything that came in via "args"
   // (since they *should* be strings to begin with)
   return [expectedType === 'string', input];
-};
+}
 
-const getTypeDesc = (setting) => {
+/**
+ * Returns description for given config setting
+ *
+ * @param {ServerSettingKey} setting
+ * @return {string} Setting description
+ */
+function getTypeDesc(setting) {
   const { type } = setting;
   switch (type) {
     case 'string':
@@ -126,12 +247,21 @@ const getTypeDesc = (setting) => {
       return 'integer (whole number)';
     case 'range':
       return `number between ${setting.min || 0} and ${setting.max || Infinity}`;
+    case 'array':
+      return `array of \`${setting.innerType || 'string'}\`s`;
+    case 'textChannel':
+      return 'text channel (`#text-channel` or channel ID)';
+    case 'user':
+      return 'user (`@User` mention or user ID)';
     default:
       return 'string';
   }
-};
+}
 
-const getAllSettings = () => {
+/**
+ * @return {string} Description of all available config settings
+ */
+function getAllSettings() {
   let message = "Here's the full list of settings that can be configured:\n\n```asciidoc\n";
   const scopes = Object.keys(configOptions);
 
@@ -153,47 +283,35 @@ const getAllSettings = () => {
 
   message += '```';
   return message;
-};
+}
 
-exports.help = {
-  name: commandName,
-  description: "Change the bot's server settings",
-  usage: (bot, message) => {
-    const prefix = getGuildCommandPrefix(bot, message);
-    const scopes = Object.keys(configOptions);
-    return `
-${commandName} <scope> (<setting> <value>)
+/**
+ * @param {string} scope Scope in configOptions to check if valid
+ * @returns {boolean} If the given scope is valid or not
+ */
+function validateScope(scope) {
+  const scopes = Object.keys(configOptions);
 
-<scope> is required and can be any of the following:
+  return scopes.includes(scope);
+}
 
-- list :: List all available settings
-- show :: show current config for the server
-${scopes.map(scope => `- ${scope} :: ${configOptions[scope].description}`).join('\n')}
+/**
+ * @param {string} scope Scope in configOptions to check
+ * @param {string} key Key within scope to check
+ * @returns {boolean} If the given key is valid within the scope
+ */
+function validateSetting(scope, key) {
+  const keys = Object.keys(configOptions[scope]);
 
-If <scope> is *not* "list" or "show", you must also provide <setting> and <value> options. Use "${prefix}${commandName} list" for more info on available settings & values options.
+  return keys.includes(key);
+}
 
-Examples ::
-
-${prefix}${commandName} show            ║ Shows the current config for the server, pretty-printed
-${prefix}${commandName} list            ║ Shows all available settings that can be modified
-${prefix}${commandName} bot prefix $    ║ Changes command prefix to "$" in this server
-`.trim();
-  },
-};
-
-exports.conf = {
-  enabled: true,
-  visible: true,
-  guildOnly: false,
-  textChannelOnly: true,
-  aliases: [],
-  permLevel: 3,
-};
-
-/* eslint-disable-next-line no-unused-vars */
 exports.run = async (bot, message, args) => {
+  let reset = false;
   const prefix = getGuildCommandPrefix(bot, message);
-  const getCurrentGuildConfig = (input) => {
+  const fullListMessage = `To see a full list of available settings and scopes, use \`${prefix}${commandName} list\``;
+
+  function getCurrentGuildConfig(input) {
     let config = null;
     // Given the ID of the guild
     if (typeof input === 'string' && bot.guildOverrides[input]) {
@@ -211,10 +329,15 @@ exports.run = async (bot, message, args) => {
       prettyConfig,
       '```',
     ].join('\n');
-  };
-  const fullListMessage = `To see a full list of available settings and scopes, use \`${prefix}${commandName} list\``;
+  }
 
-  if (!args[1]) return message.reply(`You must provide a scope to specify what type of settings you want to configure.\n\n${fullListMessage}`);
+  function checkScopeWasGiven() {
+    if (!args[1]) {
+      message.reply(`You must provide a scope to specify what type of settings you want to configure.\n\n${fullListMessage}`);
+      return false;
+    }
+    return true;
+  }
 
   /**
    * !settings list
@@ -230,39 +353,92 @@ exports.run = async (bot, message, args) => {
   if (args[1] === 'show') {
     return message.reply(getCurrentGuildConfig(message.guild.id));
   }
+  /**
+   * !settings reset
+   * Resets a given server setting(s)
+   */
+  if (args[1] === 'reset' || args[1] === 'remove') {
+    reset = true;
+    args.shift();
+  }
 
   /* Check <scope> */
-  const scopes = Object.keys(configOptions);
   const scope = args[1];
-  if (!scopes.includes(scope)) return message.reply(`\`${scope}\` is not an available scope of settings that can be configured.\n\n${fullListMessage}`);
+  if (!checkScopeWasGiven(scope)) return null;
+  if (!validateScope(scope)) return message.reply(`\`${scope}\` is not an available scope of settings that can be configured.\n\n${fullListMessage}`);
 
   /* Check <key> */
   if (!args[2]) return message.reply(`No \`key\` given. Please provide the name of the setting you want to edit for this server.\n\n${fullListMessage}`);
-  const keys = Object.keys(configOptions[scope]);
   const key = args[2];
-  if (!keys.includes(key)) return message.reply(`\`${key}\` is not an available setting within \`${scope}\`.\n\n${fullListMessage}`);
+  if (!validateSetting(scope, key)) return message.reply(`\`${key}\` is not an available setting within \`${scope}\`.\n\n${fullListMessage}`);
+
+  if (reset) {
+    let errorOnReset = null;
+    const configAfterReset = await deleteSetting(
+      bot,
+      message.guild.id,
+      scope,
+      key,
+    ).catch((err) => {
+      errorOnReset = err;
+      console.error(err);
+      message.reply([
+        'Uh-oh, something went wrong trying to remove that setting override.',
+        'Maybe this server doesn\'t have that setting configured?',
+        '',
+        `Check \`${prefix}settings show\` to see this server's setting configuration.`,
+      ].join('\n'));
+    });
+
+    if (errorOnReset) return null;
+    return message.reply(`
+Successfully removed override of setting \`${scope}.${key}\`
+
+${getCurrentGuildConfig(configAfterReset)}
+`.trim());
+  }
 
   /* Check <value> */
-  if (!args[3]) return message.reply(`No \`value\` given. Please provide a value of of type \`${configOptions[scope][key].type || 'string'}\` for this setting.\n\n${fullListMessage}`);
-  const value = args[3];
+  if (!args[3]) {
+    return message.reply(
+      `No \`value\` given. Please provide a value of of type \`${configOptions[scope][key].type || 'string'}\` for this setting.\n\n${fullListMessage}`,
+    );
+  }
+
   const expectedType = configOptions[scope][key].type || 'string';
-  const [valid, castedValue] = validateType(value, expectedType);
+
+  /* If multiple strings were given for <value>, send over the array of arguments */
+  /* (Otherwise, just send the single value) */
+  const value = (args.length >= 4 && expectedType === 'array') ? Array.from(args).slice(3, args.length) : args[3];
+  const [valid, castedValue] = validateType(value, expectedType, configOptions[scope][key], bot);
+
   if (!valid) {
     return message.reply(
       `\`${value}\` is not a valid value. Expected type of \`${expectedType}\``.concat(
         expectedType === 'range'
           ? ` (between ${configOptions[scope][key].min || 0} - ${configOptions[scope][key].max || Infinity})`
           : '',
+      ).concat(
+        expectedType === 'array'
+          ? ` with elements of type \`${configOptions[scope][key].innerType || 'string'}\``
+          : '',
       ),
     );
   }
 
+  let errorOnUpdate = null;
   const updatedConfig = await updateGuildConfig(bot, message.guild.id, scope, key, castedValue)
     .catch((err) => {
+      errorOnUpdate = err;
       console.error(err);
-      message.reply('Uh-oh. Something went wrong trying to save the server config! :(');
+      message.reply([
+        'Uh-oh, something went wrong trying to save or update the server\'s settings.',
+        '',
+        `Check \`${prefix}settings show\` to see this server's current configuration.`,
+      ].join('\n'));
     });
 
+  if (errorOnUpdate) return null;
   return message.reply(`
 Successful change of \`${scope}.${key}\` to \`${value}\`!
 

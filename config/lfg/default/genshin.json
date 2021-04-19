@@ -1,0 +1,10 @@
+{
+  "code": "genshin",
+  "name": "Genshin Impact",
+  "aliases": ["genshinimpact","gachawaifus"],
+  "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Genshin_Impact_logo.png",
+  "default_party_size": [4],
+  "modes": ["any"],
+  "modes_proper": ["Any"],
+  "default_game_mode": "any"
+}

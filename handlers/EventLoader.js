@@ -13,8 +13,6 @@ module.exports = (bot, settings) => {
   bot.on('disconnect', () => reqEvent('disconnect')(settings));
   bot.on('message', reqEvent('message'));
   bot.on('messageDelete', reqEvent('messageDelete'));
-  bot.on('messageReactionAdd', reqEvent('messageReactionAdd'));
-  bot.on('messageReactionRemove', reqEvent('messageReactionRemove'));
   bot.on('guildCreate', reqEvent('guildCreate'));
   bot.on('guildDelete', reqEvent('guildDelete'));
   bot.on('guildMemberRemove', reqEvent('guildMemberRemove'));

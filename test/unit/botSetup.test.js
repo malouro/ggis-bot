@@ -1,10 +1,7 @@
-const fs = require('fs');
-const waitForExpect = require('wait-for-expect');
 const mockConsole = require('jest-mock-console').default;
 const { Collection } = require('discord.js');
-const { numberOfCommands } = require('../testHelpers');
 const Setup = require('../../handlers/Setup');
-const { platforms } = require('../../config/lfg/platforms.json');
+const { checkBotIsSetup } = require('../testHelpers');
 
 const settings = {
   botName: 'ggis',
@@ -43,6 +40,9 @@ const settings = {
       description: 'Memes & dreams',
     },
   ],
+  streamlink: {
+    no_init: true,
+  },
 };
 
 const bot = {
@@ -56,14 +56,8 @@ describe('Bot Setup', () => {
 
   /* Wait for setup to be done */
   beforeAll(async () => {
-    const lfgGames = fs.readdirSync('./config/lfg/default');
     await Setup(bot, settings);
-
-    await waitForExpect(() => {
-      expect(bot.games.size).toBe(lfgGames.length);
-      expect(bot.commands.size).toBe(numberOfCommands);
-      expect(bot.platforms.size).toBe(platforms.length);
-    }, 10000);
+    await checkBotIsSetup();
   }, 20000);
 
   afterAll(() => {
@@ -82,7 +76,7 @@ describe('Bot Setup', () => {
 
   describe('Event Loader', () => {
     test('loads event handlers', () => {
-      expect(bot.on).toHaveBeenCalledTimes(11);
+      expect(bot.on).toHaveBeenCalledTimes(9);
     });
   });
 });

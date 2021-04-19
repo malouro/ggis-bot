@@ -12,4 +12,5 @@ require('dotenv').config({
 module.exports = Object.assign(baseJestConfig, {
   setupFilesAfterEnv: ['<rootDir>/../setupTests.js', '<rootDir>/setupE2E.js'],
   testMatch: ['<rootDir>/suite/**/*.test.{t,j}s?(x)'],
+  transform: { '\\.coffee$': '<rootDir>/../coffee-processor.js' },
 });

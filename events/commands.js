@@ -13,6 +13,9 @@
 
 const chalk = require('chalk');
 const moment = require('moment');
+const validateCommandOnly = require('./messageFeatures/commandOnlyChannels');
+const { getGuildSpecificSetting } = require('../handlers/GuildSettings');
+const { conf: { permLevel: settingsCommandPermLevel } } = require('../commands/Useful/settings');
 
 const checkIfAbleToUse = (cmd, perms, message, settings) => {
   /**
@@ -34,6 +37,12 @@ const checkIfAbleToUse = (cmd, perms, message, settings) => {
   return true;
 };
 
+/**
+ * @param {import('discord.js').Client} bot
+ * @param {import('discord.js').Message} message
+ * @param {JSON} settings Bot settings
+ * @param {string} prefix Command prefix
+ */
 module.exports = (bot, message, settings, prefix) => {
   if (message.content.startsWith(`<@!${bot.user.id}>`)) {
     bot.commands
@@ -46,7 +55,11 @@ module.exports = (bot, message, settings, prefix) => {
       );
   }
 
-  if (!message.content.startsWith(prefix)) return;
+  if (!message.content.startsWith(prefix)) {
+    const locklist = getGuildSpecificSetting(bot, message, 'commandChannels', 'locklist', []);
+
+    if (!locklist || locklist.length === 0) return;
+  }
 
   const args = message.content.substring(prefix.length).split(/ +/);
   const command = args[0].toLowerCase();
@@ -63,6 +76,21 @@ module.exports = (bot, message, settings, prefix) => {
     cmd = bot.commands.get(command);
   } else if (bot.aliases.has(command)) {
     cmd = bot.commands.get(bot.aliases.get(command));
+  }
+
+  // if able to use !settings; allow command to go thru anyway
+  // this is in case settings are corrupt, or are configured in a way that prohibits commands *everywhere*
+  // to allow admins to properly reconfigure
+  if (perms < settingsCommandPermLevel) {
+    const [disallowed, deleteMessage] = validateCommandOnly(bot, message, Boolean(cmd), settings);
+
+    if (disallowed) {
+      if (deleteMessage) {
+        console.log(`[${moment().format(settings.timeFormat)}] Message deleted in ${message.guild.name} > #${message.channel.name}\n${message.author}: "${message.content}"`);
+        message.delete();
+      }
+      return;
+    }
   }
 
   // if something was found, check to see if we can appropriately run the command
